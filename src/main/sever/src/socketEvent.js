@@ -138,10 +138,10 @@ const registerSocketHandlers = (io) => {
             captureScreen(mobileScreenSize).then();
         });
 
-        socket.on(CE.SYS_POINTER_END, () => {
+        socket.on(CE.SYS_POINTER_END, async () => {
             console.log("结束鼠标")
             // captureScreen(mobileScreenSize,true).then();
-            socket.emit(CO.SYS_POINTER_POS, nowPos)
+            socket.emit(CO.SYS_POINTER_POS, await getMousePos())
             touchPos = null
             nowPos = null
         });
