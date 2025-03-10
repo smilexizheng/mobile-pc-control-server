@@ -3,10 +3,11 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import * as upath from "upath";
 import {join} from "upath";
-import {InitWinControlServer} from "./seve/main";
+import {InitWinControlServer} from "./sever/main";
+let mainWindow = null;
 function createWindow() {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
@@ -34,6 +35,20 @@ function createWindow() {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+}
+
+
+const gotTheLock = app.requestSingleInstanceLock()
+
+if(!gotTheLock){
+  app.quit()
+}else{
+  app.on('second-instance',(event,commandLine,workingDirectory,additionalData)=>{
+    if(mainWindow){
+      if(mainWindow.isMinimized()) mainWindow.restore()
+      mainWindow.focus()
+    }
+  })
 }
 
 // This method will be called when Electron has finished
@@ -64,7 +79,7 @@ app.whenReady().then(() => {
   //
   const ffmpegPath = !app.isPackaged ? upath.join(process.cwd(), 'resources','ffmpeg.exe')
     : upath.join(process.resourcesPath, 'app.asar.unpacked', 'resources','ffmpeg.exe')
-  console.log("中文测试")
+  console.log("启动control-server")
   InitWinControlServer(ffmpegPath)
 })
 

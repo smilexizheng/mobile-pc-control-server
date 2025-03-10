@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: win-control-serve-electron
+appId: com.smile.cse.cse
+productName: ControlServe
 directories:
   buildResources: build
 files:
@@ -11,8 +11,10 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: win-control-serve-electron
+  executableName: ControlServe
 nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
