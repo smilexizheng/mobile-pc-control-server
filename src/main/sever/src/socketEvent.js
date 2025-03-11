@@ -201,7 +201,7 @@ const registerSocketHandlers = (io) => {
 
 
     setInterval(async () => {
-        if (touchPos || isCapture) return;
+        if (isCapture) return;
         await captureScreen(mobileScreenSize)
     }, captureInterval);
 
