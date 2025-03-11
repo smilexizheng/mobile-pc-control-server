@@ -1,5 +1,4 @@
 import express from 'express';
-import path from 'path';
 import upath from "upath";
 import {app} from "electron";
 

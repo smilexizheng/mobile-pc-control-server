@@ -1,5 +1,5 @@
-appId: com.smile.cse.cse
-productName: ControlServe
+appId: com.smile.cse
+productName: ControlServer
 directories:
   buildResources: build
 files:
@@ -11,7 +11,7 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: ControlServe
+  executableName: ControlServer
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true

@@ -1,7 +1,7 @@
 {
-  "name": "ControlServe",
+  "name": "ControlServer",
   "version": "1.0.0",
-  "description": "A serve to control pc",
+  "description": "ControlServer",
   "main": "./out/main/index.js",
   "author": "Smile",
   "private": "true",

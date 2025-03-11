@@ -6,19 +6,20 @@ const ipcHandle = () => window.electron.ipcRenderer.send('ping')
 
 <template>
   <img alt="logo" class="logo" src="./assets/electron.svg" />
-  <div class="creator">Powered by electron-vite</div>
+  <div class="creator">a server to control your computer</div>
   <div class="text">
-    Build an Electron app with
-    <span class="vue">Vue</span>
+    Control Server Electron
+    <span class="vue">CSE</span>
   </div>
-  <p class="tip">Please try pressing <code>F12</code> to open the devTool</p>
+  <p class="tip">Connect to the local area network and use a mobile web interface to</p>
+  <p class="tip">control the computer mouse, keyboard, and desktop</p>
   <div class="actions">
     <div class="action">
-      <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">Documentation</a>
+      <a href="http://127.0.0.1:3001" target="_blank" rel="noreferrer">网页端访问</a>
     </div>
-    <div class="action">
-      <a target="_blank" rel="noreferrer" @click="ipcHandle">Send IPC</a>
-    </div>
+<!--    <div class="action">-->
+<!--      <a target="_blank" rel="noreferrer" @click="ipcHandle">Send IPC</a>-->
+<!--    </div>-->
   </div>
   <Versions />
 </template>
