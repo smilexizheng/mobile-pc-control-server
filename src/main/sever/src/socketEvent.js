@@ -135,7 +135,6 @@ const registerSocketHandlers = (io) => {
             }
             console.log("移动鼠标", nowPos)
             WinApi.moveMouse(nowPos.x, nowPos.y);
-            captureScreen(mobileScreenSize).then();
         });
 
         socket.on(CE.SYS_POINTER_END, async () => {

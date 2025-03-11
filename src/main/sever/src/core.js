@@ -95,7 +95,7 @@ const grabRegion = async (mouseX, mouseY, captureWidth, captureHeight) => {
     return {left,right,top,bottom
         ,buffer: await sharp(img.toRawSync(),{raw: {width:img.width,height:img.height,channels:4}}).extract({
             left:Math.round(startX < 0 ? monitor.width - (Math.abs(startX)) : startX),top:Math.round(startY),width:captureWidth,height:captureHeight
-        }).toFormat('png').toBuffer()};
+      }).toFormat('jpg',{quality:20}).toBuffer()};
 
 
 }
