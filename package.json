@@ -23,7 +23,6 @@
     "@electron-toolkit/utils": "^4.0.0",
     "@nut-tree-fork/nut-js": "^4.2.4",
     "express": "^4.21.2",
-    "ffmpeg-static": "^5.2.0",
     "koffi": "^2.10.1",
     "loudness": "^0.4.2",
     "node-screenshots": "^0.2.1",
