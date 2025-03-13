@@ -1,9 +1,9 @@
 import { app, shell, BrowserWindow, ipcMain  } from 'electron'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import * as upath from "upath";
 import {join} from "upath";
-import {InitWinControlServer, startServer} from "./sever/main";
+import {InitWinControlServer} from "./sever/main";
+import {getLocalIPs} from "./utils/common";
 let mainWindow = null;
 function createWindow() {
   // Create the browser window.
@@ -65,8 +65,6 @@ app.whenReady().then(async () => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
 
   createWindow()
 
@@ -78,10 +76,11 @@ app.whenReady().then(async () => {
 
   //
   console.log("启动control-server")
+  console.log(getLocalIPs())
   const controlServerPort =await InitWinControlServer(3000)
-  ipcMain.handle('get-control-server-url', () => {
-    return `http://localhost:${controlServerPort}`
-  })
+  global.controlServerPort = controlServerPort
+  // IPC
+  import("./ipc");
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
