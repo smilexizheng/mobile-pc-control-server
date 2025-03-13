@@ -2,17 +2,16 @@ import express from 'express';
 import upath from "upath";
 import {app} from "electron";
 
-const webExpress = express();
-const port = 3001;
+// const webExpress = express();
+// const port = 3001;
 
 
-const startWebServer = () => {
+const startWebServer = (webExpress) => {
 
    const webPath = app.isPackaged
     ? upath.join(process.resourcesPath, 'app.asar.unpacked', 'resources','web') : upath.join(process.cwd(), 'resources','web')
 
 
-  console.log(`webPath: ${webPath}`)
 // 托管静态文件（public 目录）
   webExpress.use(express.static(webPath));
 
@@ -20,9 +19,9 @@ const startWebServer = () => {
   webExpress.get('/*', (req, res) => {
         res.sendFile(upath.join(webPath,  'index.html'));
     });
-  webExpress.listen(port, () => {
-        console.log(`WebServer running at http://localhost:${port}`);
-    });
+  // webExpress.listen(port, () => {
+  //       console.log(`WebServer running at http://localhost:${port}`);
+  //   });
 }
 
 export default startWebServer;

@@ -2,16 +2,16 @@ import {createServer} from 'http';
 import {Server} from "socket.io";
 import {registerSocketHandlers} from "./src/socketEvent.js";
 import startWebServer from "./src/webServer.js";
+import express from "express";
 
 const InitWinControlServer = () => {
-
-  const httpServer = createServer();
+  const webExpress = express();
+  const httpServer = createServer(webExpress);
+  startWebServer(webExpress);
   const io = new Server(httpServer, {
     path: "/win-control.io"
     // options
   });
-
-  startWebServer();
   registerSocketHandlers(io);
 
 // 启动服务器
