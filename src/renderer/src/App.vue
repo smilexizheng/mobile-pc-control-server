@@ -1,7 +1,16 @@
 <script setup>
 import Versions from './components/Versions.vue'
+import {onMounted, ref} from "vue";
 
 const ipcHandle = () => window.electron.ipcRenderer.send('ping')
+
+const serverUrl = ref('')
+
+  onMounted(async ()=>{
+    serverUrl.value = await window.api.getControlServerUrl()
+    console.log(serverUrl.value)
+  })
+
 </script>
 
 <template>
@@ -15,7 +24,7 @@ const ipcHandle = () => window.electron.ipcRenderer.send('ping')
   <p class="tip">control the computer mouse, keyboard, and desktop</p>
   <div class="actions">
     <div class="action">
-      <a href="http://127.0.0.1:3001" target="_blank" rel="noreferrer">网页端访问</a>
+      <a :href=serverUrl target="_blank" rel="noreferrer">网页端访问</a>
     </div>
 <!--    <div class="action">-->
 <!--      <a target="_blank" rel="noreferrer" @click="ipcHandle">Send IPC</a>-->

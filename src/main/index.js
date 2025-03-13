@@ -3,7 +3,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import * as upath from "upath";
 import {join} from "upath";
-import {InitWinControlServer} from "./sever/main";
+import {InitWinControlServer, startServer} from "./sever/main";
 let mainWindow = null;
 function createWindow() {
   // Create the browser window.
@@ -54,7 +54,7 @@ if(!gotTheLock){
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.win.control.electron')
 
@@ -77,10 +77,11 @@ app.whenReady().then(() => {
   })
 
   //
-  const ffmpegPath = !app.isPackaged ? upath.join(process.cwd(), 'resources','ffmpeg.exe')
-    : upath.join(process.resourcesPath, 'app.asar.unpacked', 'resources','ffmpeg.exe')
   console.log("启动control-server")
-  InitWinControlServer(ffmpegPath)
+  const controlServerPort =await InitWinControlServer(3000)
+  ipcMain.handle('get-control-server-url', () => {
+    return `http://localhost:${controlServerPort}`
+  })
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
