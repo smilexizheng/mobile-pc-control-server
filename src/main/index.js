@@ -3,7 +3,6 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import {join} from "upath";
 import {InitWinControlServer} from "./sever/main";
-import {getLocalIPs} from "./utils/common";
 let mainWindow = null;
 function createWindow() {
   // Create the browser window.
@@ -76,7 +75,6 @@ app.whenReady().then(async () => {
 
   //
   console.log("启动control-server")
-  console.log(getLocalIPs())
   const controlServerPort =await InitWinControlServer(3000)
   global.controlServerPort = controlServerPort
   // IPC
