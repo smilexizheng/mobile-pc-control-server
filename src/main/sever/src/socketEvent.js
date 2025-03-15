@@ -79,10 +79,10 @@ const registerSocketHandlers = (io) => {
 
         // 设置屏幕尺寸
         socket.on(CE.MOBILE_SCREEN_SIZE, async (data) => {
-            mobileScreenSize = data.screenSize;
-            // TODO 处理多人同时操作屏幕尺寸问题
-            socket.data.mobileScreenSize = data.screenSize;
-            socket.emit(CO.SYS_POINTER_POS, await getMousePos())
+          mobileScreenSize = {width: Math.round(data.screenSize.width), height: Math.round(data.screenSize.height)};
+          // TODO 处理多人同时操作屏幕尺寸问题
+          socket.data.mobileScreenSize = {...mobileScreenSize};
+          socket.emit(CO.SYS_POINTER_POS, await getMousePos())
         })
 
         // 键
