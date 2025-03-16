@@ -1,5 +1,5 @@
-import { app, shell, BrowserWindow, ipcMain  } from 'electron'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import {app, BrowserWindow, shell} from 'electron'
+import {electronApp, is, optimizer} from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import {join} from "upath";
 import {InitWinControlServer} from "./sever/main";
@@ -73,10 +73,9 @@ app.whenReady().then(async () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
 
-  //
+
   console.log("启动control-server")
-  const controlServerPort =await InitWinControlServer(3000)
-  global.controlServerPort = controlServerPort
+  global.controlServerPort = await InitWinControlServer(3000)
   // IPC
   import("./ipc");
 })
