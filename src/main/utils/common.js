@@ -1,3 +1,6 @@
+import {app, nativeImage} from "electron";
+import upath from "upath";
+
 const os = require('os');
 
 // 获取所有IPv4地址
@@ -17,4 +20,17 @@ function getLocalIPs() {
   return ips;
 }
 
-export {getLocalIPs}
+let icon = null;
+
+function getAppIcon() {
+  if (icon) {
+    return icon;
+  }
+  const iconPath = app.isPackaged
+    ? upath.join(process.resourcesPath, 'app.asar.unpacked', 'resources', 'icon.png') : upath.join(process.cwd(), 'resources', 'icon.png')
+
+  icon = nativeImage.createFromPath(iconPath)
+  return icon;
+}
+
+export {getLocalIPs,getAppIcon}

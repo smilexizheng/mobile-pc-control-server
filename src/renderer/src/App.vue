@@ -1,6 +1,7 @@
 <script setup>
 import Versions from './components/Versions.vue'
 import {onMounted, ref} from "vue";
+import TitleBar from "./components/TitleBar.vue";
 
 const ipcHandle = () => window.electron.ipcRenderer.send('ping')
 
@@ -15,7 +16,8 @@ const ips = ref([])
 </script>
 
 <template>
-  <img alt="logo" class="logo" src="./assets/electron.svg" />
+ <TitleBar/>
+  <img alt="logo" class="logo" src="./assets/logo.svg" />
   <div class="creator">a server to control your computer</div>
   <div class="text">
     Control Server Electron

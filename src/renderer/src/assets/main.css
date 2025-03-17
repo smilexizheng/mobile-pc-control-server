@@ -2,7 +2,7 @@
 
 body {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   overflow: hidden;
   background-image: url('./wavy-lines.svg');

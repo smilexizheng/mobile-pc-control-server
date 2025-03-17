@@ -1,17 +1,31 @@
-import {app, BrowserWindow, shell} from 'electron'
+import {app, BrowserWindow, nativeImage,shell} from 'electron'
 import {electronApp, is, optimizer} from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import {join} from "upath";
+import upath, {join} from "upath";
 import {InitWinControlServer} from "./sever/main";
+import {getAppIcon} from "./utils/common";
+import {InitTray} from "./menu/tray";
 let mainWindow = null;
+
+let willQuitApp = false
+
 function createWindow() {
+
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
     show: false,
+    titleBarOverlay: {
+      color: '#fcfcfc',
+      symbolColor: '#e80ba3',
+      height: 26
+    },
+    icon:getAppIcon(),
+    titleBarStyle: 'hidden',
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
+    // ...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
@@ -21,6 +35,15 @@ function createWindow() {
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
+
+  mainWindow.on('close', (e) => {
+    if(!willQuitApp){
+      mainWindow.hide()
+      e.preventDefault()
+    }
+  })
+
+  mainWindow.setMenu(null)
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
@@ -78,15 +101,22 @@ app.whenReady().then(async () => {
   global.controlServerPort = await InitWinControlServer(3000)
   // IPC
   import("./ipc");
+  // tray 系统托盘
+  InitTray(mainWindow)
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
-app.on('window-all-closed', () => {
+app.on('window-all-closed', (e) => {
+  // e.preventDefault()
   if (process.platform !== 'darwin') {
     app.quit()
   }
+})
+
+app.on('before-quit', () => {
+  willQuitApp = true
 })
 
 // In this file you can include the rest of your app's specific main process
