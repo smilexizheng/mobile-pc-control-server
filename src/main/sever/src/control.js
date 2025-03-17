@@ -1,6 +1,7 @@
 import {spawn} from 'child_process';
 import {CLIENT_ON_EVENTS as CO} from "./constant/client-on.js";
-import {clipboard, Key, keyboard} from "@nut-tree-fork/nut-js";
+import {Key, keyboard} from "@nut-tree-fork/nut-js";
+import {clipboard} from "electron";
 
 keyboard.config.autoDelayMs = 0;
 const withResponse = (handler, socket) => async (data) => {
@@ -63,18 +64,16 @@ const openAppHandler = async (data) => {
  * @returns {Promise<void>}
  */
 const typeString = async (data) => {
-  // todo  \node_modules\@nut-tree-fork\default-clipboard-provider\node_modules\clipboardy\lib\windows.js
-  // const windowBinaryPath = arch() === 'x64' ?
-  //   (app.isPackaged ? path.join(process.resourcesPath, '\\app.asar.unpacked\\node_modules\\@nut-tree-fork\\default-clipboard-provider\\node_modules\\clipboardy\\fallbacks\\windows\\clipboard_x86_64.exe') : path.join(__dirname, '../fallbacks/windows/clipboard_x86_64.exe'))	 :
-  //   (app.isPackaged ? path.join(process.resourcesPath, '\\app.asar.unpacked\\node_modules\\@nut-tree-fork\\default-clipboard-provider\\node_modules\\clipboardy\\fallbacks\\windows\\clipboard_i686.exe') : path.join(__dirname, '../fallbacks/windows/clipboard_i686.exe'));
-
-  await clipboard.setContent(data.val);
+  //  \node_modules\@nut-tree-fork\default-clipboard-provider\node_modules\clipboardy\lib\windows.js
+  // const windowBinaryPath = arch() === 'x64' ?(app.isPackaged ? path.join(process.resourcesPath, '\\app.asar.unpacked\\node_modules\\@nut-tree-fork\\default-clipboard-provider\\node_modules\\clipboardy\\fallbacks\\windows\\clipboard_x86_64.exe') : path.join(__dirname, '../fallbacks/windows/clipboard_x86_64.exe'))	 : (app.isPackaged ? path.join(process.resourcesPath, '\\app.asar.unpacked\\node_modules\\@nut-tree-fork\\default-clipboard-provider\\node_modules\\clipboardy\\fallbacks\\windows\\clipboard_i686.exe') : path.join(__dirname, '../fallbacks/windows/clipboard_i686.exe'));
+  // now use Electron clipboard
+  clipboard.writeText(data.val);
   await keyboard.pressKey(Key.LeftControl, Key.V);
   await keyboard.releaseKey(Key.LeftControl, Key.V);
   if (data.enter) {
     await keyboard.type(Key.Enter)
   }
-  await clipboard.setContent('');
+  clipboard.writeText('');
 };
 
 
