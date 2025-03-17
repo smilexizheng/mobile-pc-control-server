@@ -1,7 +1,7 @@
 import {app, BrowserWindow, nativeImage,shell} from 'electron'
 import {electronApp, is, optimizer} from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import upath, {join} from "upath";
+import  {join} from "upath";
 import {InitWinControlServer} from "./sever/main";
 import {getAppIcon} from "./utils/common";
 import {InitTray} from "./menu/tray";
@@ -15,14 +15,15 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
-    show: false,
+    show: true,
+    backgroundColor: 'rgb(32, 32, 32)',
+    titleBarStyle: 'hidden',
     titleBarOverlay: {
       color: '#fcfcfc',
       symbolColor: '#e80ba3',
       height: 26
     },
     icon:getAppIcon(),
-    titleBarStyle: 'hidden',
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     // ...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),
@@ -32,6 +33,7 @@ function createWindow() {
     }
   })
 
+  // todo bugs titleBarOverlay冲突  https://github.com/electron/electron/issues/42409  createWindow setTimeout 100ms  正常
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
@@ -43,7 +45,7 @@ function createWindow() {
     }
   })
 
-  mainWindow.setMenu(null)
+  // mainWindow.setMenu(null)
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
@@ -88,15 +90,14 @@ app.whenReady().then(async () => {
   })
 
 
-  createWindow()
+
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
-
-
+    createWindow()
   console.log("启动control-server")
   global.controlServerPort = await InitWinControlServer(3000)
   // IPC
@@ -109,7 +110,6 @@ app.whenReady().then(async () => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', (e) => {
-  // e.preventDefault()
   if (process.platform !== 'darwin') {
     app.quit()
   }

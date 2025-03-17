@@ -2,6 +2,7 @@ import {keyboard, mouse, Point} from "@nut-tree-fork/nut-js";
 
 import {Monitor} from 'node-screenshots'
 import sharp from "sharp";
+import zlib from "zlib";
 
 mouse.config.autoDelayMs = 0
 keyboard.config.autoDelayMs = 0
@@ -39,7 +40,6 @@ const grabRegion = async (mouseX, mouseY, captureWidth, captureHeight) => {
 
     // 确定鼠标所在的显示器
     let monitor = Monitor.fromPoint(mouseX, mouseY);
-
     if (!monitor) {
         throw new Error("鼠标不在任何已知显示器区域内");
     }
@@ -89,12 +89,14 @@ const grabRegion = async (mouseX, mouseY, captureWidth, captureHeight) => {
 
 
 
-
     // return {left,right,top,bottom
     //     ,buffer: (await img.crop(startX < 0 ? monitor.width - (Math.abs(startX)) : startX, startY, captureWidth, captureHeight)).toJpegSync()};
-    return {left,right,top,bottom
-        ,buffer: await sharp(img.toRawSync(),{raw: {width:img.width,height:img.height,channels:4}}).extract({
-            left:Math.round(startX < 0 ? monitor.width - (Math.abs(startX)) : startX),top:Math.round(startY),width:captureWidth,height:captureHeight
+
+  startX = Math.round(startX < 0 ? monitor.width - (Math.abs(startX)) : startX)
+  startY =Math.round(startY)
+    return {left,right,top,bottom,screenWidth:img.width,screenHeight:img.height,x:startX,y:startY
+        ,image: await sharp(img.toRawSync(),{raw: {width:img.width,height:img.height,channels:4}}).extract({
+            left:startX,top:startY,width:captureWidth,height:captureHeight
       }).toFormat('webp',{quality:30}).toBuffer()};
 
 

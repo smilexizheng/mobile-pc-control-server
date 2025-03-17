@@ -8,7 +8,7 @@ const  InitTray = (MainWindow) => {
     {
       label: '打开面板',
       click: () => {
-        MainWindow.isMinimized()? MainWindow.show() : MainWindow.maximize();MainWindow.focus()
+        MainWindow.isMinimized()? MainWindow.show() : MainWindow.maximize()
       }
     },
     // { label: '选项1', type: 'separator' },
