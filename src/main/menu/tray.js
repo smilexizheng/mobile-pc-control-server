@@ -11,6 +11,13 @@ const  InitTray = (MainWindow) => {
         MainWindow.isMinimized()? MainWindow.show() : MainWindow.maximize()
       }
     },
+    {
+      label: '重启',
+      click: () => {
+        app.relaunch()
+        app.exit()
+      }
+    },
     // { label: '选项1', type: 'separator' },
     // { label: '预设操作', type: 'submenu' ,submenu:[ { label: '测试1', type: 'radio', checked: true },
     //     { label: '测试2', type: 'radio', checked: false },]},

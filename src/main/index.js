@@ -1,10 +1,12 @@
-import {app, BrowserWindow, nativeImage,shell} from 'electron'
+import {app, BrowserWindow, nativeImage, shell} from 'electron'
 import {electronApp, is, optimizer} from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import  {join} from "upath";
+import upath, {join} from "upath";
 import {InitWinControlServer} from "./sever/main";
 import {getAppIcon} from "./utils/common";
 import {InitTray} from "./menu/tray";
+import './utils/log'
+
 let mainWindow = null;
 
 let willQuitApp = false
@@ -23,9 +25,9 @@ function createWindow() {
       symbolColor: '#e80ba3',
       height: 26
     },
-    icon:getAppIcon(),
+    icon: getAppIcon(),
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    ...(process.platform === 'linux' ? {icon} : {}),
     // ...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -39,7 +41,7 @@ function createWindow() {
   })
 
   mainWindow.on('close', (e) => {
-    if(!willQuitApp){
+    if (!willQuitApp) {
       mainWindow.hide()
       e.preventDefault()
     }
@@ -49,7 +51,7 @@ function createWindow() {
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
-    return { action: 'deny' }
+    return {action: 'deny'}
   })
 
   // HMR for renderer base on electron-vite cli.
@@ -64,12 +66,12 @@ function createWindow() {
 
 const gotTheLock = app.requestSingleInstanceLock()
 
-if(!gotTheLock){
+if (!gotTheLock) {
   app.quit()
-}else{
-  app.on('second-instance',(event,commandLine,workingDirectory,additionalData)=>{
-    if(mainWindow){
-      if(mainWindow.isMinimized()) mainWindow.restore()
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory, additionalData) => {
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) mainWindow.restore()
       mainWindow.focus()
     }
   })
@@ -79,6 +81,7 @@ if(!gotTheLock){
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
+
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.win.control.electron')
 
@@ -94,6 +97,13 @@ app.whenReady().then(async () => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+
+  if (app.isPackaged) {
+    app.setLoginItemSettings({
+      openAtLogin: true,
+    })
+  }
+
   createWindow()
   console.log("启动control-server")
   global.controlServerPort = await InitWinControlServer(3000)
