@@ -6,7 +6,7 @@ import {InitWinControlServer} from "./sever/main";
 import {getAppIcon} from "./utils/common";
 import {InitTray} from "./menu/tray";
 import './utils/log'
-
+import initProtocol from './utils/protocol'
 let mainWindow = null;
 
 let willQuitApp = false
@@ -35,6 +35,8 @@ function createWindow() {
     }
   })
 
+  initProtocol(mainWindow)
+
   // todo win11 bugs titleBarOverlay冲突  https://github.com/electron/electron/issues/42409  createWindow setTimeout 100ms  正常
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -61,20 +63,6 @@ function createWindow() {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
-}
-
-
-const gotTheLock = app.requestSingleInstanceLock()
-
-if (!gotTheLock) {
-  app.quit()
-} else {
-  app.on('second-instance', (event, commandLine, workingDirectory, additionalData) => {
-    if (mainWindow) {
-      if (mainWindow.isMinimized()) mainWindow.restore()
-      mainWindow.focus()
-    }
-  })
 }
 
 // This method will be called when Electron has finished
