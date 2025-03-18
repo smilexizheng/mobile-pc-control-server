@@ -15,7 +15,7 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 900,
     height: 670,
-    show: true,
+    show: false,
     backgroundColor: 'rgb(32, 32, 32)',
     titleBarStyle: 'hidden',
     titleBarOverlay: {
@@ -33,7 +33,7 @@ function createWindow() {
     }
   })
 
-  // todo bugs titleBarOverlay冲突  https://github.com/electron/electron/issues/42409  createWindow setTimeout 100ms  正常
+  // todo win11 bugs titleBarOverlay冲突  https://github.com/electron/electron/issues/42409  createWindow setTimeout 100ms  正常
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
   })
@@ -89,15 +89,12 @@ app.whenReady().then(async () => {
     optimizer.watchWindowShortcuts(window)
   })
 
-
-
-
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
-    createWindow()
+  createWindow()
   console.log("启动control-server")
   global.controlServerPort = await InitWinControlServer(3000)
   // IPC

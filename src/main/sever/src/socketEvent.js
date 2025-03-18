@@ -13,8 +13,6 @@ const registerSocketHandlers = (io) => {
 
   // 前端触摸时的pos
   let touchPos = null;
-  // 更新系统的指针位置
-  let nowPos = null;
   let mobileScreenSize = {width: 400, height: 800};
   io.on('connection', (socket) => {
 
@@ -106,7 +104,7 @@ const registerSocketHandlers = (io) => {
 
     //鼠标指针
     socket.on(CE.SYS_MOUSE_CLICK, async (data) => {
-      console.log("点击鼠标")
+      console.log("点击鼠标",data.double)
       await mouseClick(data.button, data.double);
 
     });
@@ -132,21 +130,22 @@ const registerSocketHandlers = (io) => {
       socket.emit(CO.SYS_POINTER_POS, touchPos)
     });
     socket.on(CE.SYS_POINTER_MOVE, (data) => {
-      if (!touchPos) {
+      let nowPos;
+      if (!data.touchMove) {
         nowPos = {x: data.x, y: data.y}
-      } else {
+      } else if(touchPos) {
         nowPos = {x: touchPos.x + data.x, y: touchPos.y + data.y}
       }
-      console.log("移动鼠标", nowPos)
-      WinApi.moveMouse(nowPos.x, nowPos.y);
+      if(nowPos){
+        console.log("移动鼠标", nowPos)
+        WinApi.moveMouse(nowPos.x, nowPos.y);
+      }
+
     });
 
     socket.on(CE.SYS_POINTER_END, async () => {
       console.log("结束鼠标")
-      // captureScreen(mobileScreenSize,true).then();
       socket.emit(CO.SYS_POINTER_POS, await getMousePos())
-      touchPos = null
-      nowPos = null
     });
 
     // 处理客户端断开连接
