@@ -12,7 +12,9 @@ asarUnpack:
   - resources/**
 win:
   executableName: ControlServer
+  requestedExecutionLevel: requireAdministrator
 nsis:
+  allowElevation: false
   oneClick: false
   allowToChangeInstallationDirectory: true
   artifactName: ${name}-${version}-setup.${ext}

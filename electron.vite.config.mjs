@@ -1,4 +1,4 @@
-import { resolve } from 'path'
+import {resolve} from 'path'
 import {bytecodePlugin, defineConfig, externalizeDepsPlugin} from 'electron-vite'
 import vue from '@vitejs/plugin-vue'
 

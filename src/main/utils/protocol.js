@@ -1,6 +1,6 @@
 import {app} from "electron";
 import * as path from "path";
-
+const PROTOCOL = 'cse';
 const initProtocol = (mainWindow) => {
   const gotTheLock = app.requestSingleInstanceLock()
   if (!gotTheLock) {
@@ -19,6 +19,7 @@ const initProtocol = (mainWindow) => {
       }
     })
   }
+
   // Windows 第一个实例触发
   handleArgv(process.argv);
 
@@ -26,7 +27,7 @@ const initProtocol = (mainWindow) => {
   if (!app.isPackaged) {
     args.push(path.resolve(process.argv[1]));
   }
-  const PROTOCOL = 'cse';
+
   app.setAsDefaultProtocolClient(PROTOCOL, process.execPath, args);
 
 // Windows

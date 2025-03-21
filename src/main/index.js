@@ -1,7 +1,7 @@
-import {app, BrowserWindow, nativeImage, shell} from 'electron'
-import {electronApp, is, optimizer} from '@electron-toolkit/utils'
+import {app, BrowserWindow,  shell} from 'electron'
+import {electronApp, is, optimizer, platform} from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import upath, {join} from "upath";
+import  {join} from "upath";
 import {InitWinControlServer} from "./sever/main";
 import {getAppIcon} from "./utils/common";
 import {InitTray} from "./menu/tray";
@@ -11,7 +11,7 @@ let mainWindow = null;
 
 let willQuitApp = false
 
-function createWindow() {
+const createWindow = async ()=> {
 
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -36,6 +36,14 @@ function createWindow() {
   })
 
   initProtocol(mainWindow)
+
+  console.log("启动control-server")
+  global.controlServerPort = await InitWinControlServer(3000)
+  // IPC
+  import("./ipc");
+  // tray 系统托盘
+  InitTray(mainWindow)
+
 
   // todo win11 bugs titleBarOverlay冲突  https://github.com/electron/electron/issues/42409  createWindow setTimeout 100ms  正常
   mainWindow.on('ready-to-show', () => {
@@ -93,19 +101,14 @@ app.whenReady().then(async () => {
   }
 
   createWindow()
-  console.log("启动control-server")
-  global.controlServerPort = await InitWinControlServer(3000)
-  // IPC
-  import("./ipc");
-  // tray 系统托盘
-  InitTray(mainWindow)
+
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', (e) => {
-  if (process.platform !== 'darwin') {
+  if (!platform.isMacOS) {
     app.quit()
   }
 })

@@ -1,6 +1,8 @@
 node_modules
 dist
-out
+out/main
+out/preload
+out/renderer
 .DS_Store
 .eslintcache
 *.log*
