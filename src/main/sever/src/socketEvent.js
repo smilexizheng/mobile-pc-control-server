@@ -5,8 +5,9 @@ import {CLIENT_EMIT_EVENTS as CE} from "./constant/client-emit.js";
 import {CLIENT_ON_EVENTS as CO} from "./constant/client-on.js";
 import {WinApi} from "./utils/win-api.js"
 import {sendHeader, stopScreenLive} from "./utils/ffmpeg_captrue.js";
-
+import {Window} from 'node-screenshots'
 import {getMousePos, grabRegion, mouseClick, mouseToggle} from "./core.js";
+import * as buffer from "buffer";
 
 
 const registerSocketHandlers = (io) => {
@@ -147,6 +148,42 @@ const registerSocketHandlers = (io) => {
       console.log("结束鼠标")
       socket.emit(CO.SYS_POINTER_POS, await getMousePos())
     });
+
+
+    socket.on(CE.WINDOW_LIST, async ()=>{
+      const window = Window.all();
+      const windowList = [];
+      window.forEach((item) => {
+        windowList.push({
+          id: item.id,
+          title: item.title,
+          appName: item.appName,
+          x: item.x,
+          y: item.y,
+          width: item.width,
+          height: item.height,
+          isMaximized: item.isMaximized,
+          isMinimized: item.isMinimized,
+        });
+
+        // let image = item.captureImageSync();
+        // fs.writeFileSync(`${item.id}-sync.bmp`, image.toBmpSync());
+        //
+        // item.captureImage().then(async (data) => {
+        //   console.log(data);
+        //   let newImage = await data.crop(10, 10, 10, 10);
+        //   fs.writeFileSync(`${item.id}.png`, await newImage.toPng());
+        });
+      console.log(windowList)
+      socket.emit(CE.WINDOW_LIST,  windowList)
+      });
+
+    socket.on(CE.WINDOW_IMG,  (windowId)=>{
+      const window = Window.all();
+      const buffer=window.find(s=>s.id===windowId).captureImageSync().toPngSync()
+      socket.emit(CE.WINDOW_IMG,  buffer)
+    });
+
 
     // 处理客户端断开连接
     socket.on('disconnect', () => {

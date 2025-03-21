@@ -5,6 +5,7 @@ out/preload
 out/renderer
 .DS_Store
 .eslintcache
+logs
 *.log*
 .idea
 
