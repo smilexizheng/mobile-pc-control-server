@@ -3,8 +3,12 @@ import {getLocalIPs} from "../utils/common";
 
 ipcMain.on('ping', () => console.log('pong'))
 
+ipcMain.on('window-minimize', () => mainWindow.hide())
+ipcMain.on('window-close', () => mainWindow.close())
+
+
 ipcMain.handle('get-control-server-port', () => {
-  return global.controlServerPort
+  return controlServerPort
 })
 
 ipcMain.handle('get-app-version', () => {

@@ -5,7 +5,7 @@ import { electronAPI } from '@electron-toolkit/preload'
 const api = {
   getControlServerPort: () => ipcRenderer.invoke('get-control-server-port'),
   getLocalIPs: () => ipcRenderer.invoke('get-local-ips'),
-getAppVersion: () => ipcRenderer.invoke('get-app-version'),
+  getAppVersion: () => ipcRenderer.invoke('get-app-version'),
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

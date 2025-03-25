@@ -18,7 +18,7 @@ const ips = ref([])
 <template>
  <TitleBar/>
   <img alt="logo" class="logo" src="./assets/logo.svg" />
-  <div class="creator">a server to control your computer</div>
+<!--  <div class="creator">a server to control your computer</div>-->
   <div class="text">
     Control Server Electron
     <span class="vue">CSE</span>

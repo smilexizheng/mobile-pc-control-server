@@ -15,16 +15,19 @@ const createWindow = async ()=> {
 
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 820,
+    height: 600,
+    minWidth: 820,
+    minHeight: 600,
+    frame: false,
     show: false,
     backgroundColor: 'rgb(32, 32, 32)',
     titleBarStyle: 'hidden',
-    titleBarOverlay: {
-      color: '#fcfcfc',
-      symbolColor: '#e80ba3',
-      height: 26
-    },
+    // titleBarOverlay: {
+    //   color: '#fcfcfc',
+    //   symbolColor: '#e80ba3',
+    //   height: 26
+    // },
     icon: getAppIcon(),
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? {icon} : {}),
@@ -39,6 +42,7 @@ const createWindow = async ()=> {
 
   console.log("启动control-server")
   global.controlServerPort = await InitWinControlServer(3000)
+  global.mainWindow = mainWindow
   // IPC
   import("./ipc");
   // tray 系统托盘
