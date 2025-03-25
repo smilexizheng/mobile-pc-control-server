@@ -67,7 +67,7 @@ const typeString = async (data) => {
   //  \node_modules\@nut-tree-fork\default-clipboard-provider\node_modules\clipboardy\lib\windows.js
   // const windowBinaryPath = arch() === 'x64' ?(app.isPackaged ? path.join(process.resourcesPath, '\\app.asar.unpacked\\node_modules\\@nut-tree-fork\\default-clipboard-provider\\node_modules\\clipboardy\\fallbacks\\windows\\clipboard_x86_64.exe') : path.join(__dirname, '../fallbacks/windows/clipboard_x86_64.exe'))	 : (app.isPackaged ? path.join(process.resourcesPath, '\\app.asar.unpacked\\node_modules\\@nut-tree-fork\\default-clipboard-provider\\node_modules\\clipboardy\\fallbacks\\windows\\clipboard_i686.exe') : path.join(__dirname, '../fallbacks/windows/clipboard_i686.exe'));
   // now use Electron clipboard
-  clipboard.writeText(data.val);
+  clipboard.writeText(data.val.toString());
   await keyboard.pressKey(Key.LeftControl, Key.V);
   await keyboard.releaseKey(Key.LeftControl, Key.V);
   if (data.enter) {

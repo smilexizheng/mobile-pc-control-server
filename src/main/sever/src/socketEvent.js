@@ -3,11 +3,10 @@ import {shutdown} from "./system.js";
 import {getVol, setVol, toggleVolMute} from "./volume.js";
 import {CLIENT_EMIT_EVENTS as CE} from "./constant/client-emit.js";
 import {CLIENT_ON_EVENTS as CO} from "./constant/client-on.js";
-import {WinApi} from "./utils/win-api.js"
 import {sendHeader, stopScreenLive} from "./utils/ffmpeg_captrue.js";
 import {Window} from 'node-screenshots'
 import {getMousePos, grabRegion, mouseClick, mouseToggle} from "./core.js";
-import * as buffer from "buffer";
+import { mouse} from "@nut-tree-fork/nut-js";
 
 
 const registerSocketHandlers = (io) => {
@@ -114,14 +113,13 @@ const registerSocketHandlers = (io) => {
       await mouseToggle(data.isPress, data.button);
     });
 
-    socket.on(CE.SYS_SCROLL_VERTICAL, (delta) => {
-      WinApi.scrollVertical(delta ? 120 : -120);
-
+    socket.on(CE.SYS_SCROLL_VERTICAL, async (delta) => {
+      delta ? await mouse.scrollUp(120) : await mouse.scrollDown(120)
     });
 
 
-    socket.on(CE.SYS_SCROLL_HORIZONTAL, (delta) => {
-      WinApi.scrollHorizontal(delta ? 120 : -120);
+    socket.on(CE.SYS_SCROLL_HORIZONTAL, async (delta) => {
+      delta ? await mouse.scrollLeft(120) : await mouse.scrollRight(120)
     });
 
 
@@ -130,7 +128,7 @@ const registerSocketHandlers = (io) => {
       touchPos = await getMousePos();
       socket.emit(CO.SYS_POINTER_POS, touchPos)
     });
-    socket.on(CE.SYS_POINTER_MOVE, (data) => {
+    socket.on(CE.SYS_POINTER_MOVE, async (data) => {
       let nowPos;
       if (!data.touchMove) {
         nowPos = {x: data.x, y: data.y}
@@ -138,8 +136,7 @@ const registerSocketHandlers = (io) => {
         nowPos = {x: touchPos.x + data.x, y: touchPos.y + data.y}
       }
       if(nowPos){
-        console.log("移动鼠标", nowPos)
-        WinApi.moveMouse(nowPos.x, nowPos.y);
+        await  mouse.move([nowPos])
       }
 
     });

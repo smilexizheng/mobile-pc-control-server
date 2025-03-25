@@ -26,7 +26,12 @@ const VK_CONTROL = 0x11;
 const VK_MENU = 0x12; // Alt 键
 const VK_RETURN = 0x0D; // Enter 键
 
-
+/**
+ *  WinApi.moveMouse(nowPos.x, nowPos.y);
+ *  WinApi.scrollHorizontal(delta ? 120 : -120);
+ *     WinApi.scrollVertical(delta ? 120 : -120);
+ * @type {IKoffiLib}
+ */
 
 
 // 加载 user32.dll
