@@ -43,6 +43,7 @@ const createWindow = async ()=> {
   console.log("启动control-server")
   global.controlServerPort = await InitWinControlServer(3000)
   global.mainWindow = mainWindow
+  global.ssss = "ssss"
   // IPC
   import("./ipc");
   // tray 系统托盘

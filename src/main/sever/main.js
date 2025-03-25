@@ -13,6 +13,20 @@ const InitWinControlServer = (port) => {
       path: "/win-control.io"
       // options
     });
+
+    io.use((socket, next) => {
+      const token = socket.handshake.auth.token;
+      const decoded = token===ssss;
+      if (!decoded || !token) {
+        // socket.disconnect(true);
+        return next(new Error('认证失败：无效的令牌'));
+      }
+
+      // 将用户信息附加到socket对象
+      // socket.user = decoded;
+      next();
+    });
+
     registerSocketHandlers(io);
 
 
