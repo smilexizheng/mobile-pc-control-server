@@ -19,6 +19,9 @@
 ### 创建自动化操作
 ![img2.png](docs/img/4.png)
 
+### 移动端仓库
+[ mobile-pc-control-web 仓库](https://github.com/smilexizheng/mobile-pc-control-web).
+
 
 ## 平台支持：
 - Windows
