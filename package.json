@@ -5,7 +5,7 @@
   "main": "./out/main/index.js",
   "author": "smilexizheng",
   "private": "true",
-  "homepage": "smile.cse",
+  "homepage": "https://github.com/smilexizheng/mobile-pc-control-server",
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint --cache .",
