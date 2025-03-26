@@ -2,13 +2,13 @@ import {app, Menu, Tray} from 'electron'
 import {getAppIcon} from "../utils/common";
 
 let tray = null;
-const  InitTray = (MainWindow) => {
+const  InitTray = () => {
   tray = new Tray(getAppIcon())
   const contextMenu = Menu.buildFromTemplate([
     {
       label: '打开面板',
       click: () => {
-        MainWindow.isMinimized()? MainWindow.show() : MainWindow.maximize()
+        mainWindow.isMinimized()? mainWindow.show() : mainWindow.maximize()
       }
     },
     {
@@ -26,7 +26,7 @@ const  InitTray = (MainWindow) => {
   tray.setToolTip('Control Service')
   tray.setContextMenu(contextMenu)
   tray.on('click', () => {
-    MainWindow.show()
+    mainWindow.show()
   })
   // 监听鼠标右键信息
   tray.on('right-click', () => {

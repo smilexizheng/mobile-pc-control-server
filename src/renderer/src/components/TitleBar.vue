@@ -14,10 +14,10 @@ const handleClose = () => window.electron.ipcRenderer.send('window-close')
 
     <div class="window-controls">
       <button class="control-btn minimize" @click="handleMinimize">
-        一
+        -
       </button>
       <button class="control-btn close" @click="handleClose">
-        X
+        ×
       </button>
     </div>
   </div>
@@ -27,7 +27,7 @@ const handleClose = () => window.electron.ipcRenderer.send('window-close')
 .title-bar {
   user-select: none;
   app-region: drag;
-  height: 26px;
+  height: 30px;
   width: 100%;
   color: #e0dede;
   /*background: #fcfcfc;*/
@@ -54,9 +54,10 @@ const handleClose = () => window.electron.ipcRenderer.send('window-close')
 }
 
 .control-btn {
-  color: #FFF;
+  color: #c5c5c5;
+  font-size: 16px;
   width: 32px;
-  height: 26px;
+  height: 30px;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -66,7 +67,8 @@ const handleClose = () => window.electron.ipcRenderer.send('window-close')
   transition: background-color 0.2s;
 }
 
-.control-btn.minimize:hover {
+.control-btn:hover {
+  color: #fff;
   background: rgba(0, 0, 0, 0.05);
 }
 

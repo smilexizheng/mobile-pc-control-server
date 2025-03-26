@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "ControlServer",
   "main": "./out/main/index.js",
-  "author": "Smile",
+  "author": "smilexizheng",
   "private": "true",
   "homepage": "smile.cse",
   "scripts": {
