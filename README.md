@@ -21,7 +21,7 @@
 
 ### 移动端仓库
 [ mobile-pc-control-web 仓库](https://github.com/smilexizheng/mobile-pc-control-web).
-
+- 将移动端web项目`build`后的静态资源放到此项目的`out/web`文件中,然后`build:win`, 即可替换移动端网页
 
 ## 平台支持：
 - Windows
