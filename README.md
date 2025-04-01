@@ -71,6 +71,10 @@
 
 > 欢迎大家提交PR 或者 issue
 
+
+## Github Star历史
+[![Stargazers over time](https://starchart.cc/smilexizheng/mobile-pc-control-server.svg?variant=adaptive&background=%23ffffff&axis=%23101010&line=%23e86161)](https://starchart.cc/smilexizheng/mobile-pc-control-server)
+
 ##  运行项目
 
 ### Install

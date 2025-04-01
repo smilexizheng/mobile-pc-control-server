@@ -27,9 +27,10 @@ const VK_MENU = 0x12; // Alt 键
 const VK_RETURN = 0x0D; // Enter 键
 
 /**
+ * WinApi 封装了 Windows API 的常用功能，包括鼠标、键盘 操作。
  *  WinApi.moveMouse(nowPos.x, nowPos.y);
  *  WinApi.scrollHorizontal(delta ? 120 : -120);
- *     WinApi.scrollVertical(delta ? 120 : -120);
+ *  WinApi.scrollVertical(delta ? 120 : -120);
  * @type {IKoffiLib}
  */
 
