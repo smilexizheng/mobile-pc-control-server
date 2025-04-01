@@ -2,11 +2,11 @@ import {keyPressHandle, keyToggleHandle, openAppHandler, openUrlHandler, typeStr
 import {shutdown} from "./system.js";
 import {getVol, setVol, toggleVolMute} from "./volume.js";
 import {CLIENT_EMIT_EVENTS as CE} from "./constant/client-emit.js";
-import {CLIENT_ON_EVENTS as CO} from "./constant/client-on.js";
 import {sendHeader, stopScreenLive} from "./utils/ffmpeg_captrue.js";
 import {Window} from 'node-screenshots'
 import {getMousePos, grabRegion, mouseClick, mouseToggle} from "./core.js";
 import { mouse} from "@nut-tree-fork/nut-js";
+import {TransferFile} from "./TransferFile";
 
 
 const registerSocketHandlers = (io) => {
@@ -16,7 +16,8 @@ const registerSocketHandlers = (io) => {
   let mobileScreenSize = {width: 400, height: 800};
   io.on('connection', (socket) => {
 
-    socket.emit(CO.RESPONSE, {success: true, msg: 'client connected'});
+    TransferFile(socket)
+    socket.emit(CE.RESPONSE, {success: true, msg: 'client connected'});
 
     // 保存原始的 on 方法
     const originalOn = socket.on;
@@ -29,7 +30,7 @@ const registerSocketHandlers = (io) => {
         } catch (error) {
           // 全局错误处理
           console.error(error, eventName, socket);
-          socket.emit(CO.RESPONSE, {
+          socket.emit(CE.RESPONSE, {
             success: false,
             msg: error.message,
             event: eventName,
@@ -37,7 +38,7 @@ const registerSocketHandlers = (io) => {
           });
         } finally {
           // todo 某些事件不需要提示
-          socket.emit(CO.RESPONSE, {
+          socket.emit(CE.RESPONSE, {
             success: true,
             event: eventName,
             time: Date.now() - socket.data[`${eventName}-time`]
@@ -78,7 +79,7 @@ const registerSocketHandlers = (io) => {
       mobileScreenSize = {width: Math.round(data.screenSize.width), height: Math.round(data.screenSize.height)};
       // TODO 处理多人同时操作屏幕尺寸问题
       socket.data.mobileScreenSize = {...mobileScreenSize};
-      socket.emit(CO.SYS_POINTER_POS, await getMousePos())
+      socket.emit(CE.SYS_POINTER_POS, await getMousePos())
     })
 
     // 键
@@ -126,7 +127,7 @@ const registerSocketHandlers = (io) => {
     // 前端触摸 记录指针位置
     socket.on(CE.SYS_POINTER_START, async () => {
       touchPos = await getMousePos();
-      socket.emit(CO.SYS_POINTER_POS, touchPos)
+      socket.emit(CE.SYS_POINTER_POS, touchPos)
     });
     socket.on(CE.SYS_POINTER_MOVE, async (data) => {
       let nowPos;
@@ -143,7 +144,7 @@ const registerSocketHandlers = (io) => {
 
     socket.on(CE.SYS_POINTER_END, async () => {
       console.log("结束鼠标")
-      socket.emit(CO.SYS_POINTER_POS, await getMousePos())
+      socket.emit(CE.SYS_POINTER_POS, await getMousePos())
     });
 
 
@@ -186,6 +187,15 @@ const registerSocketHandlers = (io) => {
     socket.on('disconnect', () => {
       console.log('Client disconnected');
     });
+
+
+    socket.on(CE.FILE_TRANSFER, async (data) => {
+      console.log(data);
+
+
+    })
+
+
 
   });
 
@@ -242,7 +252,7 @@ const registerSocketHandlers = (io) => {
         width: cutSize.width * config.scale,
         height: cutSize.height * config.scale,
       });
-      io.to('screen').emit(CO.SYS_POINTER_POS, mousePos)
+      io.to('screen').emit(CE.SYS_POINTER_POS, mousePos)
     } catch (error) {
       console.error('截图失败:', error);
     } finally {
@@ -263,6 +273,8 @@ const registerSocketHandlers = (io) => {
   // screenLive.emit('an event sent to all connected clients in chat namespace')
   // 启用桌面推送
   // startScreenLive(io)
+
+
 
 
   io.of("/").adapter.on("create-room", (room) => {

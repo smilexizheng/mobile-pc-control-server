@@ -2,9 +2,6 @@ import express from 'express';
 import upath, {join} from "upath";
 import {app} from "electron";
 
-// const webExpress = express();
-// const port = 3001;
-
 
 const startWebServer = (webExpress) => {
 

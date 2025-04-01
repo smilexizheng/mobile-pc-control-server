@@ -1,9 +1,9 @@
 import {getVolume, isMute, setVolume, toggleMute} from "./utils/sys-volume.js";
-import {CLIENT_ON_EVENTS as CO}  from "./constant/client-on.js";
+import {CLIENT_EMIT_EVENTS as CE}  from "./constant/client-emit.js";
 
 // 设置音量
 const getVol = async (socket) => {
-    socket.emit(CO.SYS_VOLUME, {success: true, data:{volume: await getVolume(), mute: await isMute()}});
+    socket.emit(CE.SYS_VOLUME, {success: true, data:{volume: await getVolume(), mute: await isMute()}});
 };
 
 const setVol = async (data, socket) => {

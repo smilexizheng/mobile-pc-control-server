@@ -10,7 +10,8 @@ const InitWinControlServer = (port) => {
     const httpServer = createServer(webExpress);
     startWebServer(webExpress);
     const io = new Server(httpServer, {
-      path: "/win-control.io"
+      path: "/win-control.io",
+      maxHttpBufferSize:4e8
       // options
     });
 

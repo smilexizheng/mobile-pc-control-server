@@ -1,5 +1,5 @@
 import {spawn} from 'child_process';
-import {CLIENT_ON_EVENTS as CO} from "./constant/client-on.js";
+import {CLIENT_EMIT_EVENTS as CE}  from "./constant/client-emit.js";
 import {Key, keyboard} from "@nut-tree-fork/nut-js";
 import {clipboard} from "electron";
 
@@ -9,7 +9,7 @@ const withResponse = (handler, socket) => async (data) => {
   try {
     await handler(data, socket);
   } catch (err) {
-    socket.emit(CO.RESPONSE, {
+    socket.emit(CE.RESPONSE, {
       success: false,
       time: Date.now() - now,
       msg: err.message  // 统一错误消息字段为msg
