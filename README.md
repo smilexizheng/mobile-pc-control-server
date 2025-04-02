@@ -18,12 +18,15 @@
 
 ### 移动端界面
 ![img2.png](docs/img/2.png)
-### 鼠标控制界面
+### 远程控制
 ![img2.png](docs/img/3.png)
 ### 创建自动化操作
-![img2.png](docs/img/4.png)
-![img2.png](docs/img/5.png)
 ![img2.png](docs/img/6.png)
+
+![img2.png](docs/img/4.png)
+## 文件共享
+![img2.png](docs/img/5.png)
+## 窗口截屏
 ![img2.png](docs/img/7.png)
 
 ### 移动端仓库
