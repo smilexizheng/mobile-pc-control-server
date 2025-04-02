@@ -22,6 +22,9 @@
 ![img2.png](docs/img/3.png)
 ### 创建自动化操作
 ![img2.png](docs/img/4.png)
+![img2.png](docs/img/5.png)
+![img2.png](docs/img/6.png)
+![img2.png](docs/img/7.png)
 
 ### 移动端仓库
 [ mobile-pc-control-web 仓库](https://github.com/smilexizheng/mobile-pc-control-web).
