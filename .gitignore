@@ -1,0 +1,14 @@
+node_modules
+dist
+out/main
+out/preload
+out/renderer
+.DS_Store
+.eslintcache
+logs
+*.log*
+.idea
+db
+.vscode
+
+
