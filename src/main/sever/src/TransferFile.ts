@@ -74,7 +74,7 @@ const TransferFile = (socket): void => {
     })
     notification.show()
     notification.on('click', () => {
-      shell.openPath(downloadDir).then()
+      shell.showItemInFolder(downloadDir)
     })
 
     upload.writeStream.end()
