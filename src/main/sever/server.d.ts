@@ -1,17 +1,26 @@
+type Event1 = {
+  event: string
+  eventData: EventData
+  delay: number
+}
+
+type EventData = {
+  x?: number
+  y?: number
+  button?: number
+  double?: boolean
+  url?: string
+}
+
 // socket 事件
 type SocketEvent = {
   id: string
   name: string
   color: string
-  event: string
-  eventData: EventData
-}
+  event?: string
+  eventData?: EventData
+  events?: Array<Event1>
 
-type EventData = {
-  x: number
-  y: number
-  button: number
-  double: boolean
 }
 
 type Pos = {

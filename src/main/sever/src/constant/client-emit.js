@@ -18,6 +18,7 @@ export const CLIENT_EMIT_EVENTS = {
 
   // 系统控制
   SYS_SHUTDOWN: 'sys-shutdown',
+  SYS_SHELL: 'sys_shell',
   SYS_SET_VOLUME: 'sys-set-volume',
   SYS_GET_VOLUME: 'sys-get-volume',
   SYS_VOLUME: 'sys-volume',
@@ -48,5 +49,10 @@ export const CLIENT_EMIT_EVENTS = {
   SCHEDULE_GET: 'schedule:get',
   SCHEDULE_DELETE: 'schedule:delete',
   SCHEDULE_ADD: 'schedule:add',
-  SCHEDULE_TOGGLE_JOB: 'schedule:toggle-job'
+  SCHEDULE_TOGGLE_JOB: 'schedule:toggle-job',
+
+
+  EVENTS_GET: 'events:get',
+  EVENTS_DELETE: 'events:delete',
+  EVENTS_PUT: 'events:put',
 }

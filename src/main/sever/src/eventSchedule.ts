@@ -1,5 +1,5 @@
 import schedule, { Job } from 'node-schedule'
-import db from './database'
+import {db} from './database'
 import { eventHandler } from './core'
 
 /**

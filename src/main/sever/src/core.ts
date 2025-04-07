@@ -24,7 +24,9 @@ const keyPressHandle = async (data): Promise<void> => {
   if (typeof data.key === 'number') {
     await keyboard.type(data.key)
   } else {
-    await keyboard.pressKey(...data.key)
+    // await keyboard.pressKey(...data.key)
+    // await keyboard.releaseKey(...data.key)
+    await keyboard.releaseKey(...data.key)
     await keyboard.releaseKey(...data.key)
   }
 }
@@ -180,13 +182,14 @@ const grabRegion = async (mouseX, mouseY, captureWidth, captureHeight): Promise<
 }
 
 const eventHandler = (e: SocketEvent): void => {
-  const data: EventData = e.eventData
+  const data: EventData|undefined = e.eventData
   if (!data) return
   switch (e.event) {
     case CE.KEYPRESS:
       keyPressHandle(data).then()
       break
     case CE.SYS_POINTER_MOVE:
+      if(!data.x || !data.y) break
       mouse.move([{ x: data.x, y: data.y }]).then()
       break
     case CE.SYS_MOUSE_CLICK:
@@ -199,7 +202,7 @@ const eventHandler = (e: SocketEvent): void => {
       openUrlHandler(data)
       break
     case CE.SYS_SHUTDOWN:
-      shutdown()
+      shutdown(data,null)
       break
     default:
       console.log(`schedule event type ${e.event} is not supported`)

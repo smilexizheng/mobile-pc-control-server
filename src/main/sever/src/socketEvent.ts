@@ -1,8 +1,8 @@
-import { shutdown } from './system'
-import { getVol, setVol, toggleVolMute } from './volume'
-import { CLIENT_EMIT_EVENTS as CE } from './constant/client-emit'
-import { sendHeader, stopScreenLive } from './utils/ffmpeg_captrue'
-import { Window } from 'node-screenshots'
+import {shutdown} from './system'
+import {getVol, setVol, toggleVolMute} from './volume'
+import {CLIENT_EMIT_EVENTS as CE} from './constant/client-emit'
+import {sendHeader, stopScreenLive} from './utils/ffmpeg_captrue'
+import {Window} from 'node-screenshots'
 import {
   getMousePos,
   grabRegion,
@@ -15,16 +15,17 @@ import {
   openUrlHandler,
   typeString
 } from './core.js'
-import { mouse, Point } from '@nut-tree-fork/nut-js'
-import { TransferFile } from './TransferFile'
-import { createJob, deleteJob, getJobList, toggleJob } from './eventSchedule'
+import {mouse, Point} from '@nut-tree-fork/nut-js'
+import {TransferFile} from './TransferFile'
+import {createJob, deleteJob, getJobList, toggleJob} from './eventSchedule'
+import {db, getAll} from "./database";
 
 const registerSocketHandlers = (io): void => {
   // 前端触摸时的pos
   let touchPos: Point
-  let mobileScreenSize = { width: 400, height: 800 }
+  let mobileScreenSize = {width: 400, height: 800}
   io.on('connection', (socket) => {
-    socket.emit(CE.RESPONSE, { success: true, msg: 'client connected' })
+    socket.emit(CE.RESPONSE, {success: true, msg: 'client connected'})
     // 保存原始的 on 方法
     const originalOn = socket.on
     // 覆盖 socket.on 方法
@@ -88,6 +89,24 @@ const registerSocketHandlers = (io): void => {
       socket.emit(CE.SCHEDULE_GET, await getJobList())
     })
 
+
+    const sendEventList = () => {
+      getAll(db.events).then(data => io.emit(CE.EVENTS_GET, data))
+    }
+    sendEventList();
+    socket.on(CE.EVENTS_GET, () => {
+      sendEventList()
+    })
+    socket.on(CE.EVENTS_DELETE, async (id) => {
+      await db.events.del(id)
+      sendEventList()
+    })
+    socket.on(CE.EVENTS_PUT, async (data) => {
+      const id = data.id || crypto.randomUUID();
+      await db.events.put(id, {...data, id})
+      sendEventList()
+    })
+
     // 屏幕直播 flv获取流的头部信息
     socket.on(CE.GET_SCREEN_STREAM_HEADER, () => {
       sendHeader(io, socket)
@@ -108,7 +127,7 @@ const registerSocketHandlers = (io): void => {
         height: Math.round(data.screenSize.height)
       }
       // TODO 处理多人同时操作屏幕尺寸问题
-      socket.data.mobileScreenSize = { ...mobileScreenSize }
+      socket.data.mobileScreenSize = {...mobileScreenSize}
       socket.emit(CE.SYS_POINTER_POS, await getMousePos())
     })
 
@@ -121,7 +140,9 @@ const registerSocketHandlers = (io): void => {
     socket.on(CE.OPEN_APP, openAppHandler)
 
     // 系统
-    socket.on(CE.SYS_SHUTDOWN, shutdown)
+    socket.on(CE.SYS_SHUTDOWN, async (data) => {
+      shutdown(data, socket)
+    })
     socket.on(CE.SYS_SET_VOLUME, async (d) => {
       await setVol(d, socket)
     })
@@ -166,9 +187,9 @@ const registerSocketHandlers = (io): void => {
     socket.on(CE.SYS_POINTER_MOVE, async (data) => {
       let nowPos
       if (!data.touchMove) {
-        nowPos = { x: data.x, y: data.y }
+        nowPos = {x: data.x, y: data.y}
       } else if (touchPos) {
-        nowPos = { x: touchPos.x + data.x, y: touchPos.y + data.y }
+        nowPos = {x: touchPos.x + data.x, y: touchPos.y + data.y}
       }
       if (nowPos) {
         await moveMouse([nowPos])
@@ -231,7 +252,7 @@ const registerSocketHandlers = (io): void => {
   const captureInterval = 18 // 截图间隔（毫秒）
 
   let isCapture = false
-  const captureScreen = async (cutSize = { width: 400, height: 800 }, force): Promise<void> => {
+  const captureScreen = async (cutSize = {width: 400, height: 800}, force): Promise<void> => {
     if (!io.sockets.adapter.rooms.has('screen')) return
     if (isCapture && !force) return
     try {
@@ -307,4 +328,4 @@ const registerSocketHandlers = (io): void => {
   })
 }
 
-export { registerSocketHandlers }
+export {registerSocketHandlers}
