@@ -39,7 +39,7 @@ async function createWindow(): Promise<void> {
   global.mainWindow = mainWindow
   global.ssss = 'ssss'
   global.controlServerPort = await InitWinControlServer(3000)
-
+  global.childWindow={}
   // IPC
   import('./ipc')
   // tray 系统托盘

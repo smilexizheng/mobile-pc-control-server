@@ -25,7 +25,7 @@ const registerSocketHandlers = (io): void => {
   let touchPos: Point
   let mobileScreenSize = {width: 400, height: 800}
   io.on('connection', (socket) => {
-    socket.emit(CE.RESPONSE, {success: true, msg: 'client connected'})
+    // socket.emit(CE.RESPONSE, {success: true, msg: 'client connected'})
     // 保存原始的 on 方法
     const originalOn = socket.on
     // 覆盖 socket.on 方法
@@ -45,11 +45,11 @@ const registerSocketHandlers = (io): void => {
           })
         } finally {
           // todo 某些事件不需要提示
-          socket.emit(CE.RESPONSE, {
-            success: true,
-            event: eventName,
-            time: Date.now() - socket.data[`${eventName}-time`]
-          })
+          // socket.emit(CE.RESPONSE, {
+          //   success: true,
+          //   event: eventName,
+          //   time: Date.now() - socket.data[`${eventName}-time`]
+          // })
         }
       }
       // 注册包装后的监听器
@@ -105,6 +105,10 @@ const registerSocketHandlers = (io): void => {
       const id = data.id || crypto.randomUUID();
       await db.events.put(id, {...data, id})
       sendEventList()
+      socket.emit(CE.RESPONSE, {
+        success: true,
+        msg: `[${data.name}]指令保存成功`,
+      })
     })
 
     // 屏幕直播 flv获取流的头部信息
@@ -128,6 +132,10 @@ const registerSocketHandlers = (io): void => {
       }
       // TODO 处理多人同时操作屏幕尺寸问题
       socket.data.mobileScreenSize = {...mobileScreenSize}
+      socket.emit(CE.SYS_POINTER_POS, await getMousePos())
+    })
+
+    socket.on(CE.SYS_POINTER_POS, async () => {
       socket.emit(CE.SYS_POINTER_POS, await getMousePos())
     })
 

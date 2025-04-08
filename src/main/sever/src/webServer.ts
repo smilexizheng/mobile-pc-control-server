@@ -1,6 +1,6 @@
-import express, { Express } from 'express'
+import express, {Express} from 'express'
 import upath from 'upath'
-import { app } from 'electron'
+import {app} from 'electron'
 
 const startWebServer = (webExpress: Express): void => {
   // const webPath = app.isPackaged
@@ -11,15 +11,7 @@ const startWebServer = (webExpress: Express): void => {
     : upath.join(process.cwd(), 'out', 'web')
 
   // 托管静态文件（public 目录）
-  webExpress.use(express.static(webPath))
-
-  // 根路由指向 index.html
-  webExpress.get('/*', (_, res): void => {
-    res.sendFile(upath.join(webPath, 'index.html'))
-  })
-  // webExpress.listen(port, () => {
-  //       console.log(`WebServer running at http://localhost:${port}`);
-  //   });
+  webExpress.use('/', express.static(webPath))
 }
 
 export default startWebServer

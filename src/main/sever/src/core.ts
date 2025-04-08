@@ -7,8 +7,8 @@ import { spawn } from 'child_process'
 import { CLIENT_EMIT_EVENTS as CE } from './constant/client-emit'
 import { shutdown } from './system'
 
-mouse.config.autoDelayMs = 0
-keyboard.config.autoDelayMs = 0
+mouse.config.autoDelayMs = 10
+keyboard.config.autoDelayMs = 10
 
 // 参数校验函数
 const validateParams = (data, fields): void => {
@@ -21,14 +21,12 @@ const validateParams = (data, fields): void => {
 const keyPressHandle = async (data): Promise<void> => {
   validateParams(data, ['key']) // 假设需要key参数
   // console.log(typeof  data.key)
-  if (typeof data.key === 'number') {
-    await keyboard.type(data.key)
-  } else {
-    // await keyboard.pressKey(...data.key)
-    // await keyboard.releaseKey(...data.key)
+  // if (typeof data.key === 'number') {qqqqqq
+  //   await keyboard.type(data.key)
+  // } else {
+    await keyboard.pressKey(...data.key)
     await keyboard.releaseKey(...data.key)
-    await keyboard.releaseKey(...data.key)
-  }
+  // }
 }
 
 const keyToggleHandle = async (data): Promise<void> => {
@@ -63,10 +61,9 @@ const typeString = async (data): Promise<void> => {
   // const windowBinaryPath = arch() === 'x64' ?(app.isPackaged ? path.join(process.resourcesPath, '\\app.asar.unpacked\\node_modules\\@nut-tree-fork\\default-clipboard-provider\\node_modules\\clipboardy\\fallbacks\\windows\\clipboard_x86_64.exe') : path.join(__dirname, '../fallbacks/windows/clipboard_x86_64.exe'))	 : (app.isPackaged ? path.join(process.resourcesPath, '\\app.asar.unpacked\\node_modules\\@nut-tree-fork\\default-clipboard-provider\\node_modules\\clipboardy\\fallbacks\\windows\\clipboard_i686.exe') : path.join(__dirname, '../fallbacks/windows/clipboard_i686.exe'));
   // now use Electron clipboard
   clipboard.writeText(data.val.toString())
-  await keyboard.pressKey(Key.LeftControl, Key.V)
-  await keyboard.releaseKey(Key.LeftControl, Key.V)
+  await keyPressHandle({ key: [Key.LeftControl,Key.V]})
   if (data.enter) {
-    await keyboard.type(Key.Enter)
+    await keyPressHandle({ key: [Key.Enter]})
   }
   clipboard.writeText('')
 }

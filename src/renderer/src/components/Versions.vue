@@ -2,7 +2,6 @@
 import { onMounted, reactive, ref } from 'vue'
 
 const versions = reactive({ ...window.electron.process.versions })
-
 const appVersion = ref('')
 onMounted(async () => {
   appVersion.value = await window.api.getAppVersion()

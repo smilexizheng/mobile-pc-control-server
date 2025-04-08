@@ -10,6 +10,13 @@ onMounted(async () => {
   serverPort.value = await window.api.getControlServerPort()
   ips.value = await window.api.getLocalIPs()
 })
+
+const openWindow = () => {
+  window.electron.ipcRenderer.send('openWindow', {
+    id: 1,
+    url: `http://localhost:${serverPort.value}`
+  })
+}
 </script>
 
 <template>
@@ -20,13 +27,11 @@ onMounted(async () => {
     Control Server Electron
     <span class="vue">CSE</span>
   </div>
-  <p class="tip">Connect to the local area network and use a mobile web interface to</p>
-  <p class="tip">control the computer mouse, keyboard, and desktop</p>
+  <p class="tip">在同一局域网内，您可以通过浏览器访问下列地址</p>
+  <p class="tip">创建自动化、定时任务、远程控制鼠标、键盘、桌面</p>
   <div class="actions">
-    <div v-for="ip in ips" :key="ip" class="action">
-      <a :href="`http://${ip}:${serverPort}`" target="_blank" rel="noreferrer"
-        >访问地址: http://{{ ip }}:{{ serverPort }}</a
-      >
+    <div v-for="ip in ips" :key="ip" class="action" @click="openWindow">
+      <span>访问地址: http://{{ ip }}:{{ serverPort }}</span>
     </div>
     <!--    <div class="action">-->
     <!--      <a target="_blank" rel="noreferrer" @click="ipcHandle">Send IPC</a>-->

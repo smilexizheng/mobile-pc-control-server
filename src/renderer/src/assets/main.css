@@ -95,7 +95,7 @@ code {
   padding: 6px;
 }
 
-.action a {
+.action span{
   cursor: pointer;
   text-decoration: none;
   display: inline-block;
