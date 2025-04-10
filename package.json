@@ -1,6 +1,6 @@
 {
   "name": "control-server",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "ControlServer",
   "main": "./out/main/index.js",
   "author": "smilexizheng",
@@ -43,6 +43,7 @@
     "upath": "^2.0.1"
   },
   "devDependencies": {
+    "@arco-design/web-vue": "^2.57.0",
     "@electron-toolkit/eslint-config-prettier": "3.0.0",
     "@electron-toolkit/eslint-config-ts": "^3.0.0",
     "@electron-toolkit/tsconfig": "^1.0.1",

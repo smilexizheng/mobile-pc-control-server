@@ -8,7 +8,7 @@ const dbPath = !is.dev ? upath.join(electronApp.getPath('home'), '.control-serve
 const schedule: Level<string, ScheduleJob> = new Level(upath.join(dbPath, 'schedule'), {
   valueEncoding: 'json'
 })
-const app = new Level<string,number|string|object>(upath.join(dbPath, 'app'), { valueEncoding: 'json' })
+const app = new Level<string,number|string|object|any>(upath.join(dbPath, 'app'), { valueEncoding: 'json' })
 
 const events = new Level<string,SocketEvent>(upath.join(dbPath, 'events'), { valueEncoding: 'json' })
 

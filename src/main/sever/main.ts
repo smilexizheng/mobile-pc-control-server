@@ -5,9 +5,11 @@ import startWebServer from './src/webServer.js'
 import express from 'express'
 import {getJobList, runJob} from './src/eventSchedule'
 import {db} from "./src/database";
+import {ExtendedError} from "socket.io/dist/namespace";
+import {Setting} from "../../renderer/src/env";
 
-const InitWinControlServer = (port: number): Promise<number> => {
-  return new Promise((resolve, reject) => {
+const InitWinControlServer =  (port: number): Promise<number> => {
+  return new Promise(async (resolve, reject) => {
     const webExpress = express()
     const httpServer = createServer(webExpress)
     startWebServer(webExpress)
@@ -17,11 +19,14 @@ const InitWinControlServer = (port: number): Promise<number> => {
       // options
     })
 
+    const setting:Setting = await db.app.get('app:settings')
     io.use((socket, next) => {
       const token = socket.handshake.auth.token
-      const decoded = token === global.ssss
+      const decoded = token === (setting?.token ||'ssss')
       if (!decoded || !token) {
-        return next(new Error('认证失败：无效的令牌'))
+        const error: ExtendedError = new Error('令牌验证失败');
+        error.data = {code: 401}
+        return next(error)
       }
       // 将用户信息附加到socket对象
       // socket.user = decoded;
@@ -44,10 +49,20 @@ const InitWinControlServer = (port: number): Promise<number> => {
       if (num < 1) {
         console.log('首次启动，初始化默认指令...')
         db.events.put("f6749f0c-d95b-40e8-8f9f-40ecb38b623e",
-          {"name": "腾旭视频","color": "#22bdff", "events": [{"event": "open-url","eventData": { "url": "https://v.qq.com/"}, "delay": 0} ], "id": "f6749f0c-d95b-40e8-8f9f-40ecb38b623e"}
+          {
+            "name": "腾旭视频",
+            "color": "#22bdff",
+            "events": [{"event": "open-url", "eventData": {"url": "https://v.qq.com/"}, "delay": 0}],
+            "id": "f6749f0c-d95b-40e8-8f9f-40ecb38b623e"
+          }
         ).then()
         db.events.put("f7749f0c-d95b-40e8-8f9f-40ecb38b623e",
-          {"name": "移动鼠标","color": "#22bdff", "events": [{"event": "sys-pointer-move","eventData": { "x": 500, "y": 500}, "delay": 0} ], "id": "f7749f0c-d95b-40e8-8f9f-40ecb38b623e"}
+          {
+            "name": "移动鼠标",
+            "color": "#22bdff",
+            "events": [{"event": "sys-pointer-move", "eventData": {"x": 500, "y": 500}, "delay": 0}],
+            "id": "f7749f0c-d95b-40e8-8f9f-40ecb38b623e"
+          }
         ).then()
       }
       db.app.put('app:LaunchNum', num + 1).then()

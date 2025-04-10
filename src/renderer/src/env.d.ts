@@ -13,3 +13,7 @@ declare global {
     api: CustomAPI
   }
 }
+
+type Setting = {
+  token:string
+}

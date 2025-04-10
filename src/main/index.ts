@@ -37,7 +37,6 @@ async function createWindow(): Promise<void> {
 
   console.log('启动control-server')
   global.mainWindow = mainWindow
-  global.ssss = 'ssss'
   global.controlServerPort = await InitWinControlServer(3000)
   global.childWindow={}
   // IPC
