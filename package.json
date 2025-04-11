@@ -36,11 +36,13 @@
     "loudness": "^0.4.2",
     "node-schedule": "^2.1.1",
     "node-screenshots": "^0.2.3",
+    "pinia": "^3.0.2",
     "screenshot-desktop": "^1.15.1",
     "sharp": "^0.34.1",
     "socket.io": "^4.8.1",
     "systeminformation": "^5.25.11",
-    "upath": "^2.0.1"
+    "upath": "^2.0.1",
+    "vue-router": "^4.5.0"
   },
   "devDependencies": {
     "@arco-design/web-vue": "^2.57.0",

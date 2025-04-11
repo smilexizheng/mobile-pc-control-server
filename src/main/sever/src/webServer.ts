@@ -13,10 +13,16 @@ const startWebServer = (webExpress: Express): void => {
   // 托管静态文件（public 目录）
   webExpress.use(express.static(webPath))
 
+  webExpress.get('/getInfo', (_, res): void => {
+    res.json({version: app.getVersion()})
+  })
+
   // 根路由指向 index.html
   webExpress.get(/.*/, (_, res): void => {
     res.sendFile(upath.join(webPath, 'index.html'))
   })
+
+
 }
 
 export default startWebServer

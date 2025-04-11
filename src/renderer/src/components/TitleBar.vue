@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import {ref} from 'vue'
 import Settings from "./settings.vue";
 
 const visible = ref(false)
@@ -10,10 +10,10 @@ const handleClose = () => window.electron.ipcRenderer.send('window-close')
 
 <template>
   <div class="title-bar">
-    <img alt="logo" class="min-logo" src="../assets/logo.svg" />
+    <img alt="logo" class="min-logo" src="../assets/logo.svg"/>
     {{ title }}
     <div class="window-controls">
-      <icon-settings @click="visible=true" />
+      <icon-settings @click="visible=true"/>
       <button class="control-btn minimize" @click="handleMinimize">一</button>
       <!--      <button class="control-btn minimize">-->
       <!--        ❏❑-->
@@ -22,7 +22,7 @@ const handleClose = () => window.electron.ipcRenderer.send('window-close')
     </div>
   </div>
   <a-modal v-model:visible="visible" title="系统设置" :footer="false">
-    <Settings />
+    <Settings/>
   </a-modal>
 </template>
 
@@ -32,7 +32,7 @@ const handleClose = () => window.electron.ipcRenderer.send('window-close')
   app-region: drag;
   height: 30px;
   width: 100%;
-  color: #e0dede;
+  color: var(--color-text-1);
   /*background: #fcfcfc;*/
   display: flex;
   align-items: center;
@@ -55,7 +55,7 @@ const handleClose = () => window.electron.ipcRenderer.send('window-close')
 }
 
 .control-btn {
-  color: #c5c5c5;
+  color: var(--color-text-3);
   font-size: 16px;
   width: 32px;
   height: 30px;
@@ -73,18 +73,11 @@ const handleClose = () => window.electron.ipcRenderer.send('window-close')
   background: rgba(0, 0, 0, 0.05);
 }
 
-.control-btn.close:hover {
-  background: #ff5c5c;
-}
-
-.control-btn.close:hover path {
-  fill: #23ea0e;
-}
 
 /* Windows 风格悬停效果 */
 @media (hover: hover) {
   .control-btn.minimize:hover {
-    background: #525454;
+    background: var(--color-border-3);
   }
 
   .control-btn.close:hover {
