@@ -12,12 +12,13 @@ const serverPort = ref<number>()
 const ips = ref<string[]>()
 
 onMounted(async () => {
+
   serverPort.value = await window.api.getControlServerPort()
   ips.value = await window.api.getLocalIPs()
   window.electron.ipcRenderer.on('openWindow-resp', (_, success) => {
     isLoading.value = false
-    success? Message.success('正在连接中...') :
-    Message.error('无法连接对方设备')
+    success ? Message.success('正在连接中...') :
+      Message.error('无法连接对方设备')
   })
 })
 
@@ -53,7 +54,7 @@ const openWindow = (data) => {
     </a-typography-text>
     <a-input-group>
       <a-input v-model="deviceCode" :style="{width:'150px'}" placeholder="请输入IP地址" allow-clear/>
-      <a-input-number v-model="devicePort" :style="{width:'90px'}"  placeholder="端口"
+      <a-input-number v-model="devicePort" :style="{width:'90px'}" placeholder="端口"
                       allow-clear/>
       <a-button type="primary"
                 :loading="isLoading"

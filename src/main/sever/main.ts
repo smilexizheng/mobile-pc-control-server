@@ -6,23 +6,23 @@ import express from 'express'
 import {getJobList, runJob} from './src/eventSchedule'
 import {db} from "./src/database";
 import {ExtendedError} from "socket.io/dist/namespace";
-import {Setting} from "../../renderer/src/env";
 
+
+let io;
 const InitWinControlServer =  (port: number): Promise<number> => {
   return new Promise(async (resolve, reject) => {
     const webExpress = express()
     const httpServer = createServer(webExpress)
     startWebServer(webExpress)
-    const io = new Server(httpServer, {
+    io = new Server(httpServer, {
       path: '/win-control.io',
       maxHttpBufferSize: 1024 * 1024 * 50
       // options
     })
 
-    const setting:Setting = await db.app.get('app:settings')
     io.use((socket, next) => {
       const token = socket.handshake.auth.token
-      const decoded = token === (setting?.token ||'ssss')
+      const decoded = token === (global.setting.token)
       if (!decoded || !token) {
         const error: ExtendedError = new Error('令牌验证失败');
         error.data = {code: 401}
@@ -88,4 +88,12 @@ const InitWinControlServer =  (port: number): Promise<number> => {
   })
 }
 
-export {InitWinControlServer}
+const disconnectSockets =()=>{
+  if(!io){
+    console.error("disconnectSockets:socket.io is not running");
+    return;
+  }
+  io.emit('reconnected');
+}
+
+export {InitWinControlServer,disconnectSockets}

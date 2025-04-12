@@ -8,6 +8,7 @@ import { InitTray } from './menu/tray'
 import './utils/log'
 import { initProtocol, handleArgv } from './utils/protocol'
 import { pathToFileURL, URL } from 'url'
+import {db} from "./sever/src/database";
 
 async function createWindow(): Promise<void> {
   // Create the browser window.
@@ -36,8 +37,9 @@ async function createWindow(): Promise<void> {
   })
 
   console.log('启动control-server')
+  global.setting = await db.getSettings()
   global.mainWindow = mainWindow
-  global.controlServerPort = await InitWinControlServer(3000)
+  global.controlServerPort = await InitWinControlServer(global.setting.port)
   global.childWindow={}
   // IPC
   import('./ipc')

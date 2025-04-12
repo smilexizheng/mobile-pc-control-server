@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import {ref} from 'vue'
-import Settings from "./settings.vue";
+import Settings from "./Settings.vue";
 
-const visible = ref(false)
+
 const title = ref(window.document.title)
 const handleMinimize = () => window.electron.ipcRenderer.send('window-minimize')
 const handleClose = () => window.electron.ipcRenderer.send('window-close')
@@ -13,7 +13,7 @@ const handleClose = () => window.electron.ipcRenderer.send('window-close')
     <img alt="logo" class="min-logo" src="../assets/logo.svg"/>
     {{ title }}
     <div class="window-controls">
-      <icon-settings @click="visible=true"/>
+      <Settings  />
       <button class="control-btn minimize" @click="handleMinimize">一</button>
       <!--      <button class="control-btn minimize">-->
       <!--        ❏❑-->
@@ -21,9 +21,7 @@ const handleClose = () => window.electron.ipcRenderer.send('window-close')
       <button class="control-btn close" @click="handleClose">✖</button>
     </div>
   </div>
-  <a-modal v-model:visible="visible" title="系统设置" :footer="false">
-    <Settings/>
-  </a-modal>
+
 </template>
 
 <style scoped>
@@ -53,6 +51,7 @@ const handleClose = () => window.electron.ipcRenderer.send('window-close')
   gap: 6px;
   margin-left: auto;
 }
+
 
 .control-btn {
   color: var(--color-text-3);

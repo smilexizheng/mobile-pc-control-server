@@ -18,7 +18,7 @@ import {
 import {mouse, Point} from '@nut-tree-fork/nut-js'
 import {TransferFile} from './TransferFile'
 import {createJob, deleteJob, getJobList, toggleJob} from './eventSchedule'
-import {db, getAll} from "./database";
+import {db} from "./database";
 
 const registerSocketHandlers = (io): void => {
   // 前端触摸时的pos
@@ -91,7 +91,7 @@ const registerSocketHandlers = (io): void => {
 
 
     const sendEventList = () => {
-      getAll(db.events).then(data => io.emit(CE.EVENTS_GET, data))
+      db.getAll(db.events).then(data => io.emit(CE.EVENTS_GET, data))
     }
     sendEventList();
     socket.on(CE.EVENTS_GET, () => {

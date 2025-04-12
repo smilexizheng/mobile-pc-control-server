@@ -22,10 +22,16 @@ const getAll = async (db) => {
   return result
 }
 
+const getSettings = async () => {
+  const settings= await db.app.get('app:settings')
+  return settings || {port: 3000, token:'ssss'}
+}
+
 const db = {
   app,
   schedule,
   events,
-  getAll
+  getAll,
+  getSettings
 }
-export {db,getAll}
+export {db}
