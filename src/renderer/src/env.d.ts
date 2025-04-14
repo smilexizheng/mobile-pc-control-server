@@ -7,6 +7,9 @@ type CustomAPI = {
   getAppVersion: () => Promise<string>
 }
 
+type ThemeType = 'light' | 'dark';
+
+
 declare global {
   interface Window {
     electron: ElectronAPI

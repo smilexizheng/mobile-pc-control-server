@@ -25,6 +25,7 @@
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^4.0.0",
     "@nut-tree-fork/nut-js": "^4.2.6",
+    "@vueuse/core": "^13.1.0",
     "electron-log": "^5.3.2",
     "electron-updater": "^6.3.9",
     "express": "5.1.0",
