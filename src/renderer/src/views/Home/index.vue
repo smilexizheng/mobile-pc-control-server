@@ -4,7 +4,7 @@ import {onMounted, ref} from 'vue'
 import TitleBar from '@renderer/components/TitleBar.vue'
 import {Message} from "@arco-design/web-vue";
 
-const deviceCode = ref<string>()
+const deviceCode = ref<string>('127.0.0.1')
 const devicePort = ref<number>(3000)
 const isLoading = ref<boolean>(false)
 

@@ -6,6 +6,8 @@ import { clipboard } from 'electron'
 import { spawn } from 'child_process'
 import { CLIENT_EMIT_EVENTS as CE } from './constant/client-emit'
 import { shutdown } from './system'
+// import { WinApi } from './utils/win-api'
+// import screenshot  from 'screenshot-desktop'
 
 mouse.config.autoDelayMs = 10
 keyboard.config.autoDelayMs = 10
@@ -21,11 +23,11 @@ const validateParams = (data, fields): void => {
 const keyPressHandle = async (data): Promise<void> => {
   validateParams(data, ['key']) // 假设需要key参数
   // console.log(typeof  data.key)
-  // if (typeof data.key === 'number') {qqqqqq
+  // if (typeof data.key === 'number') {
   //   await keyboard.type(data.key)
   // } else {
-    await keyboard.pressKey(...data.key)
-    await keyboard.releaseKey(...data.key)
+  await keyboard.pressKey(...data.key)
+  await keyboard.releaseKey(...data.key)
   // }
 }
 
@@ -53,17 +55,20 @@ const openAppHandler = async (): Promise<void> => {
 
 /**
  * 自动输入前端输出内容
+ * <p>
+ * now use Electron clipboard
+ * \node_modules\@nut-tree-fork\default-clipboard-provider\node_modules\clipboardy\lib\windows.js
+ * const windowBinaryPath = arch() === 'x64' ?(app.isPackaged ? path.join(process.resourcesPath, '\\app.asar.unpacked\\node_modules\\@nut-tree-fork\\default-clipboard-provider\\node_modules\\clipboardy\\fallbacks\\windows\\clipboard_x86_64.exe') : path.join(__dirname, '../fallbacks/windows/clipboard_x86_64.exe'))	 : (app.isPackaged ? path.join(process.resourcesPath, '\\app.asar.unpacked\\node_modules\\@nut-tree-fork\\default-clipboard-provider\\node_modules\\clipboardy\\fallbacks\\windows\\clipboard_i686.exe') : path.join(__dirname, '../fallbacks/windows/clipboard_i686.exe'));
+ *
+ *
  * @param data
  * @returns {Promise<void>}
  */
 const typeString = async (data): Promise<void> => {
-  //  \node_modules\@nut-tree-fork\default-clipboard-provider\node_modules\clipboardy\lib\windows.js
-  // const windowBinaryPath = arch() === 'x64' ?(app.isPackaged ? path.join(process.resourcesPath, '\\app.asar.unpacked\\node_modules\\@nut-tree-fork\\default-clipboard-provider\\node_modules\\clipboardy\\fallbacks\\windows\\clipboard_x86_64.exe') : path.join(__dirname, '../fallbacks/windows/clipboard_x86_64.exe'))	 : (app.isPackaged ? path.join(process.resourcesPath, '\\app.asar.unpacked\\node_modules\\@nut-tree-fork\\default-clipboard-provider\\node_modules\\clipboardy\\fallbacks\\windows\\clipboard_i686.exe') : path.join(__dirname, '../fallbacks/windows/clipboard_i686.exe'));
-  // now use Electron clipboard
   clipboard.writeText(data.val.toString())
-  await keyPressHandle({ key: [Key.LeftControl,Key.V]})
+  await keyPressHandle({ key: [Key.LeftControl, Key.V] })
   if (data.enter) {
-    await keyPressHandle({ key: [Key.Enter]})
+    await keyPressHandle({ key: [Key.Enter] })
   }
   clipboard.writeText('')
 }
@@ -98,6 +103,7 @@ const mouseToggle = async (isPress, button): Promise<void> => {
 }
 
 const moveMouse = async (point: Point[]): Promise<void> => {
+  // WinApi.moveMouse(point[0].x, point[0].y)
   await mouse.move(point)
 }
 
@@ -179,14 +185,14 @@ const grabRegion = async (mouseX, mouseY, captureWidth, captureHeight): Promise<
 }
 
 const eventHandler = (e: SocketEvent): void => {
-  const data: EventData|undefined = e.eventData
+  const data: EventData | undefined = e.eventData
   if (!data) return
   switch (e.event) {
     case CE.KEYPRESS:
       keyPressHandle(data).then()
       break
     case CE.SYS_POINTER_MOVE:
-      if(!data.x || !data.y) break
+      if (!data.x || !data.y) break
       mouse.move([{ x: data.x, y: data.y }]).then()
       break
     case CE.SYS_MOUSE_CLICK:
@@ -199,7 +205,7 @@ const eventHandler = (e: SocketEvent): void => {
       openUrlHandler(data)
       break
     case CE.SYS_SHUTDOWN:
-      shutdown(data,null)
+      shutdown(data, null)
       break
     default:
       console.log(`schedule event type ${e.event} is not supported`)
