@@ -8,6 +8,9 @@ import { CLIENT_EMIT_EVENTS as CE } from './constant/client-emit'
 import { shutdown } from './system'
 // import { WinApi } from './utils/win-api'
 // import screenshot  from 'screenshot-desktop'
+// import indexNode from './index.node'
+// console.log(indexNode)
+// indexNode.captureScreen()
 
 mouse.config.autoDelayMs = 10
 keyboard.config.autoDelayMs = 10
@@ -103,8 +106,8 @@ const mouseToggle = async (isPress, button): Promise<void> => {
 }
 
 const moveMouse = async (point: Point[]): Promise<void> => {
-  // WinApi.moveMouse(point[0].x, point[0].y)
   await mouse.move(point)
+  // WinApi.moveMouse(point[0].x, point[0].y)
 }
 
 const grabRegion = async (mouseX, mouseY, captureWidth, captureHeight): Promise<object> => {

@@ -8,7 +8,8 @@ import { InitTray } from './menu/tray'
 import './utils/log'
 import { initProtocol, handleArgv } from './utils/protocol'
 import { pathToFileURL, URL } from 'url'
-import {db} from "./sever/src/database";
+import { db } from './sever/src/database'
+// import { InitAsrTts } from './asr-tts'
 
 async function createWindow(): Promise<void> {
   // Create the browser window.
@@ -40,11 +41,13 @@ async function createWindow(): Promise<void> {
   global.setting = await db.getSettings()
   global.mainWindow = mainWindow
   global.controlServerPort = await InitWinControlServer(global.setting.port)
-  global.childWindow={}
+  global.childWindow = {}
+  // InitAsrTts()
   // IPC
   import('./ipc')
   // tray 系统托盘
   InitTray()
+  // 注册协议
   initProtocol()
 
   // todo win11 bugs titleBarOverlay冲突  https://github.com/electron/electron/issues/42409  createWindow setTimeout 100ms  正常
