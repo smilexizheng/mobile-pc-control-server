@@ -9,7 +9,7 @@ import './utils/log'
 import { initProtocol, handleArgv } from './utils/protocol'
 import { pathToFileURL, URL } from 'url'
 import { db } from './sever/src/database'
-// import { InitAsrTts } from './asr-tts'
+import { InitAsrTts } from './asr-tts-ocr'
 
 async function createWindow(): Promise<void> {
   // Create the browser window.
@@ -42,7 +42,7 @@ async function createWindow(): Promise<void> {
   global.mainWindow = mainWindow
   global.controlServerPort = await InitWinControlServer(global.setting.port)
   global.childWindow = {}
-  // InitAsrTts()
+  InitAsrTts()
   // IPC
   import('./ipc')
   // tray 系统托盘
