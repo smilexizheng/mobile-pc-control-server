@@ -57,13 +57,19 @@ import ChildProcessManager from './child_process_manager'
 import OCRService from './ocr'
 
 const InitAsrTts = (): void => {
+  // const nodeAser = new ChildProcessManager(
+  //   'D:\\IdeaProjects\\win-control-serve-electron\\childProcess\\asr.js'
+  // )
+  //
+  // nodeAser.start()
+
   const ocrService = new OCRService({ lang: 'zhCN' })
 
   ocrService.ocr('D:\\IdeaProjects\\win-control-serve-electron\\resources\\ocr\\test.png')
 
   // 麦克风流式语音监听
   const asrProcess = new ChildProcessManager(
-    'D:\\IdeaProjects\\win-control-serve-electron\\src\\main\\asr-tts\\asr_streaming_paraformer.mjs'
+    'D:\\IdeaProjects\\win-control-serve-electron\\src\\main\\asr-tts-ocr\\asr_streaming_paraformer.mjs'
   )
   asrProcess.start()
   asrProcess.send({ logPath: 'logs' })
@@ -73,7 +79,7 @@ const InitAsrTts = (): void => {
   global.asrProcess = asrProcess
 
   const ttsProcess = new ChildProcessManager(
-    'D:\\IdeaProjects\\win-control-serve-electron\\src\\main\\asr-tts\\tts_non_streaming_kokoro_zh_en.mjs'
+    'D:\\IdeaProjects\\win-control-serve-electron\\src\\main\\asr-tts-ocr\\tts_non_streaming_kokoro_zh_en.mjs'
   )
   ttsProcess.start()
   ttsProcess.send({ cmd: 'tts', text: '这是中文，this is a dog,中英切换，效果如何？' })
