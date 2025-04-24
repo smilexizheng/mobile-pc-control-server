@@ -2,17 +2,13 @@ import sherpa_onnx from 'sherpa-onnx'
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const createOfflineTts = () => {
   const offlineTtsKokoroModelConfig = {
-    model:
-      'D:\\IdeaProjects\\win-control-serve-electron\\models\\kokoro-multi-lang-v1_1\\model.onnx',
-    voices:
-      'D:\\IdeaProjects\\win-control-serve-electron\\models\\kokoro-multi-lang-v1_1\\voices.bin',
-    tokens:
-      'D:\\IdeaProjects\\win-control-serve-electron\\models\\kokoro-multi-lang-v1_1\\tokens.txt',
-    dataDir:
-      'D:\\IdeaProjects\\win-control-serve-electron\\models\\kokoro-multi-lang-v1_1\\espeak-ng-data',
-    dictDir: 'D:\\IdeaProjects\\win-control-serve-electron\\models\\kokoro-multi-lang-v1_1\\dict',
+    model: 'D:\\models\\kokoro-multi-lang-v1_1\\model.onnx',
+    voices: 'D:\\models\\kokoro-multi-lang-v1_1\\voices.bin',
+    tokens: 'D:\\models\\kokoro-multi-lang-v1_1\\tokens.txt',
+    dataDir: 'D:\\models\\kokoro-multi-lang-v1_1\\espeak-ng-data',
+    dictDir: 'D:\\models\\kokoro-multi-lang-v1_1\\dict',
     lexicon:
-      'D:\\IdeaProjects\\win-control-serve-electron\\models\\kokoro-multi-lang-v1_1\\lexicon-us-en.txt,D:\\IdeaProjects\\win-control-serve-electron\\models\\kokoro-multi-lang-v1_1\\lexicon-zh.txt',
+      'D:\\models\\kokoro-multi-lang-v1_1\\lexicon-us-en.txt,D:\\models\\kokoro-multi-lang-v1_1\\lexicon-zh.txt',
     lengthScale: 1.0
   }
   const offlineTtsModelConfig = {

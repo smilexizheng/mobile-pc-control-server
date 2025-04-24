@@ -8,16 +8,13 @@ import sherpa_onnx from 'sherpa-onnx'
 
 function createOnlineRecognizer() {
   let onlineParaformerModelConfig = {
-    encoder:
-      'D:\\IdeaProjects\\win-control-serve-electron\\models\\sherpa-onnx-streaming-paraformer-bilingual-zh-en\\encoder.int8.onnx',
-    decoder:
-      'D:\\IdeaProjects\\win-control-serve-electron\\models\\sherpa-onnx-streaming-paraformer-bilingual-zh-en\\decoder.int8.onnx'
+    encoder: 'D:\\models\\sherpa-onnx-streaming-paraformer-bilingual-zh-en\\encoder.int8.onnx',
+    decoder: 'D:\\models\\sherpa-onnx-streaming-paraformer-bilingual-zh-en\\decoder.int8.onnx'
   }
 
   let onlineModelConfig = {
     paraformer: onlineParaformerModelConfig,
-    tokens:
-      'D:\\IdeaProjects\\win-control-serve-electron\\models\\sherpa-onnx-streaming-paraformer-bilingual-zh-en\\tokens.txt'
+    tokens: 'D:\\models\\sherpa-onnx-streaming-paraformer-bilingual-zh-en\\tokens.txt'
   }
 
   let recognizerConfig = {

@@ -1,12 +1,13 @@
-import { spawn } from 'child_process'
-import { app } from 'electron'
+import { ChildProcess, spawn } from 'child_process'
+import ffmpegPath from 'ffmpeg-static'
+import ffprobePath from '@ffprobe-installer/ffprobe'
 import upath from 'upath'
 
 // import {createWriteStream} from "fs";
 
 // const file = createWriteStream("capture.flv");
 
-let childProcess
+let childProcess: ChildProcess | null
 
 let header = null
 const sendHeader = (io, socket): void => {
@@ -20,13 +21,10 @@ const sendHeader = (io, socket): void => {
 }
 
 const startScreenLive = (io): void => {
-  if (childProcess) return
-  const ffmpegPath = app.isPackaged
-    ? upath.join(process.resourcesPath, 'app.asar.unpacked', 'resources', 'ffmpeg.exe')
-    : upath.join(process.cwd(), 'resources', 'ffmpeg.exe')
-
+  if (childProcess || !ffmpegPath) return
+  console.log(ffmpegPath, ffprobePath, ffprobePath.path)
   childProcess = spawn(
-    ffmpegPath,
+    upath.join(ffmpegPath).replace('app.asar', 'app.asar.unpacked'),
     [
       '-f',
       'gdigrab',
@@ -52,7 +50,7 @@ const startScreenLive = (io): void => {
   // stream.pipe(file);
 
   // 处理捕获的流数据
-  stream.on('data', (data) => {
+  stream?.on('data', (data) => {
     if (!io.sockets.adapter.rooms.has('screenlive')) {
       stopScreenLive()
     }
@@ -65,7 +63,7 @@ const startScreenLive = (io): void => {
     io.to('screenlive').emit('flv_data', data)
   })
 
-  stream.on('end', () => {
+  stream?.on('end', () => {
     console.log('Stream ended')
   })
 
