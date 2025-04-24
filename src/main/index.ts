@@ -75,7 +75,7 @@ async function createWindow(): Promise<void> {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html')).then()
   }
 }
-
+app.commandLine.appendSwitch('lang', 'zh-CN')
 const gotTheLock = app.requestSingleInstanceLock()
 if (!gotTheLock) {
   app.quit()

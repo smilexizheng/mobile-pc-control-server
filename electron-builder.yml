@@ -2,13 +2,29 @@ appId: com.smile.cse
 productName: ControlServer
 directories:
   buildResources: build
+electronLanguages:
+  - zh-CN
+  - en-US
+  - zh_CN # for macOS
+  - zh_TW # for macOS
+  - en # for macOS
 files:
   - '!**/.vscode/*'
   - '!src/*'
   - '!electron.vite.config.{js,ts,mjs,cjs}'
-  - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+  - '!{.eslintignore,.eslintrc.cjs,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  - '!{.idea,.fastRequest,docs,db,logs,test}'
+  - '!*.md'
+  - '!**/*.{map,ts,tsx,jsx,less,scss,sass,css.d.ts,d.cts,d.mts,md,markdown,yaml,yml}'
+  - '!**/{test,tests,__tests__,coverage}/**'
+  - '!**/*.{spec,test}.{js,jsx,ts,tsx}'
+  - '!**/{*.map,*.log,*.d.ts,*.LICENSE,*license,*.README,*example.js}'
+  - '!**/{.DS_Store,Thumbs.db}'
+  - '!**/{LICENSE,LICENSE.txt,LICENSE-MIT.txt,*.LICENSE.txt,NOTICE.txt,README.md,CHANGELOG.md}'
+
+# to look app.asar  npx asar extract app.asar ./unpacked
 asarUnpack:
   - resources/**
 win:
