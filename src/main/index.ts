@@ -14,10 +14,10 @@ import { db } from './sever/src/database'
 async function createWindow(): Promise<void> {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 820,
-    height: 600,
-    minWidth: 820,
-    minHeight: 600,
+    width: 800,
+    height: 550,
+    minWidth: 800,
+    minHeight: 550,
     frame: false,
     show: false,
     backgroundColor: 'rgb(32, 32, 32)',
