@@ -70,10 +70,10 @@ class OCRService {
   }
 
   private initializeEngine(): void {
+    console.log(`OCR[${this.config.lang}] 引擎启动`)
     this.ocrEnginePath = this.getEnginePath()
     const args = this.getModelArgs()
     const executablePath = path.join(this.ocrEnginePath, './RapidOCR-json.exe')
-    console.log(executablePath, args)
     this.ocrEngine = spawn(executablePath, args)
     this.ocrEngine.stdout?.on('data', this.handleStdout.bind(this))
     this.ocrEngine.stderr?.on('data', this.handleStderr.bind(this))
@@ -83,13 +83,9 @@ class OCRService {
 
   private handleStdout(data: Buffer): void {
     const result = data.toString().trim()
-    console.log(`OCR引擎输出: ${result}`)
-
     try {
-      const parsed = JSON.parse(result)
-      if (parsed.code === 100) {
-        console.log('Parsed OCR result:', parsed)
-      }
+      // JSON.parse(result)
+      global.mainWindow.webContents.send('ocr-result', result)
     } catch (e) {
       console.error('Failed to parse OCR output:', e)
     }
@@ -117,7 +113,7 @@ class OCRService {
     if (this.ocrEngine) {
       this.ocrEngine.stdin?.write(JSON.stringify({ image_path: imagePath }) + '\n')
     } else {
-      console.log('OCE 引擎没有初始化')
+      console.log('OCR 引擎没有初始化')
     }
   }
 }

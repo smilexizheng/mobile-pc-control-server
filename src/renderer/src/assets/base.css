@@ -16,8 +16,6 @@ ul {
 
 body {
   min-height: 100vh;
-  color: var(--color-text-1);
-  background: var(--color-fill-3);
   line-height: 1.6;
   font-family:
     Inter,

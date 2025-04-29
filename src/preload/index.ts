@@ -5,7 +5,8 @@ import { electronAPI } from '@electron-toolkit/preload'
 const api = {
   getControlServerPort: (): Promise<number> => ipcRenderer.invoke('get-control-server-port'),
   getLocalIPs: (): Promise<string[]> => ipcRenderer.invoke('get-local-ips'),
-  getAppVersion: (): Promise<string> => ipcRenderer.invoke('get-app-version')
+  getAppVersion: (): Promise<string> => ipcRenderer.invoke('get-app-version'),
+  ocrImg: (img): void => ipcRenderer.send('ocr-recognition', img)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

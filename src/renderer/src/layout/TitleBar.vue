@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import Settings from './Settings.vue'
+import Settings from '../components/Settings.vue'
 
 const title = ref(window.document.title)
 const handleMinimize = () => window.electron.ipcRenderer.send('window-minimize')

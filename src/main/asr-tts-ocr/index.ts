@@ -54,18 +54,15 @@
 // export { tts }
 
 import ChildProcessManager from './child_process_manager'
-import OCRService from './ocr'
 
+// https://github.com/k2-fsa/sherpa-onnx/releases/tag/tts-models
+// https://github.com/k2-fsa/sherpa-onnx/releases/tag/asr-models
 const InitAsrTts = (): void => {
   // const nodeAser = new ChildProcessManager(
   //   'D:\\IdeaProjects\\win-control-serve-electron\\childProcess\\asr.js'
   // )
   //
   // nodeAser.start()
-
-  const ocrService = new OCRService({ lang: 'zhCN' })
-
-  ocrService.ocr('D:\\IdeaProjects\\win-control-serve-electron\\resources\\ocr\\test.png')
 
   // 麦克风流式语音监听
   const asrProcess = new ChildProcessManager(

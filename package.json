@@ -34,6 +34,7 @@
     "fluent-ffmpeg": "2.1.3",
     "iconv-lite": "^0.6.3",
     "koffi": "^2.10.1",
+    "konva": "^9.3.20",
     "level": "^9.0.0",
     "level-supports": "^6.0.0",
     "level-transcoder": "^1.0.1",
@@ -49,6 +50,7 @@
     "socket.io": "^4.8.1",
     "systeminformation": "^5.25.11",
     "upath": "^2.0.1",
+    "vue-konva": "^3.2.1",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {

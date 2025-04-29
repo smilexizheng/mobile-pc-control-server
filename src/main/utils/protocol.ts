@@ -1,5 +1,6 @@
-import { app } from 'electron'
+import { app, protocol, net } from 'electron'
 import * as path from 'path'
+import { pathToFileURL } from 'url'
 
 const PROTOCOL = 'cse'
 const initProtocol = (): void => {
@@ -16,6 +17,15 @@ const initProtocol = (): void => {
   // macOS 下通过协议URL启动时，主实例会通过 open-url 事件接收这个 URL
   app.on('open-url', (_, urlStr) => {
     handleUrl(urlStr)
+  })
+
+  /**
+   * 从本地磁盘读取文件
+   */
+  protocol.handle('disk', (request) => {
+    let pathName = new URL(request.url).pathname
+    pathName = decodeURIComponent(pathName)
+    return net.fetch(pathToFileURL(pathName.substring(1)).toString())
   })
 }
 

@@ -1,5 +1,6 @@
-import {createRouter, createWebHistory} from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import Home from '@renderer/views/Home/index.vue'
+import Ocr from '@renderer/views/OCR/index.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -9,7 +10,11 @@ const router = createRouter({
       name: '首页',
       component: Home
     },
-
+    {
+      path: '/ocr',
+      name: 'ocr',
+      component: Ocr
+    }
   ]
 })
 
