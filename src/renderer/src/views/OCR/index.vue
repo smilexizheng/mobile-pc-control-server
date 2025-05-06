@@ -1,7 +1,16 @@
 <script setup lang="ts">
 import { useOcrStore } from '@renderer/store/ocr'
+import { onMounted, onUnmounted } from 'vue'
 
 const ocrStore = useOcrStore()
+
+onMounted(() => {
+  window.addEventListener('keydown', ocrStore.shortcutKeyHandler)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', ocrStore.shortcutKeyHandler)
+})
 </script>
 
 <template>
@@ -17,10 +26,15 @@ const ocrStore = useOcrStore()
           mode="button"
         />
         <a-button type="primary" :loading="ocrStore.isLoading" @click="ocrStore.chooseFile()"
-          >选择图片
+          >打开图片
         </a-button>
-        <a-button type="primary" :disabled="ocrStore.isLoading" @click="ocrStore.toggle()"
+
+        <a-button :disabled="ocrStore.isLoading" @click="ocrStore.toggle()"
           >{{ ocrStore.showOcr ? '隐藏结果' : '显示结果' }}
+        </a-button>
+
+        <a-button :disabled="ocrStore.isLoading" @click="ocrStore.copyAllText()"
+          >复制全部
         </a-button>
       </a-space>
     </div>
@@ -51,8 +65,8 @@ const ocrStore = useOcrStore()
         >
           <k-stage
             :config="{
-              width: ocrStore.mainLayerWH.width - 20,
-              height: ocrStore.mainLayerWH.height - 20
+              width: ocrStore.mainLayerWH.width - 16,
+              height: ocrStore.mainLayerWH.height - 16
             }"
           >
             <k-layer
@@ -72,7 +86,11 @@ const ocrStore = useOcrStore()
                 }"
               />
 
-              <template v-for="(data, i) in ocrStore.ocrResult" :key="`index_${i}`">
+              <k-group
+                v-for="(data, i) in ocrStore.ocrResult"
+                :key="`index_${i}`"
+                @click="ocrStore.copyText(data.text)"
+              >
                 <k-rect
                   v-if="ocrStore.showOcr"
                   :config="{
@@ -97,14 +115,14 @@ const ocrStore = useOcrStore()
                     y: data.box[0][1],
                     width: data.box[2][0] - data.box[0][0],
                     height: data.box[2][1] - data.box[0][1],
-                    fontSize: 18,
+                    fontSize: ocrStore.dynamicFontSize(data.box[2][1] - data.box[0][1]),
                     fill: 'red',
                     text: data.text,
                     verticalAlign: 'middle',
                     align: 'center'
                   }"
                 />
-              </template>
+              </k-group>
             </k-layer>
           </k-stage>
         </div>

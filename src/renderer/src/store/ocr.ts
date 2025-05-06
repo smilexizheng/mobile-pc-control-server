@@ -1,13 +1,27 @@
 import { defineStore } from 'pinia'
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import { OcrResult } from '@renderer/env'
+import { createKeybindingsHandler } from 'tinykeys'
 import { useResizeObserver, useToggle, useMouseInElement, useScroll } from '@vueuse/core'
 import { useSystemStore } from '@renderer/store/system'
+import { Message } from '@arco-design/web-vue'
 
 type WH = { width: number; height: number }
 
 export const useOcrStore = defineStore('ocr', () => {
   const systemStore = useSystemStore()
+
+  window.electron.ipcRenderer.on('ocr-result', (_, result) => {
+    toggleLoading()
+    toggle()
+    const box = JSON.parse(result)
+    if (box.code === 100) {
+      ocrResult.value = box.data
+    } else {
+      Message.error(box.data)
+    }
+  })
+
   const mainLayerDiv = ref<HTMLDivElement | null>(null)
   const scrollDiv = ref<HTMLDivElement | null>(null)
   const { elementX: layerDivX, elementY: layerDivY } = useMouseInElement(mainLayerDiv)
@@ -16,12 +30,6 @@ export const useOcrStore = defineStore('ocr', () => {
   const mainLayerWH = ref<WH>({ width: 0, height: 0 })
   // 缩放倍数
   const scale = ref<number>(100)
-  // konva canvas 配置
-  // const stageConfig = ref({
-  //   width: appStore.contentWH?.width,
-  //   height: appStore.contentWH?.height
-  // })
-
   const realScale = computed(() => {
     return scale.value / 100
   })
@@ -48,6 +56,22 @@ export const useOcrStore = defineStore('ocr', () => {
       setScale(newScale)
     }
   }
+
+  /**
+   * 快捷键处理
+   */
+  const shortcutKeyHandler = createKeybindingsHandler({
+    '$mod+KeyV': async () => {
+      const path = await window.electron.ipcRenderer.invoke('cor-clipboard-readImage')
+      // console.log(imageBase64)
+      // if (imageBase64) {
+      //   loadImage(imageBase64)
+      //   ocrRecognition(imageBase64)
+      // }
+      console.log(path)
+      ocrImage(path)
+    }
+  })
 
   /**
    * 设置缩放比例
@@ -95,16 +119,6 @@ export const useOcrStore = defineStore('ocr', () => {
   const [showOcr, toggle] = useToggle(true)
   // 是否正在处理ocr图片
   const [isLoading, toggleLoading] = useToggle(false)
-
-  onMounted(() => {
-    // 监听事件处理ocr响应
-    window.electron.ipcRenderer.on('ocr-result', (_, result) => {
-      toggleLoading()
-      toggle()
-      const box = JSON.parse(result)
-      ocrResult.value = box.data
-    })
-  })
 
   // 图片放大缩小的实际宽高
   const ocrImageWH = computed<WH>(() => {
@@ -167,8 +181,30 @@ export const useOcrStore = defineStore('ocr', () => {
     }
   })
 
+  /**
+   * 字体大小 = 容器高度 × 比例系数（推荐 0.4-0.6）
+   * @param boxHeight
+   */
+  const dynamicFontSize = (boxHeight: number): number => {
+    return Math.max(
+      Math.min(Math.trunc(boxHeight * 0.4), 30), // 最大24px
+      12 // 最小8px
+    )
+  }
+
   // 发送ocr识别
   const ocrRecognition = (img): void => window.electron.ipcRenderer.send('ocr-recognition', img)
+  const copyText = (text): void => {
+    if (window.api.copyText(text)) {
+      Message.success('已复制到粘贴板')
+    } else {
+      Message.error('复制文字失败')
+    }
+  }
+
+  const copyAllText = (): void => {
+    copyText(ocrResult.value.map((item) => item.text).join('\n'))
+  }
 
   /**
    * 加载图片，并开始ocr识别
@@ -177,14 +213,20 @@ export const useOcrStore = defineStore('ocr', () => {
   const ocrImage = (path: string): void => {
     const imgSrc = `disk:///${path}`
     if (imgSrc) {
-      const img = new Image()
-      img.onload = (): void => {
-        image.value = img
-        calcScale()
-      }
-      img.src = imgSrc
+      loadImage(imgSrc)
+      ocrRecognition(path)
     }
-    ocrRecognition(path)
+  }
+
+  const loadImage = (imgSrc): void => {
+    const img = new Image()
+    img.onload = (): void => {
+      toggleLoading()
+      showOcr.value = false
+      image.value = img
+      calcScale()
+    }
+    img.src = imgSrc
   }
 
   /**
@@ -193,8 +235,6 @@ export const useOcrStore = defineStore('ocr', () => {
   const chooseFile = async (): Promise<void> => {
     const img = await systemStore.chooseFile('打开图片', ['png', 'jpg', 'jpeg'])
     if (img) {
-      toggleLoading()
-      showOcr.value = false
       ocrImage(img)
     }
   }
@@ -229,9 +269,13 @@ export const useOcrStore = defineStore('ocr', () => {
     showOcr,
     isLoading,
     layerConfig,
+    copyText,
+    copyAllText,
     toggle,
     toggleLoading,
     chooseFile,
-    wheelHandler
+    wheelHandler,
+    dynamicFontSize,
+    shortcutKeyHandler
   }
 })

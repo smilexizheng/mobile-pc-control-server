@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge, ipcRenderer, clipboard } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
@@ -6,7 +6,14 @@ const api = {
   getControlServerPort: (): Promise<number> => ipcRenderer.invoke('get-control-server-port'),
   getLocalIPs: (): Promise<string[]> => ipcRenderer.invoke('get-local-ips'),
   getAppVersion: (): Promise<string> => ipcRenderer.invoke('get-app-version'),
-  ocrImg: (img): void => ipcRenderer.send('ocr-recognition', img)
+  ocrImg: (img): void => ipcRenderer.send('ocr-recognition', img),
+  copyText: (str: string): boolean => {
+    if (str) {
+      clipboard.writeText(str)
+      return true
+    }
+    return false
+  }
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

@@ -4,6 +4,7 @@ import { ChildProcess, spawn } from 'child_process'
 interface IOCRConfig {
   lang?: 'zhCN' | 'zhTW' | 'ko' | 'ja' | 'en' // Add other supported languages as needed
 }
+type ImageSourceType = 'base64' | 'path' | 'base64-raw' | 'invalid' | 'unknown'
 
 class OCRService {
   private ocrEngine?: ChildProcess
@@ -109,12 +110,48 @@ class OCRService {
     }
   }
 
-  public ocr(imagePath): void {
-    if (this.ocrEngine) {
-      this.ocrEngine.stdin?.write(JSON.stringify({ image_path: imagePath }) + '\n')
+  public ocr(image): void {
+    const imageType = this.getImageSourceType(image)
+    if (this.ocrEngine && imageType !== 'invalid') {
+      if (imageType === 'base64') {
+        this.ocrEngine.stdin?.write(JSON.stringify({ image_base64: image }) + '\n')
+      } else if (imageType === 'path') {
+        this.ocrEngine.stdin?.write(JSON.stringify({ image_path: image }) + '\n')
+      }
     } else {
       console.log('OCR 引擎没有初始化')
     }
+  }
+
+  public getImageSourceType(str): ImageSourceType {
+    if (!str) return 'invalid'
+
+    // 快速检查Base64
+    if (str.startsWith('data:image/')) {
+      return 'base64'
+    }
+
+    // 快速检查常见图片扩展名
+    if (/\.(png|jpe?g|gif|webp|svg|bmp)$/i.test(str)) {
+      return 'path'
+    }
+
+    // 检查是否是URL（无扩展名情况）
+    if (/^(https?:)?\/\//.test(str)) {
+      return 'path'
+    }
+
+    // 可能是无前缀的Base64 暂不处理
+    // if (/^[A-Za-z0-9+/]+={0,2}$/.test(str) && str.length % 4 === 0) {
+    //   try {
+    //     atob(str)
+    //     return 'base64-raw'
+    //   } catch (e) {
+    //     console.error(e)
+    //   }
+    // }
+
+    return 'invalid'
   }
 }
 

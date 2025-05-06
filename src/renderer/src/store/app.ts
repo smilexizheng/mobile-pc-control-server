@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { computed, ref, useTemplateRef } from 'vue'
 import { Setting, ThemeType } from '../env'
-import { useStorage, useResizeObserver } from '@vueuse/core'
+import { useResizeObserver, useStorage } from '@vueuse/core'
+
 export const useAppStore = defineStore('app', () => {
   const mainLayout = useTemplateRef<HTMLDivElement>('main_layout')
   const mainLayoutWH = ref<{ width: number; height: number }>({
@@ -18,9 +19,7 @@ export const useAppStore = defineStore('app', () => {
   const theme = useStorage<ThemeType>('arco-theme', 'light')
 
   const initSetting = async (): Promise<void> => {
-    const value = await window.electron.ipcRenderer.invoke('get-settings')
-    console.info('init setting', value)
-    settings.value = value
+    settings.value = await window.electron.ipcRenderer.invoke('get-settings')
   }
 
   const updateSettings = (value: Setting): void => {

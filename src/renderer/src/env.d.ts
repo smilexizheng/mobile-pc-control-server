@@ -5,6 +5,7 @@ type CustomAPI = {
   getControlServerPort: () => Promise<number>
   getLocalIPs: () => Promise<string[]>
   getAppVersion: () => Promise<string>
+  copyText: (str: string) => boolean
 }
 
 type ThemeType = 'light' | 'dark'

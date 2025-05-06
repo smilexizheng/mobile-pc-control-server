@@ -49,6 +49,7 @@
     "sherpa-onnx": "^1.11.3",
     "socket.io": "^4.8.1",
     "systeminformation": "^5.25.11",
+    "tinykeys": "^3.0.0",
     "upath": "^2.0.1",
     "vue-konva": "^3.2.1",
     "vue-router": "^4.5.0"
