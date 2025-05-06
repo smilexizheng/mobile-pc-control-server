@@ -1,27 +1,7 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { Message } from '@arco-design/web-vue'
+import { useRemoteStore } from '@renderer/store/remote'
 
-const deviceCode = ref<string>('127.0.0.1')
-const devicePort = ref<number>(3000)
-const isLoading = ref<boolean>(false)
-
-const serverPort = ref<number>()
-const ips = ref<string[]>()
-
-onMounted(async () => {
-  serverPort.value = await window.api.getControlServerPort()
-  ips.value = await window.api.getLocalIPs()
-  window.electron.ipcRenderer.on('openWindow-resp', (_, success) => {
-    isLoading.value = false
-    success ? Message.success('正在连接中...') : Message.error('无法连接对方设备')
-  })
-})
-
-const openWindow = (data): void => {
-  isLoading.value = true
-  window.electron.ipcRenderer.send('openWindow', data)
-}
+const remoteStore = useRemoteStore()
 </script>
 
 <template>
@@ -38,41 +18,41 @@ const openWindow = (data): void => {
         <a-divider direction="vertical" />
       </template>
       <a-button
-        v-for="ip in ips"
+        v-for="ip in remoteStore.ips"
         :key="ip"
         type="primary"
         class="action"
         @click="
-          openWindow({
+          remoteStore.openWindow({
             id: 'self',
-            url: `http://localhost:${serverPort}`
+            url: `http://localhost:${remoteStore.serverPort}`
           })
         "
-        >访问http://{{ ip }}:{{ serverPort }}
+        >访问http://{{ ip }}:{{ remoteStore.serverPort }}
       </a-button>
     </a-space>
     <a-input-group>
       <a-typography-text> 远程设备： </a-typography-text>
       <a-input
-        v-model="deviceCode"
+        v-model="remoteStore.deviceCode"
         :style="{ width: '150px' }"
         placeholder="请输入IP地址"
         allow-clear
       />
       <a-input-number
-        v-model="devicePort"
+        v-model="remoteStore.devicePort"
         :style="{ width: '90px' }"
         placeholder="端口"
         allow-clear
       />
       <a-button
         type="primary"
-        :loading="isLoading"
+        :loading="remoteStore.isLoading"
         @click="
-          openWindow({
-            id: `remote_${deviceCode}`,
-            title: `远程设备_${deviceCode}`,
-            url: `http://${deviceCode}:${devicePort}`
+          remoteStore.openWindow({
+            id: `remote_${remoteStore.deviceCode}`,
+            title: `远程设备_${remoteStore.deviceCode}`,
+            url: `http://${remoteStore.deviceCode}:${remoteStore.devicePort}`
           })
         "
         >连接
