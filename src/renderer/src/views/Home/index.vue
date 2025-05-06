@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import TitleBar from '@renderer/layout/TitleBar.vue'
 import { Message } from '@arco-design/web-vue'
 
 const deviceCode = ref<string>('127.0.0.1')

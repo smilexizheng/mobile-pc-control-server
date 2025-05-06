@@ -21,6 +21,9 @@ type Setting = {
   port: number
 }
 
+/**
+ * ocr 识别的坐标位置
+ */
 interface OcrDetectedBox {
   /**
    * 文本框的四个顶点坐标，顺序为：

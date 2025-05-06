@@ -1,99 +1,114 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { useAppStore } from '@renderer/store/app'
-import { useToggle } from '@vueuse/core'
-import { OcrResult } from '@renderer/env'
+import { useOcrStore } from '@renderer/store/ocr'
 
-const appStore = useAppStore()
-const drawImage = ref()
-const ocrTextBox = ref<OcrResult>([])
-const [showOcr, toggle] = useToggle(true)
-// const showOcr = ref(true)
-const configKonva = ref({
-  width: appStore.contentWH.width,
-  height: appStore.contentWH.height
-})
-
-const ocrRecognition = (img): void => window.electron.ipcRenderer.send('ocr-recognition', img)
-onMounted(() => {
-  window.electron.ipcRenderer.on('ocr-result', (_, result) => {
-    // console.log(result)
-    const boxs = JSON.parse(result)
-    console.log(boxs)
-    ocrTextBox.value = boxs.data
-  })
-
-  ocrImage('D:/IdeaProjects/win-control-serve-electron/resources/ocr/test.png')
-})
-
-const ocrImage = (path): void => {
-  const imgSrc = `disk:///${path}`
-  if (imgSrc) {
-    const img = new Image()
-    img.onload = (): void => {
-      drawImage.value = img
-      configKonva.value = { width: drawImage.value.width, height: drawImage.value.height }
-    }
-    img.src = imgSrc
-  }
-  ocrRecognition(path)
-}
+const ocrStore = useOcrStore()
 </script>
 
 <template>
   <div class="layer-1">
     <div style="height: 50px; padding: 10px">
       <a-space>
-        <a-button type="primary">选择图片</a-button>
-        <a-button type="primary" @click="toggle()">{{
-          showOcr ? '隐藏结果' : '显示结果'
-        }}</a-button>
+        <a-input-number
+          v-model="ocrStore.scale"
+          :style="{ width: '130px' }"
+          :step="5"
+          :min="10"
+          :max="2000"
+          mode="button"
+        />
+        <a-button type="primary" :loading="ocrStore.isLoading" @click="ocrStore.chooseFile()"
+          >选择图片
+        </a-button>
+        <a-button type="primary" :disabled="ocrStore.isLoading" @click="ocrStore.toggle()"
+          >{{ ocrStore.showOcr ? '隐藏结果' : '显示结果' }}
+        </a-button>
       </a-space>
     </div>
-    <div class="layer-2">
-      <v-stage :config="configKonva">
-        <v-layer>
-          <v-image
-            v-show="drawImage"
-            :config="{
-              x: 0,
-              y: 0,
-              image: drawImage
-            }"
-          />
 
-          <v-rect
-            v-if="showOcr"
-            v-for="data in ocrTextBox"
-            :config="{
-              x: data.box[0][0],
-              y: data.box[0][1],
-              width: data.box[2][0] - data.box[0][0],
-              height: data.box[2][1] - data.box[0][1],
-              fill: '#ffffff', // 背景色（白色）
-              // stroke: '#3366ff', // 边框颜色（蓝色）
-              strokeWidth: 2, // 边框粗细
-              cornerRadius: 5, // 圆角
-              shadowColor: 'black', // 阴影（可选）
-              shadowBlur: 5,
-              shadowOpacity: 0.2
+    <div :ref="(r: any) => ocrStore.setMainLayer(r)" class="layer-2">
+      <a-spin :loading="ocrStore.isLoading" dot>
+        <div
+          :ref="(r: any) => ocrStore.setScrollDivRef(r)"
+          :style="{
+            width: `${ocrStore.mainLayerWH.width}px`,
+            height: `${ocrStore.mainLayerWH.height}px`,
+            overflow: 'auto'
+          }"
+        >
+          <div
+            :style="{
+              width: `${ocrStore.stageConfig.width}px`,
+              height: `${ocrStore.stageConfig.height}px`
             }"
-          />
-
-          <v-text
-            v-if="showOcr"
-            v-for="data in ocrTextBox"
+          ></div>
+        </div>
+        <div
+          :style="{
+            position: 'absolute',
+            top: 0
+          }"
+          @wheel="ocrStore.wheelHandler"
+        >
+          <k-stage
             :config="{
-              x: data.box[0][0],
-              y: data.box[0][1],
-              fontSize: 14,
-              fill: 'red',
-
-              text: data.text
+              width: ocrStore.mainLayerWH.width - 20,
+              height: ocrStore.mainLayerWH.height - 20
             }"
-          />
-        </v-layer>
-      </v-stage>
+          >
+            <k-layer
+              :config="{
+                scaleX: ocrStore.realScale,
+                scaleY: ocrStore.realScale,
+                x: ocrStore.layerConfig.x,
+                y: ocrStore.layerConfig.y,
+                offsetX: ocrStore.layerConfig.offsetX,
+                offsetY: ocrStore.layerConfig.offsetY
+              }"
+            >
+              <k-image
+                v-show="ocrStore.image"
+                :config="{
+                  image: ocrStore.image
+                }"
+              />
+
+              <template v-for="(data, i) in ocrStore.ocrResult" :key="`index_${i}`">
+                <k-rect
+                  v-if="ocrStore.showOcr"
+                  :config="{
+                    x: data.box[0][0],
+                    y: data.box[0][1],
+                    width: data.box[2][0] - data.box[0][0],
+                    height: data.box[2][1] - data.box[0][1],
+                    fill: '#ffffff', // 背景色（白色）
+                    // stroke: '#3366ff', // 边框颜色（蓝色）
+                    strokeWidth: 2, // 边框粗细
+                    cornerRadius: 5, // 圆角
+                    shadowColor: 'black', // 阴影（可选）
+                    shadowBlur: 5,
+                    shadowOpacity: 0.2
+                  }"
+                />
+
+                <k-text
+                  v-if="ocrStore.showOcr"
+                  :config="{
+                    x: data.box[0][0],
+                    y: data.box[0][1],
+                    width: data.box[2][0] - data.box[0][0],
+                    height: data.box[2][1] - data.box[0][1],
+                    fontSize: 18,
+                    fill: 'red',
+                    text: data.text,
+                    verticalAlign: 'middle',
+                    align: 'center'
+                  }"
+                />
+              </template>
+            </k-layer>
+          </k-stage>
+        </div>
+      </a-spin>
     </div>
   </div>
 </template>
@@ -102,15 +117,15 @@ const ocrImage = (path): void => {
 .layer-1 {
   width: 100%;
   height: 100%;
-  background-color: #f0f0f0;
+  background-color: var(--color-fill-2);
   position: relative;
 }
 
 .layer-2 {
-  width: 100%;
+  width: calc(100%);
   height: calc(100% - 50px);
-  background-color: #e0e0e0;
+  background-color: var(--color-fill-3);
   position: absolute;
-  overflow: auto;
+  overflow: hidden;
 }
 </style>

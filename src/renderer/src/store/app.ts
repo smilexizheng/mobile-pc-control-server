@@ -1,12 +1,12 @@
 import { defineStore } from 'pinia'
 import { computed, ref, useTemplateRef } from 'vue'
-import { Setting, ThemeType } from '../../env'
+import { Setting, ThemeType } from '../env'
 import { useStorage, useResizeObserver } from '@vueuse/core'
 export const useAppStore = defineStore('app', () => {
   const mainLayout = useTemplateRef<HTMLDivElement>('main_layout')
-  const mainLayoutWH = ref({
-    width: mainLayout.value?.offsetWidth,
-    height: mainLayout.value?.offsetHeight
+  const mainLayoutWH = ref<{ width: number; height: number }>({
+    width: mainLayout.value?.offsetWidth || 600,
+    height: mainLayout.value?.offsetHeight || 500
   })
   useResizeObserver(mainLayout, (entries) => {
     const entry = entries[0]
@@ -57,8 +57,8 @@ export const useAppStore = defineStore('app', () => {
   })
 
   return {
-    contentWH,
     mainLayoutWH,
+    contentWH,
     settings,
     isDark,
     initSetting,
