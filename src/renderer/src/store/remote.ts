@@ -28,5 +28,5 @@ export const useRemoteStore = defineStore('remote', () => {
     window.electron.ipcRenderer.send('openWindow', data)
   }
 
-  return { deviceCode, devicePort, isLoading, serverPort, openWindow }
+  return { deviceCode, devicePort, isLoading, ips, serverPort, openWindow }
 })
