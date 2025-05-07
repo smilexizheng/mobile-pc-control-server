@@ -4,7 +4,9 @@ import { Setting, ThemeType } from '../env'
 import { useResizeObserver, useStorage } from '@vueuse/core'
 
 export const useAppStore = defineStore('app', () => {
+  // 主区域ref
   const mainLayout = useTemplateRef<HTMLDivElement>('main_layout')
+  // 主区域大小
   const mainLayoutWH = ref<{ width: number; height: number }>({
     width: mainLayout.value?.offsetWidth || 600,
     height: mainLayout.value?.offsetHeight || 500
@@ -15,7 +17,12 @@ export const useAppStore = defineStore('app', () => {
     mainLayoutWH.value = { width, height }
   })
 
+  // 系统设置参数
+  const settingsVisible = ref(false)
   const settings = ref<Setting>({ token: 'ssss', port: 3000 })
+  // 关于显隐
+  const aboutVisible = ref(false)
+  // 主题
   const theme = useStorage<ThemeType>('arco-theme', 'light')
 
   const initSetting = async (): Promise<void> => {
@@ -59,6 +66,8 @@ export const useAppStore = defineStore('app', () => {
     mainLayoutWH,
     contentWH,
     settings,
+    settingsVisible,
+    aboutVisible,
     isDark,
     initSetting,
     updateSettings,

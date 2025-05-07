@@ -19,8 +19,6 @@ onMounted(async () => {
 
 <style scoped>
 .versions {
-  //position: absolute;
-  //bottom: 30px;
   margin: 0 auto;
   padding: 15px 0;
   font-family: 'Menlo', 'Lucida Console', monospace;
@@ -28,14 +26,14 @@ onMounted(async () => {
   overflow: hidden;
   align-items: center;
   border-radius: 22px;
-  background-color: var(--color-fill-4);
+  background-color: var(--color-fill-2);
   backdrop-filter: blur(24px);
 }
 
 .versions li {
   display: block;
   float: left;
-  border-right: 1px solid var(--color-border-4);
+  border-right: 1px solid var(--color-border-2);
   padding: 0 20px;
   font-size: 14px;
   line-height: 14px;

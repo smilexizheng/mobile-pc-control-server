@@ -4,8 +4,6 @@ import { Setting } from '../env'
 import { useAppStore } from '../store/app'
 import Versions from '@renderer/components/Versions.vue'
 
-const visible = ref(false)
-const about = ref(false)
 const appStore = useAppStore()
 const settingForm = ref<Setting>({ token: '', port: 0 })
 
@@ -16,11 +14,11 @@ onMounted(async () => {
 
 const handleSubmit = () => {
   appStore.updateSettings(settingForm.value)
-  visible.value = false
+  appStore.settingsVisible = false
 }
 
 const handleSelect = (v) => {
-  console.log(v)
+  // console.log(v)
 }
 </script>
 
@@ -35,16 +33,17 @@ const handleSelect = (v) => {
   <a-dropdown @select="handleSelect">
     <a-button type="text">
       <template #icon>
-        <icon-list />
+        <icon-menu />
       </template>
     </a-button>
     <template #content>
-      <a-doption @click="visible = true">系统设置</a-doption>
-      <a-doption @click="about = true" :value="{ value: 'about' }">关于</a-doption>
+      <a-doption @click="appStore.settingsVisible = true">系统设置</a-doption>
+      <a-doption @click="appStore.aboutVisible = true" :value="{ value: 'about' }">关于</a-doption>
     </template>
   </a-dropdown>
   <a-modal
-    v-model:visible="visible"
+    v-model:visible="appStore.settingsVisible"
+    width="600px"
     title="系统设置"
     :footer="false"
     :unmount-on-close="true"
@@ -65,7 +64,8 @@ const handleSelect = (v) => {
   </a-modal>
 
   <a-modal
-    v-model:visible="about"
+    v-model:visible="appStore.aboutVisible"
+    width="auto"
     title="关于"
     :footer="false"
     :unmount-on-close="true"

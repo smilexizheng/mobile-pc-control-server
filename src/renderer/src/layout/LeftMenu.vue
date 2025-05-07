@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-
+import { Message } from '@arco-design/web-vue'
+import { useAppStore } from '../store/app'
 const router = useRouter()
+const appStore = useAppStore()
 const onClickMenuItem = (key): void => {
   switch (key) {
     case 'home':
@@ -10,7 +12,11 @@ const onClickMenuItem = (key): void => {
     case 'ocr':
       router.push('/ocr')
       break
+    case 'sys-setting':
+      appStore.settingsVisible = true
+      break
     default:
+      Message.info('功能测试中')
       break
   }
 }
@@ -39,25 +45,22 @@ const onClickMenuItem = (key): void => {
         远程连接
       </a-menu-item>
       <a-menu-item key="ocr">
-        <IconCalendar />
+        <icon-image />
         OCR识别
       </a-menu-item>
-      <a-menu-item key="asr">
-        <IconCalendar />
-        ASR语音识别
-      </a-menu-item>
+      <a-menu-item key="asr"> <iconVoice /> ASR语音识别 </a-menu-item>
       <a-menu-item key="tts">
-        <IconCalendar />
+        <icon-chinese-fill />
         TTS文字转换
       </a-menu-item>
       <a-sub-menu key="more">
         <template #title>
-          <span><IconCalendar />更多</span>
+          <span><icon-more />更多</span>
         </template>
-        <a-menu-item key="tools">工具箱</a-menu-item>
-        <a-sub-menu key="config" title="配置">
-          <a-menu-item key="sys-setting">系统设置</a-menu-item>
-        </a-sub-menu>
+        <a-menu-item key="tools"><icon-send />工具箱</a-menu-item>
+        <!--        <a-sub-menu key="config" title="配置">-->
+        <a-menu-item key="sys-setting"><icon-settings />系统设置</a-menu-item>
+        <!--        </a-sub-menu>-->
       </a-sub-menu>
     </a-menu>
   </a-layout-sider>
