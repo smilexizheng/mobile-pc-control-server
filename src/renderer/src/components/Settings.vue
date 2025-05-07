@@ -16,10 +16,6 @@ const handleSubmit = () => {
   appStore.updateSettings(settingForm.value)
   appStore.settingsVisible = false
 }
-
-const handleSelect = (v) => {
-  // console.log(v)
-}
 </script>
 
 <template>
@@ -30,7 +26,7 @@ const handleSelect = (v) => {
     </template>
   </a-button>
 
-  <a-dropdown @select="handleSelect">
+  <a-dropdown>
     <a-button type="text">
       <template #icon>
         <icon-menu />

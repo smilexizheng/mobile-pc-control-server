@@ -10,7 +10,6 @@
 
 
 
-
 简体中文(V4)
 ch_PP-OCRv4_det_infer.onnx
 ch_ppocr_mobile_v2.0_cls_infer.onnx

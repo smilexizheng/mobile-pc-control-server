@@ -5,9 +5,9 @@ directories:
 electronLanguages:
   - zh-CN
   - en-US
-  - zh_CN # for macOS
-  - zh_TW # for macOS
-  - en # for macOS
+  - zh_CN
+  - zh_TW
+  - en
 files:
   - '!**/.vscode/*'
   - '!src/*'
@@ -17,7 +17,7 @@ files:
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
   - '!{.idea,.fastRequest,docs,db,logs,test}'
   - '!*.md'
-  - '!**/*.{map,ts,tsx,jsx,less,scss,sass,css.d.ts,d.cts,d.mts,md,markdown,yaml,yml}'
+  - '!**/*.{map,ts,tsx,jsx,less,scss,sass,css.d.ts,d.cts,d.mts,txt,md,markdown,yaml,yml}'
   - '!**/{test,tests,__tests__,coverage}/**'
   - '!**/*.{spec,test}.{js,jsx,ts,tsx}'
   - '!**/{*.map,*.log,*.d.ts,*.LICENSE,*license,*.README,*example.js}'

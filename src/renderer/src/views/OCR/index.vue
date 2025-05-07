@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useOcrStore } from '@renderer/store/ocr'
 import { onMounted, onUnmounted } from 'vue'
-
 const ocrStore = useOcrStore()
 
 onMounted(() => {

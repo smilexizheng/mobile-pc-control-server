@@ -31,31 +31,31 @@ class OCRService {
         cls: 'ch_ppocr_mobile_v2.0_cls_infer.onnx',
         rec: 'rec_ch_PP-OCRv4_infer.onnx',
         keys: 'dict_chinese.txt'
-      },
-      zhTW: {
-        det: 'ch_PP-OCRv3_det_infer.onnx',
-        cls: 'ch_ppocr_mobile_v2.0_cls_infer.onnx',
-        rec: 'rec_chinese_cht_PP-OCRv3_infer.onnx',
-        keys: 'dict_chinese_cht.txt'
-      },
-      en: {
-        det: 'ch_PP-OCRv3_det_infer.onnx',
-        cls: 'ch_ppocr_mobile_v2.0_cls_infer.onnx',
-        rec: 'rec_en_PP-OCRv3_infer.onnx',
-        keys: 'dict_chinese.txt'
-      },
-      ko: {
-        det: 'ch_PP-OCRv3_det_infer.onnx',
-        cls: 'ch_ppocr_mobile_v2.0_cls_infer.onnx',
-        rec: 'rec_korean_PP-OCRv3_infer.onnx',
-        keys: 'dict_korean.txt'
-      },
-      ja: {
-        det: 'ch_PP-OCRv3_det_infer.onnx',
-        cls: 'ch_ppocr_mobile_v2.0_cls_infer.onnx',
-        rec: 'rec_japan_PP-OCRv3_infer.onnx',
-        keys: 'dict_japan.txt'
       }
+      // zhTW: {
+      //   det: 'ch_PP-OCRv3_det_infer.onnx',
+      //   cls: 'ch_ppocr_mobile_v2.0_cls_infer.onnx',
+      //   rec: 'rec_chinese_cht_PP-OCRv3_infer.onnx',
+      //   keys: 'dict_chinese_cht.txt'
+      // },
+      // en: {
+      //   det: 'ch_PP-OCRv3_det_infer.onnx',
+      //   cls: 'ch_ppocr_mobile_v2.0_cls_infer.onnx',
+      //   rec: 'rec_en_PP-OCRv3_infer.onnx',
+      //   keys: 'dict_chinese.txt'
+      // }
+      // ko: {
+      //   det: 'ch_PP-OCRv3_det_infer.onnx',
+      //   cls: 'ch_ppocr_mobile_v2.0_cls_infer.onnx',
+      //   rec: 'rec_korean_PP-OCRv3_infer.onnx',
+      //   keys: 'dict_korean.txt'
+      // },
+      // ja: {
+      //   det: 'ch_PP-OCRv3_det_infer.onnx',
+      //   cls: 'ch_ppocr_mobile_v2.0_cls_infer.onnx',
+      //   rec: 'rec_japan_PP-OCRv3_infer.onnx',
+      //   keys: 'dict_japan.txt'
+      // }
       // Add other languages as needed
     }
 
