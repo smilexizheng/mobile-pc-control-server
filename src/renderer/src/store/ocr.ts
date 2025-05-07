@@ -22,6 +22,10 @@ export const useOcrStore = defineStore('ocr', () => {
     }
   })
 
+  window.electron.ipcRenderer.on('ocr-screenshots-success', (_, path) => {
+    ocrImage(path)
+  })
+
   const mainLayerDiv = ref<HTMLDivElement | null>(null)
   const scrollDiv = ref<HTMLDivElement | null>(null)
   const { elementX: layerDivX, elementY: layerDivY } = useMouseInElement(mainLayerDiv)
@@ -194,6 +198,8 @@ export const useOcrStore = defineStore('ocr', () => {
 
   // 发送ocr识别
   const ocrRecognition = (img): void => window.electron.ipcRenderer.send('ocr-recognition', img)
+  // 截取屏幕
+  const ocrScreenshots = (): void => window.electron.ipcRenderer.send('ocr-screenshots')
   const copyText = (text): void => {
     if (window.api.copyText(text)) {
       Message.success('已复制到粘贴板')
@@ -225,6 +231,7 @@ export const useOcrStore = defineStore('ocr', () => {
       showOcr.value = false
       image.value = img
       calcScale()
+      ocrResult.value = []
     }
     img.src = imgSrc
   }
@@ -270,6 +277,7 @@ export const useOcrStore = defineStore('ocr', () => {
     isLoading,
     layerConfig,
     copyText,
+    ocrScreenshots,
     copyAllText,
     toggle,
     toggleLoading,

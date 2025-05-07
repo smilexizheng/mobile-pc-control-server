@@ -28,6 +28,10 @@ onUnmounted(() => {
           >打开图片
         </a-button>
 
+        <a-button type="primary" :loading="ocrStore.isLoading" @click="ocrStore.ocrScreenshots()"
+          >截取屏幕
+        </a-button>
+
         <a-button :disabled="ocrStore.isLoading" @click="ocrStore.toggle()"
           >{{ ocrStore.showOcr ? '隐藏结果' : '显示结果' }}
         </a-button>
@@ -118,7 +122,7 @@ onUnmounted(() => {
                     fill: 'red',
                     text: data.text,
                     verticalAlign: 'middle',
-                    align: 'center'
+                    align: 'left'
                   }"
                 />
               </k-group>
