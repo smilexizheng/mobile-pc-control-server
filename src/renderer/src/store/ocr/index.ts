@@ -5,11 +5,24 @@ import { createKeybindingsHandler } from 'tinykeys'
 import { useResizeObserver, useToggle, useMouseInElement, useScroll } from '@vueuse/core'
 import { useSystemStore } from '@renderer/store/system'
 import { Message } from '@arco-design/web-vue'
-
-type WH = { width: number; height: number }
+import Konva from 'konva'
+import { useDrawRectStore } from '@renderer/store/ocr/DrawRectStore'
+import { DrawMode, WH, IChildDrawStore } from '@renderer/store/ocr/type'
+type ChildStoreGetter = () => IChildDrawStore
 
 export const useOcrStore = defineStore('ocr', () => {
-  const systemStore = useSystemStore()
+  // 开启涂鸦
+  const graffitiMode = ref(false)
+  // 涂鸦绘制模式
+  const currentMode = ref<DrawMode>('rect')
+  const storeMap: Record<DrawMode, ChildStoreGetter> = {
+    rect: () => useDrawRectStore() as IChildDrawStore
+  }
+  const drawStore = ref<IChildDrawStore | null>(storeMap[currentMode.value]())
+  const setDrawMode = (newMode: DrawMode): void => {
+    currentMode.value = newMode
+    drawStore.value = storeMap[currentMode.value]()
+  }
 
   window.electron.ipcRenderer.on('ocr-result', (_, result) => {
     toggleLoading()
@@ -232,6 +245,7 @@ export const useOcrStore = defineStore('ocr', () => {
       image.value = img
       calcScale()
       ocrResult.value = []
+      drawStore.value?.removeAll()
     }
     img.src = imgSrc
   }
@@ -240,6 +254,7 @@ export const useOcrStore = defineStore('ocr', () => {
    * 选择ocr的图片
    */
   const chooseFile = async (): Promise<void> => {
+    const systemStore = useSystemStore()
     const img = await systemStore.chooseFile('打开图片', ['png', 'jpg', 'jpeg'])
     if (img) {
       ocrImage(img)
@@ -247,7 +262,7 @@ export const useOcrStore = defineStore('ocr', () => {
   }
 
   /**
-   * 滚轮事件
+   * canvas外层div滚轮事件
    * @param e
    */
   const wheelHandler = (e: WheelEvent): void => {
@@ -262,6 +277,52 @@ export const useOcrStore = defineStore('ocr', () => {
       divScrollX.value = divScrollX.value + e.deltaX
       divScrollY.value = divScrollY.value + e.deltaY
     }
+  }
+
+  // knova stage 事件监听
+  const stageMouseDown = (e: Konva.KonvaPointerEvent): void => {
+    console.log('stageMouseDown', e)
+    // 开启涂鸦模式
+    if (graffitiMode.value) {
+      drawStore.value?.startDrawing(e)
+    }
+  }
+
+  const stageMouseMove = (e: Konva.KonvaPointerEvent): void => {
+    // console.log('stageMouseMove', e)
+    if (graffitiMode.value) {
+      drawStore.value?.updateDrawing(e)
+    }
+  }
+
+  const stageMouseUp = (e: Konva.KonvaPointerEvent): void => {
+    console.log('stageMouseUp', e)
+    if (graffitiMode.value) {
+      drawStore.value?.endDrawing(e)
+    }
+  }
+
+  const stageMouseLeave = (e: Konva.KonvaPointerEvent): void => {
+    console.log('stageMouseLeave', e)
+    if (graffitiMode.value) {
+      drawStore.value?.resetDrawing(e)
+    }
+  }
+
+  const stageDragStart = (e: Konva.KonvaPointerEvent): void => {
+    console.log('stageDragStart', e)
+  }
+
+  const stageDragEnd = (e: Konva.KonvaPointerEvent): void => {
+    console.log('stageDragEnd', e)
+  }
+
+  const stageWheel = (e: Konva.KonvaPointerEvent): void => {
+    console.log('stageWheel', e)
+  }
+
+  const stageClick = (e: Konva.KonvaPointerEvent): void => {
+    console.log('stageClick', e)
   }
 
   return {
@@ -284,6 +345,16 @@ export const useOcrStore = defineStore('ocr', () => {
     chooseFile,
     wheelHandler,
     dynamicFontSize,
-    shortcutKeyHandler
+    shortcutKeyHandler,
+    graffitiMode,
+    setDrawMode,
+    stageMouseDown,
+    stageClick,
+    stageMouseLeave,
+    stageMouseUp,
+    stageMouseMove,
+    stageDragStart,
+    stageDragEnd,
+    stageWheel
   }
 })

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useOcrStore } from '@renderer/store/ocr'
 import { onMounted, onUnmounted } from 'vue'
+import Rectangles from '@renderer/views/OCR/Rectangles.vue'
 const ocrStore = useOcrStore()
 
 onMounted(() => {
@@ -15,28 +16,39 @@ onUnmounted(() => {
 <template>
   <div class="layer-1">
     <div style="height: 50px; padding: 10px">
-      <a-space>
+      <a-space size="small">
+        涂鸦 <a-switch v-model="ocrStore.graffitiMode" size="small" />
+        缩放
         <a-input-number
           v-model="ocrStore.scale"
-          :style="{ width: '130px' }"
+          :style="{ width: '120px' }"
           :step="5"
           :min="10"
+          size="small"
           :max="2000"
           mode="button"
         />
-        <a-button type="primary" :loading="ocrStore.isLoading" @click="ocrStore.chooseFile()"
+        <a-button
+          type="primary"
+          size="mini"
+          :loading="ocrStore.isLoading"
+          @click="ocrStore.chooseFile()"
           >打开图片
         </a-button>
 
-        <a-button type="primary" :loading="ocrStore.isLoading" @click="ocrStore.ocrScreenshots()"
+        <a-button
+          type="primary"
+          size="mini"
+          :loading="ocrStore.isLoading"
+          @click="ocrStore.ocrScreenshots()"
           >截取屏幕
         </a-button>
 
-        <a-button :disabled="ocrStore.isLoading" @click="ocrStore.toggle()"
+        <a-button size="mini" :disabled="ocrStore.isLoading" @click="ocrStore.toggle()"
           >{{ ocrStore.showOcr ? '隐藏结果' : '显示结果' }}
         </a-button>
 
-        <a-button :disabled="ocrStore.isLoading" @click="ocrStore.copyAllText()"
+        <a-button size="mini" :disabled="ocrStore.isLoading" @click="ocrStore.copyAllText()"
           >复制全部
         </a-button>
       </a-space>
@@ -71,6 +83,14 @@ onUnmounted(() => {
               width: ocrStore.mainLayerWH.width - 16,
               height: ocrStore.mainLayerWH.height - 16
             }"
+            @mousedown="ocrStore.stageMouseDown"
+            @mousemove="ocrStore.stageMouseMove"
+            @mouseup="ocrStore.stageMouseUp"
+            @mouseleave="ocrStore.stageMouseLeave"
+            @dragstart="ocrStore.stageDragStart"
+            @dragend="ocrStore.stageDragEnd"
+            @wheel="ocrStore.stageWheel"
+            @click="ocrStore.stageClick"
           >
             <k-layer
               :config="{
@@ -92,13 +112,15 @@ onUnmounted(() => {
               <k-group
                 v-for="(data, i) in ocrStore.ocrResult"
                 :key="`index_${i}`"
-                @click="ocrStore.copyText(data.text)"
+                :config="{
+                  x: data.box[0][0],
+                  y: data.box[0][1]
+                }"
+                @click="!ocrStore.graffitiMode && ocrStore.copyText(data.text)"
               >
                 <k-rect
                   v-if="ocrStore.showOcr"
                   :config="{
-                    x: data.box[0][0],
-                    y: data.box[0][1],
                     width: data.box[2][0] - data.box[0][0],
                     height: data.box[2][1] - data.box[0][1],
                     fill: '#ffffff', // 背景色（白色）
@@ -114,8 +136,6 @@ onUnmounted(() => {
                 <k-text
                   v-if="ocrStore.showOcr"
                   :config="{
-                    x: data.box[0][0],
-                    y: data.box[0][1],
                     width: data.box[2][0] - data.box[0][0],
                     height: data.box[2][1] - data.box[0][1],
                     fontSize: ocrStore.dynamicFontSize(data.box[2][1] - data.box[0][1]),
@@ -126,6 +146,18 @@ onUnmounted(() => {
                   }"
                 />
               </k-group>
+            </k-layer>
+            <k-layer
+              :config="{
+                scaleX: ocrStore.realScale,
+                scaleY: ocrStore.realScale,
+                x: ocrStore.layerConfig.x,
+                y: ocrStore.layerConfig.y,
+                offsetX: ocrStore.layerConfig.offsetX,
+                offsetY: ocrStore.layerConfig.offsetY
+              }"
+            >
+              <Rectangles />
             </k-layer>
           </k-stage>
         </div>
