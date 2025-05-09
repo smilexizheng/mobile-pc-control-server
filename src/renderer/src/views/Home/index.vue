@@ -1,36 +1,34 @@
 <script setup lang="ts">
 import { useRemoteStore } from '@renderer/store/remote'
-
+import { onMounted, ref } from 'vue'
+import QRCodeStyling from 'qr-code-styling'
+import { Message } from '@arco-design/web-vue'
 const remoteStore = useRemoteStore()
+const qrContainer = ref<HTMLDivElement>()
+onMounted(async () => {
+  const qrCode = new QRCodeStyling(remoteStore.qrOptions)
+  qrCode.append(qrContainer.value as HTMLDivElement)
+  remoteStore.serverPort = await window.api.getControlServerPort()
+  remoteStore.ips = await window.api.getLocalIPs()
+
+  console.log(remoteStore.ips)
+  if (remoteStore.ips && remoteStore.ips.length) {
+    qrCode.update({ data: `http://${remoteStore.ips![0]}:${remoteStore.devicePort}` })
+  } else {
+    Message.error('获取本机的网卡信息识别！')
+  }
+})
 </script>
 
 <template>
   <div class="main-view">
-    <img alt="logo" class="logo" src="@renderer/assets/logo.svg" />
     <div class="text">
       Control Server Electron
       <span class="vue">CSE</span>
     </div>
-    <p class="tip">在同一局域网内，您可以通过浏览器访问下列地址</p>
-    <p class="tip">任务自动化、定时任务、远程控制</p>
-    <a-space wrap>
-      <template #split>
-        <a-divider direction="vertical" />
-      </template>
-      <a-button
-        v-for="ip in remoteStore.ips"
-        :key="ip"
-        type="primary"
-        class="action"
-        @click="
-          remoteStore.openRemoteWindow({
-            id: 'self',
-            url: `http://localhost:${remoteStore.serverPort}`
-          })
-        "
-        >访问http://{{ ip }}:{{ remoteStore.serverPort }}
-      </a-button>
-    </a-space>
+    <p class="tip">在局域网内，手机扫描二维码</p>
+    <p class="tip">即可PC远程控制、任务自动化、定时任务等操作</p>
+    <div ref="qrContainer" class="qr-container"></div>
     <a-input-group>
       <a-typography-text> 远程设备： </a-typography-text>
       <a-input
@@ -75,12 +73,18 @@ const remoteStore = useRemoteStore()
   -webkit-user-drag: none;
   height: 128px;
   width: 128px;
-  will-change: filter;
-  transition: filter 300ms;
 }
 
 .logo:hover {
   filter: drop-shadow(0 0 1.2em #6988e6aa);
+}
+
+.qr-container {
+  will-change: filter;
+  transition: filter 300ms;
+}
+.qr-container:hover {
+  filter: drop-shadow(0 0 1.2em rgb(246, 72, 97, 0.3));
 }
 
 .text {

@@ -2,17 +2,19 @@
 import { onMounted, ref } from 'vue'
 import { Setting } from '../env'
 import { useAppStore } from '../store/app'
+import { useRemoteStore } from '../store/remote'
 import Versions from '@renderer/components/Versions.vue'
 
 const appStore = useAppStore()
-const settingForm = ref<Setting>({ token: '', port: 0 })
+const remoteStore = useRemoteStore()
+const settingForm = ref<Setting>({ token: '', port: 0, hostname: '' })
 
 onMounted(async () => {
   await appStore.initSetting()
-  settingForm.value = { ...appStore.settings }
+  settingForm.value = { ...appStore.settings } as Setting
 })
 
-const handleSubmit = () => {
+const handleSubmit = (): void => {
   appStore.updateSettings(settingForm.value)
   appStore.settingsVisible = false
 }
@@ -46,7 +48,13 @@ const handleSubmit = () => {
     title-align="start"
   >
     <a-form :model="settingForm" @submit="handleSubmit">
-      <a-form-item field="port" tooltip="启动端口" label="启动端口">
+      <a-form-item field="hostname" tooltip="默认绑定所有网络IP接口,可手动指定" label="主机IP">
+        <a-select v-model="settingForm.hostname" placeholder="主机IP">
+          <a-option value="0.0.0.0">所有</a-option>
+          <a-option v-for="ip in remoteStore.ips" :key="ip" :value="ip">{{ ip }}</a-option>
+        </a-select>
+      </a-form-item>
+      <a-form-item field="port" tooltip="端口" label="端口">
         <a-input-number v-model="settingForm.port" placeholder="端口号" />
       </a-form-item>
       <a-form-item field="name" tooltip="连接的令牌" label="访问令牌">

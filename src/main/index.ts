@@ -40,7 +40,10 @@ async function createWindow(): Promise<void> {
   console.log('启动control-server')
   global.setting = await db.getSettings()
   global.mainWindow = mainWindow
-  global.controlServerPort = await InitWinControlServer(global.setting.port)
+  global.controlServerPort = await InitWinControlServer(
+    global.setting.port,
+    global.setting.hostname
+  )
   global.childWindow = {}
   // InitAsrTts()
   // IPC

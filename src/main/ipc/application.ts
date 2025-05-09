@@ -9,9 +9,10 @@ ipcMain.on('window-minimize', () => global.mainWindow.minimize())
 ipcMain.on('window-close', () => global.mainWindow.close())
 ipcMain.on('update-settings', (_, { settings }) => {
   db.app.put('app:settings', settings).then(() => {
-    console.log('update-settings', global.setting, settings)
-
-    if (global.controlServerPort !== settings.port) {
+    if (
+      global.controlServerPort !== settings.port ||
+      global.setting.hostname !== settings.hostname
+    ) {
       app.relaunch()
       app.exit(0)
     }

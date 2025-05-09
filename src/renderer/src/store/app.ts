@@ -5,7 +5,7 @@ import { useResizeObserver, useStorage } from '@vueuse/core'
 
 export const useAppStore = defineStore('app', () => {
   // 主区域ref
-  const mainLayout = useTemplateRef<HTMLDivElement>('main_layout')
+  const mainLayout = useTemplateRef<HTMLDivElement>('mainLayout')
   // 主区域大小
   const mainLayoutWH = ref<{ width: number; height: number }>({
     width: mainLayout.value?.offsetWidth || 600,
@@ -19,7 +19,7 @@ export const useAppStore = defineStore('app', () => {
 
   // 系统设置参数
   const settingsVisible = ref(false)
-  const settings = ref<Setting>({ token: 'ssss', port: 3000 })
+  const settings = ref<Setting>()
   // 关于显隐
   const aboutVisible = ref(false)
   // 主题

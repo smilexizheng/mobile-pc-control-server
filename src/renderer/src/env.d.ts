@@ -20,6 +20,7 @@ declare global {
 type Setting = {
   token: string
   port: number
+  hostname: string
 }
 
 /**

@@ -29,7 +29,7 @@ const getAll = async (db) => {
 
 const getSettings = async () => {
   const settings = await db.app.get('app:settings')
-  return settings || { port: 3000, token: 'ssss' }
+  return settings || { port: 3000, token: 'ssss', hostname: '0.0.0.0' }
 }
 
 const db = {
