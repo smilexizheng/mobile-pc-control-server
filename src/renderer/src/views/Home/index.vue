@@ -23,7 +23,7 @@ const remoteStore = useRemoteStore()
         type="primary"
         class="action"
         @click="
-          remoteStore.openWindow({
+          remoteStore.openRemoteWindow({
             id: 'self',
             url: `http://localhost:${remoteStore.serverPort}`
           })
@@ -49,7 +49,7 @@ const remoteStore = useRemoteStore()
         type="primary"
         :loading="remoteStore.isLoading"
         @click="
-          remoteStore.openWindow({
+          remoteStore.openRemoteWindow({
             id: `remote_${remoteStore.deviceCode}`,
             title: `远程设备_${remoteStore.deviceCode}`,
             url: `http://${remoteStore.deviceCode}:${remoteStore.devicePort}`
