@@ -1,8 +1,8 @@
-import {shutdown} from './system'
-import {getVol, setVol, toggleVolMute} from './volume'
-import {CLIENT_EMIT_EVENTS as CE} from './constant/client-emit'
-import {sendHeader, stopScreenLive} from './utils/ffmpeg_captrue'
-import {Window} from 'node-screenshots'
+import { shutdown } from './system'
+import { getVol, setVol, toggleVolMute } from './volume'
+import { CLIENT_EMIT_EVENTS as CE } from './constant/client-emit'
+import { sendHeader, stopScreenLive } from './utils/ffmpeg_captrue'
+import { Window } from 'node-screenshots'
 import {
   getMousePos,
   grabRegion,
@@ -15,16 +15,28 @@ import {
   openUrlHandler,
   typeString
 } from './core.js'
-import {mouse, Point} from '@nut-tree-fork/nut-js'
-import {TransferFile} from './TransferFile'
-import {createJob, deleteJob, getJobList, toggleJob} from './eventSchedule'
-import {db} from "./database";
-
+import { mouse, Point } from '@nut-tree-fork/nut-js'
+import { TransferFile } from './TransferFile'
+import { createJob, deleteJob, getJobList, toggleJob } from './eventSchedule'
+import { db } from './database'
+import { UAParser } from 'ua-parser-js'
+// 记录在线的用户
+const onlineSocket = {}
 const registerSocketHandlers = (io): void => {
   // 前端触摸时的pos
   let touchPos: Point
-  let mobileScreenSize = {width: 400, height: 800}
+  let mobileScreenSize = { width: 400, height: 800 }
   io.on('connection', (socket) => {
+    // 获取客户端IP地址
+    const clientIp = socket.handshake.address
+    // 获取请求头信息
+    const headers = socket.handshake.headers
+    // 获取用户代理(User-Agent)
+    const userAgent = new UAParser(headers['user-agent']).getResult()
+    // 获取连接时间
+    const connectTime = new Date(socket.handshake.time)
+    onlineSocket[socket.id] = { id: socket.id, connectTime, userAgent, clientIp }
+    sendOnlineSocket()
     // socket.emit(CE.RESPONSE, {success: true, msg: 'client connected'})
     // 保存原始的 on 方法
     const originalOn = socket.on
@@ -69,6 +81,11 @@ const registerSocketHandlers = (io): void => {
 
     // 文件上传
     TransferFile(socket)
+    // 收到移动端消息
+    socket.on('web-socket-msg', async (message) => {
+      console.log('收到消息')
+      global.mainWindow.webContents.send('web-socket-msg', { id: socket.id, message })
+    })
 
     // 任务计划
     socket.on(CE.SCHEDULE_ADD, async (data) => {
@@ -89,11 +106,10 @@ const registerSocketHandlers = (io): void => {
       socket.emit(CE.SCHEDULE_GET, await getJobList())
     })
 
-
     const sendEventList = () => {
-      db.getAll(db.events).then(data => io.emit(CE.EVENTS_GET, data))
+      db.getAll(db.events).then((data) => io.emit(CE.EVENTS_GET, data))
     }
-    sendEventList();
+    sendEventList()
     socket.on(CE.EVENTS_GET, () => {
       sendEventList()
     })
@@ -102,12 +118,12 @@ const registerSocketHandlers = (io): void => {
       sendEventList()
     })
     socket.on(CE.EVENTS_PUT, async (data) => {
-      const id = data.id || crypto.randomUUID();
-      await db.events.put(id, {...data, id})
+      const id = data.id || crypto.randomUUID()
+      await db.events.put(id, { ...data, id })
       sendEventList()
       socket.emit(CE.RESPONSE, {
         success: true,
-        msg: `[${data.name}]指令保存成功`,
+        msg: `[${data.name}]指令保存成功`
       })
     })
 
@@ -131,7 +147,7 @@ const registerSocketHandlers = (io): void => {
         height: Math.round(data.screenSize.height)
       }
       // TODO 处理多人同时操作屏幕尺寸问题
-      socket.data.mobileScreenSize = {...mobileScreenSize}
+      socket.data.mobileScreenSize = { ...mobileScreenSize }
       socket.emit(CE.SYS_POINTER_POS, await getMousePos())
     })
 
@@ -195,9 +211,9 @@ const registerSocketHandlers = (io): void => {
     socket.on(CE.SYS_POINTER_MOVE, async (data) => {
       let nowPos
       if (!data.touchMove) {
-        nowPos = {x: data.x, y: data.y}
+        nowPos = { x: data.x, y: data.y }
       } else if (touchPos) {
-        nowPos = {x: touchPos.x + data.x, y: touchPos.y + data.y}
+        nowPos = { x: touchPos.x + data.x, y: touchPos.y + data.y }
       }
       if (nowPos) {
         await moveMouse([nowPos])
@@ -248,9 +264,15 @@ const registerSocketHandlers = (io): void => {
 
     // 处理客户端断开连接
     socket.on('disconnect', () => {
-      console.log('Client disconnected')
+      console.log('Client disconnected', socket.id)
+      delete onlineSocket[socket.id]
+      sendOnlineSocket()
     })
   })
+
+  const sendOnlineSocket = (): void => {
+    global.mainWindow.webContents.send('online-socket-user', onlineSocket)
+  }
 
   // 配置参数优化
   const config = {
@@ -260,7 +282,7 @@ const registerSocketHandlers = (io): void => {
   const captureInterval = 18 // 截图间隔（毫秒）
 
   let isCapture = false
-  const captureScreen = async (cutSize = {width: 400, height: 800}, force): Promise<void> => {
+  const captureScreen = async (cutSize = { width: 400, height: 800 }, force): Promise<void> => {
     if (!io.sockets.adapter.rooms.has('screen')) return
     if (isCapture && !force) return
     try {
@@ -336,4 +358,4 @@ const registerSocketHandlers = (io): void => {
   })
 }
 
-export {registerSocketHandlers}
+export { registerSocketHandlers }

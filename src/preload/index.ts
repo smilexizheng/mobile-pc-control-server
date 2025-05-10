@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer, clipboard } from 'electron'
+import { contextBridge, ipcRenderer, clipboard, nativeImage } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
@@ -13,7 +13,23 @@ const api = {
       return true
     }
     return false
-  }
+  },
+  copyImage: async (buffer: Buffer | Blob): boolean => {
+    if (buffer) {
+      if (buffer instanceof Blob) {
+        const arrayBuffer = await buffer.arrayBuffer()
+        buffer = Buffer.from(arrayBuffer)
+      }
+      clipboard.writeImage(nativeImage.createFromBuffer(buffer))
+      return true
+    }
+    return false
+  },
+  writeClipboard: (data: Electron.Data): void => {
+    clipboard.write(data)
+  },
+  readText: (): string => clipboard.readText(),
+  readImage: (): Buffer => clipboard.readImage().toPNG()
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

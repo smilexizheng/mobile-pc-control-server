@@ -73,12 +73,12 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
     currentRect.value = null
   }
 
-  function remove(index) {
+  function remove(index: number): void {
     resetDrawing()
     rectangles.value.splice(index, 1)
   }
 
-  function removeAll() {
+  function removeAll(): void {
     resetDrawing()
     rectangles.value = []
   }

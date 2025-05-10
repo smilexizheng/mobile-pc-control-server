@@ -2,13 +2,13 @@ import Konva from 'konva'
 import { useOcrStore } from '@renderer/store/ocr/index'
 
 /**
- * 获取缩放的坐标位置
+ * 获取指针在 图像中的绝对坐标位置
  * @param e
  */
 const getPos = <T>(
   e: Konva.KonvaPointerEvent | Konva.KonvaEventObject<T>
 ): { x: number; y: number } => {
-  const ocrStroe = useOcrStore()
+  const ocrStore = useOcrStore()
   const layer = e.target.getLayer()
   const pos = e.target.getStage()!.getPointerPosition()!
   const posX = pos.x ?? 0
@@ -19,8 +19,8 @@ const getPos = <T>(
   const offsetY = layer?.offsetY() ?? 0
 
   return {
-    x: (posX - x) / ocrStroe.realScale + offsetX,
-    y: (posY - y) / ocrStroe.realScale + offsetY
+    x: (posX - x) / ocrStore.realScale + offsetX,
+    y: (posY - y) / ocrStore.realScale + offsetY
   }
 }
 

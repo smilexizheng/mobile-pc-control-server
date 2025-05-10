@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '@renderer/views/Home/index.vue'
 import Ocr from '@renderer/views/OCR/index.vue'
+import Chat from '@renderer/views/Chat/index.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -14,6 +15,11 @@ const router = createRouter({
       path: '/ocr',
       name: 'ocr',
       component: Ocr
+    },
+    {
+      path: '/chat',
+      name: 'chat',
+      component: Chat
     }
   ]
 })

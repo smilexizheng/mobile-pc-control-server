@@ -37,7 +37,7 @@ export const useRemoteStore = defineStore('remote', () => {
     qrOptions: { mode: 'Byte', errorCorrectionLevel: 'Q' },
     imageOptions: { saveAsBlob: true, hideBackgroundDots: true, imageSize: 0.5, margin: 5 },
     dotsOptions: { type: 'square', color: '#f5aa29', roundSize: true },
-    backgroundOptions: { round: 0, color: 'none' },
+    backgroundOptions: { round: 0, color: 'rgba(255,255,255,0.9)' },
     cornersSquareOptions: { type: 'dot', color: '#f08928' },
     cornersDotOptions: { type: 'dot', color: '#f75802' }
   }

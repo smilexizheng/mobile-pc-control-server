@@ -6,6 +6,10 @@ type CustomAPI = {
   getLocalIPs: () => Promise<string[]>
   getAppVersion: () => Promise<string>
   copyText: (str: string) => boolean
+  copyImage: (buffer: Buffer) => boolean
+  writeClipboard: (data: Electron.Data) => void
+  readImage: () => Buffer
+  readText: () => string
 }
 
 type ThemeType = 'light' | 'dark'

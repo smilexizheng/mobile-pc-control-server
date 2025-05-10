@@ -96,4 +96,13 @@ const disconnectSockets = (): void => {
   io.emit('reconnected')
 }
 
-export { InitWinControlServer, disconnectSockets }
+const sendMessage = (id: string, message: string): void => {
+  if (!io) {
+    console.error('disconnectSockets:socket.io is not running')
+    return
+  }
+  console.log('发送消息', id, message)
+  io.to(id).emit('pc-socket-message', message)
+}
+
+export { InitWinControlServer, disconnectSockets, sendMessage }

@@ -1,10 +1,12 @@
 import { ipcMain, app } from 'electron'
 import { getLocalIPs } from '../utils/common'
 import { db } from '../sever/src/database'
-import { disconnectSockets } from '../sever/main'
+import { disconnectSockets, sendMessage } from '../sever/main'
 
 ipcMain.on('ping', () => console.log('pong'))
-
+ipcMain.on('pc-socket-message', (_, { id, message }: { id: string; message: string }): void => {
+  sendMessage(id, message)
+})
 ipcMain.on('window-minimize', () => global.mainWindow.minimize())
 ipcMain.on('window-close', () => global.mainWindow.close())
 ipcMain.on('update-settings', (_, { settings }) => {

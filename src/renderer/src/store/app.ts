@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, ref, useTemplateRef, reactive } from 'vue'
 import { Setting, ThemeType } from '../env'
 import { useResizeObserver, useStorage } from '@vueuse/core'
 
@@ -16,6 +16,42 @@ export const useAppStore = defineStore('app', () => {
     const { width, height } = entry.contentRect
     mainLayoutWH.value = { width, height }
   })
+  // 在线的socket用户对象
+  const onlineSocketUser = ref({})
+  window.electron.ipcRenderer.on('online-socket-user', (_, data) => {
+    onlineSocketUser.value = data
+  })
+
+  window.electron.ipcRenderer.on('web-socket-msg', (_, { id, message }) => {
+    if (!userMessage.value[id]) {
+      userMessage.value[id] = []
+    }
+    userMessage.value[id].push({
+      isSelf: false,
+      content: message,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    })
+  })
+  const onlineSocketIds = computed(() => {
+    console.log(Object.keys(onlineSocketUser.value))
+    return Object.keys(onlineSocketUser.value)
+  })
+
+  const userMessage = ref<Record<string, Array>>({})
+  const sendMessage = (socketId: string, message): void => {
+    if (!userMessage.value[socketId]) {
+      userMessage.value[socketId] = []
+    }
+    window.electron.ipcRenderer.send('pc-socket-message', {
+      id: socketId,
+      message
+    })
+    userMessage.value[socketId].push({
+      isSelf: true,
+      content: message,
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    })
+  }
 
   // 系统设置参数
   const settingsVisible = ref(false)
@@ -69,6 +105,10 @@ export const useAppStore = defineStore('app', () => {
     settingsVisible,
     aboutVisible,
     isDark,
+    onlineSocketUser,
+    onlineSocketIds,
+    userMessage,
+    sendMessage,
     initSetting,
     updateSettings,
     toggleTheme,

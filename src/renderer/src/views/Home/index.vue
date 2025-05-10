@@ -1,23 +1,41 @@
 <script setup lang="ts">
 import { useRemoteStore } from '@renderer/store/remote'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import QRCodeStyling from 'qr-code-styling'
-import { Message } from '@arco-design/web-vue'
+import { Message, Notification } from '@arco-design/web-vue'
+import { useAppStore } from '@renderer/store/app'
+const appStore = useAppStore()
 const remoteStore = useRemoteStore()
 const qrContainer = ref<HTMLDivElement>()
+const qrCode = ref(new QRCodeStyling(remoteStore.qrOptions))
 onMounted(async () => {
-  const qrCode = new QRCodeStyling(remoteStore.qrOptions)
-  qrCode.append(qrContainer.value as HTMLDivElement)
+  qrCode.value.append(qrContainer.value as HTMLDivElement)
   remoteStore.serverPort = await window.api.getControlServerPort()
   remoteStore.ips = await window.api.getLocalIPs()
-
-  console.log(remoteStore.ips)
   if (remoteStore.ips && remoteStore.ips.length) {
-    qrCode.update({ data: `http://${remoteStore.ips![0]}:${remoteStore.devicePort}` })
+    qrCode.value.update({ data: `http://${remoteStore.ips![0]}:${remoteStore.devicePort}` })
   } else {
     Message.error('获取本机的网卡信息识别！')
   }
 })
+
+const copyQrImg = async (): void => {
+  qrCode.value.update({ backgroundOptions: { round: 0, color: '#fff' } })
+  const rawData = await qrCode.value.getRawData('png')
+  window.api.copyImage(rawData)
+  Notification.info({
+    content: '二维码 已复制到剪切板'
+  })
+}
+
+watch(
+  () => appStore.isDark,
+  (v) => {
+    qrCode.value.update({
+      backgroundOptions: { round: 0, color: v ? 'rgba(253,252,252,0.2)' : 'none' }
+    })
+  }
+)
 </script>
 
 <template>
@@ -26,9 +44,11 @@ onMounted(async () => {
       Control Server Electron
       <span class="vue">CSE</span>
     </div>
-    <p class="tip">在局域网内，手机扫描二维码</p>
-    <p class="tip">即可PC远程控制、任务自动化、定时任务等操作</p>
-    <div ref="qrContainer" class="qr-container"></div>
+    <p class="tip">在局域网内，扫描二维码，远程控制、任务自动化、定时任务等操作</p>
+    <a-tooltip content="点击将二维码图片复制到剪切板，快速分享">
+      <div ref="qrContainer" @click="copyQrImg()" class="qr-container"></div>
+    </a-tooltip>
+
     <a-input-group>
       <a-typography-text> 远程设备： </a-typography-text>
       <a-input
@@ -68,27 +88,16 @@ onMounted(async () => {
   gap: 8px;
 }
 
-.logo {
-  margin-bottom: 20px;
-  -webkit-user-drag: none;
-  height: 128px;
-  width: 128px;
-}
-
-.logo:hover {
-  filter: drop-shadow(0 0 1.2em #6988e6aa);
-}
-
 .qr-container {
   will-change: filter;
   transition: filter 300ms;
 }
 .qr-container:hover {
-  filter: drop-shadow(0 0 1.2em rgb(246, 72, 97, 0.3));
+  filter: drop-shadow(0 0 1.2em rgba(246, 72, 243, 0.3));
 }
 
 .text {
-  font-size: 28px;
+  font-size: 22px;
   color: var(--color-text-1);
   font-weight: 700;
   line-height: 32px;
@@ -97,8 +106,8 @@ onMounted(async () => {
 }
 
 .tip {
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 14px;
+  line-height: 18px;
   color: var(--color-text-2);
   font-weight: 600;
 }
@@ -109,10 +118,5 @@ onMounted(async () => {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: 700;
-}
-
-.action {
-  flex-shrink: 0;
-  padding: 6px;
 }
 </style>

@@ -12,6 +12,9 @@ const onClickMenuItem = (key): void => {
     case 'ocr':
       router.push('/ocr')
       break
+    case 'chat':
+      router.push('/chat')
+      break
     case 'sys-setting':
       appStore.settingsVisible = true
       break
@@ -43,6 +46,10 @@ const onClickMenuItem = (key): void => {
       <a-menu-item key="home">
         <IconHome />
         远程连接
+      </a-menu-item>
+      <a-menu-item key="chat">
+        <IconHome />
+        消息互传
       </a-menu-item>
       <a-menu-item key="ocr">
         <icon-image />
