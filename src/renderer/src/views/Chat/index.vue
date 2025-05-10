@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive } from 'vue'
 import { IconSend, IconFaceSmileFill, IconFolderAdd, IconImage } from '@arco-design/web-vue/es/icon'
 import { useAppStore } from '@renderer/store/app'
 import dayjs from 'dayjs'
@@ -7,27 +7,27 @@ const appStore = useAppStore()
 
 // 新增状态
 const showEmojiPicker = ref(false)
-const fileInput = ref(null)
-const imageInput = ref(null)
+const fileInput = ref<HTMLInputElement>()
+const imageInput = ref<HTMLInputElement>()
 const emojis = reactive(['😀', '😎', '❤️', '👍', '🎉']) // 示例表情
 
 // 模拟数据
-const messageList = reactive([
-  {
-    id: 1,
-    name: '张三',
-    avatar: 'https://example.com/avatar1.png',
-    lastMessage: '你好，最近怎么样？',
-    time: '10:30'
-  },
-  {
-    id: 2,
-    name: '李四',
-    avatar: 'https://example.com/avatar2.png',
-    lastMessage: '项目文档已发送',
-    time: '09:15'
-  }
-])
+// const messageList = reactive([
+//   {
+//     id: 1,
+//     name: '张三',
+//     avatar: 'https://example.com/avatar1.png',
+//     lastMessage: '你好，最近怎么样？',
+//     time: '10:30'
+//   },
+//   {
+//     id: 2,
+//     name: '李四',
+//     avatar: 'https://example.com/avatar2.png',
+//     lastMessage: '项目文档已发送',
+//     time: '09:15'
+//   }
+// ])
 
 // const chatData = reactive({
 //   abcd: {
@@ -61,25 +61,20 @@ const messageList = reactive([
 const activeId = ref(null)
 const inputMessage = ref('')
 
-// 计算当前聊天
-const activeChat = computed((): void => {
-  return activeId.value ? appStore.onlineSocketUser[activeId.value] : null
-})
-
 // 新增方法
 const toggleEmojiPicker = (): void => {
   showEmojiPicker.value = !showEmojiPicker.value
 }
 
 const triggerFileInput = (): void => {
-  fileInput.value.click()
+  fileInput.value?.click()
 }
 
 const triggerImageInput = (): void => {
-  imageInput.value.click()
+  imageInput.value?.click()
 }
 
-const handleFileSelect = (e) => {
+const handleFileSelect = (e): void => {
   const file = e.target.files[0]
   if (file) {
     // 处理文件上传逻辑
@@ -87,7 +82,7 @@ const handleFileSelect = (e) => {
   }
 }
 
-const handleImageSelect = (e) => {
+const handleImageSelect = (e): void => {
   const file = e.target.files[0]
   if (file) {
     // 处理图片上传逻辑
@@ -95,13 +90,13 @@ const handleImageSelect = (e) => {
   }
 }
 
-const insertEmoji = (emoji) => {
+const insertEmoji = (emoji): void => {
   inputMessage.value += emoji
   showEmojiPicker.value = false
 }
 
 // 方法
-const selectChat = (id) => {
+const selectChat = (id): void => {
   activeId.value = id
 }
 
@@ -171,20 +166,20 @@ const sendMessage = (): void => {
       <!-- 输入区域 -->
       <a-layout-footer class="toolbar-footer">
         <div class="toolbar">
-          <a-button type="text" @click="toggleEmojiPicker" class="toolbar-btn">
+          <a-button type="text" class="toolbar-btn" @click="toggleEmojiPicker">
             <icon-face-smile-fill />
           </a-button>
-          <a-button type="text" @click="triggerFileInput" class="toolbar-btn">
+          <a-button type="text" class="toolbar-btn" @click="triggerFileInput">
             <icon-folder-add />
           </a-button>
-          <a-button type="text" @click="triggerImageInput" class="toolbar-btn">
+          <a-button type="text" class="toolbar-btn" @click="triggerImageInput">
             <icon-image />
           </a-button>
-          <input type="file" ref="fileInput" style="display: none" @change="handleFileSelect" />
+          <input ref="fileInput" type="file" style="display: none" @change="handleFileSelect" />
           <input
+            ref="imageInput"
             type="file"
             accept="image/*"
-            ref="imageInput"
             style="display: none"
             @change="handleImageSelect"
           />
@@ -196,8 +191,8 @@ const sendMessage = (): void => {
           <span
             v-for="emoji in emojis"
             :key="emoji"
-            @click="insertEmoji(emoji)"
             class="emoji-item"
+            @click="insertEmoji(emoji)"
             >{{ emoji }}</span
           >
         </div>

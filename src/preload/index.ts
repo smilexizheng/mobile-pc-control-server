@@ -14,7 +14,7 @@ const api = {
     }
     return false
   },
-  copyImage: async (buffer: Buffer | Blob): boolean => {
+  copyImage: async (buffer: Buffer | Blob): Promise<boolean> => {
     if (buffer) {
       if (buffer instanceof Blob) {
         const arrayBuffer = await buffer.arrayBuffer()

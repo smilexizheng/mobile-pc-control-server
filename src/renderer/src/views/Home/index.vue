@@ -19,10 +19,10 @@ onMounted(async () => {
   }
 })
 
-const copyQrImg = async (): void => {
+const copyQrImg = async (): Promise<void> => {
   qrCode.value.update({ backgroundOptions: { round: 0, color: '#fff' } })
   const rawData = await qrCode.value.getRawData('png')
-  window.api.copyImage(rawData)
+  window.api.copyImage(rawData as Blob)
   Notification.info({
     content: '二维码 已复制到剪切板'
   })
@@ -46,7 +46,7 @@ watch(
     </div>
     <p class="tip">在局域网内，扫描二维码，远程控制、任务自动化、定时任务等操作</p>
     <a-tooltip content="点击将二维码图片复制到剪切板，快速分享">
-      <div ref="qrContainer" @click="copyQrImg()" class="qr-container"></div>
+      <div ref="qrContainer" class="qr-container" @click="copyQrImg()"></div>
     </a-tooltip>
 
     <a-input-group>

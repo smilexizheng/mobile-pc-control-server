@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import { computed, ref, useTemplateRef, reactive } from 'vue'
-import { Setting, ThemeType } from '../env'
+import { computed, ref, useTemplateRef } from 'vue'
+import { Setting, ThemeType, UserMessage } from '../env'
 import { useResizeObserver, useStorage } from '@vueuse/core'
 
 export const useAppStore = defineStore('app', () => {
@@ -37,7 +37,7 @@ export const useAppStore = defineStore('app', () => {
     return Object.keys(onlineSocketUser.value)
   })
 
-  const userMessage = ref<Record<string, Array>>({})
+  const userMessage = ref<Record<string, Array<UserMessage>>>({})
   const sendMessage = (socketId: string, message): void => {
     if (!userMessage.value[socketId]) {
       userMessage.value[socketId] = []
