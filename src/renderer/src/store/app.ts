@@ -1,7 +1,8 @@
 import { defineStore } from 'pinia'
 import { computed, ref, useTemplateRef } from 'vue'
-import { Setting, ThemeType, UserMessage } from '../env'
+import { Setting, ThemeType } from '../env'
 import { useResizeObserver, useStorage } from '@vueuse/core'
+import { useSocketStore } from '@renderer/store/socket'
 
 export const useAppStore = defineStore('app', () => {
   // 主区域ref
@@ -16,46 +17,14 @@ export const useAppStore = defineStore('app', () => {
     const { width, height } = entry.contentRect
     mainLayoutWH.value = { width, height }
   })
-  // 在线的socket用户对象
-  const onlineSocketUser = ref({})
-  window.electron.ipcRenderer.on('online-socket-user', (_, data) => {
-    onlineSocketUser.value = data
-  })
-
-  window.electron.ipcRenderer.on('web-socket-msg', (_, { id, message }) => {
-    if (!userMessage.value[id]) {
-      userMessage.value[id] = []
-    }
-    userMessage.value[id].push({
-      isSelf: false,
-      content: message,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    })
-  })
-  const onlineSocketIds = computed(() => {
-    console.log(Object.keys(onlineSocketUser.value))
-    return Object.keys(onlineSocketUser.value)
-  })
-
-  const userMessage = ref<Record<string, Array<UserMessage>>>({})
-  const sendMessage = (socketId: string, message): void => {
-    if (!userMessage.value[socketId]) {
-      userMessage.value[socketId] = []
-    }
-    window.electron.ipcRenderer.send('pc-socket-message', {
-      id: socketId,
-      message
-    })
-    userMessage.value[socketId].push({
-      isSelf: true,
-      content: message,
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    })
-  }
 
   // 系统设置参数
   const settingsVisible = ref(false)
   const settings = ref<Setting>()
+
+  const serverPort = ref<number>()
+  const ips = ref<string[]>([])
+
   // 关于显隐
   const aboutVisible = ref(false)
   // 主题
@@ -63,6 +32,10 @@ export const useAppStore = defineStore('app', () => {
 
   const initSetting = async (): Promise<void> => {
     settings.value = await window.electron.ipcRenderer.invoke('get-settings')
+    serverPort.value = await window.api.getControlServerPort()
+    ips.value = await window.api.getLocalIPs()
+    const socketStore = useSocketStore()
+    socketStore.connect()
   }
 
   const updateSettings = (value: Setting): void => {
@@ -93,6 +66,9 @@ export const useAppStore = defineStore('app', () => {
   }
 
   const isDark = computed(() => theme.value === 'dark')
+  const realUrl = computed(() => {
+    return `http://${settings.value?.hostname !== '0.0.0.0' ? settings.value?.hostname : ips.value[0]}:${serverPort.value}`
+  })
 
   const contentWH = computed(() => {
     return { width: mainLayoutWH.value.width, height: mainLayoutWH.value.height }
@@ -102,13 +78,13 @@ export const useAppStore = defineStore('app', () => {
     mainLayoutWH,
     contentWH,
     settings,
+    realUrl,
+    serverPort,
+    ips,
     settingsVisible,
     aboutVisible,
     isDark,
-    onlineSocketUser,
-    onlineSocketIds,
-    userMessage,
-    sendMessage,
+
     initSetting,
     updateSettings,
     toggleTheme,

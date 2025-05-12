@@ -48,7 +48,7 @@ const onClickMenuItem = (key): void => {
         远程连接
       </a-menu-item>
       <a-menu-item key="chat">
-        <IconHome />
+        <icon-message />
         消息互传
       </a-menu-item>
       <a-menu-item key="ocr">

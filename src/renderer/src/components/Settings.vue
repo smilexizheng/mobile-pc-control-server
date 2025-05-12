@@ -2,17 +2,10 @@
 import { onMounted, ref } from 'vue'
 import { Setting } from '../env'
 import { useAppStore } from '../store/app'
-import { useRemoteStore } from '../store/remote'
 import Versions from '@renderer/components/Versions.vue'
 
 const appStore = useAppStore()
-const remoteStore = useRemoteStore()
 const settingForm = ref<Setting>({ token: '', port: 0, hostname: '' })
-
-onMounted(async () => {
-  await appStore.initSetting()
-  settingForm.value = { ...appStore.settings } as Setting
-})
 
 const handleSubmit = (): void => {
   appStore.updateSettings(settingForm.value)
@@ -43,6 +36,7 @@ const handleSubmit = (): void => {
     v-model:visible="appStore.settingsVisible"
     width="600px"
     title="系统设置"
+    @before-open="() => (settingForm = { ...appStore.settings } as Setting)"
     :footer="false"
     :unmount-on-close="true"
     title-align="start"
@@ -51,7 +45,7 @@ const handleSubmit = (): void => {
       <a-form-item field="hostname" tooltip="默认绑定所有网络IP接口,可手动指定" label="主机IP">
         <a-select v-model="settingForm.hostname" placeholder="主机IP">
           <a-option value="0.0.0.0">所有</a-option>
-          <a-option v-for="ip in remoteStore.ips" :key="ip" :value="ip">{{ ip }}</a-option>
+          <a-option v-for="ip in appStore.ips" :key="ip" :value="ip">{{ ip }}</a-option>
         </a-select>
       </a-form-item>
       <a-form-item field="port" tooltip="端口" label="端口">

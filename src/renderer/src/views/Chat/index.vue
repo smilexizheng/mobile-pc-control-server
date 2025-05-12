@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { IconSend, IconFaceSmileFill, IconFolderAdd, IconImage } from '@arco-design/web-vue/es/icon'
-import { useAppStore } from '@renderer/store/app'
+import { useSocketStore } from '@renderer/store/socket'
 import dayjs from 'dayjs'
-const appStore = useAppStore()
+const socketStore = useSocketStore()
 
 // 新增状态
 const showEmojiPicker = ref(false)
@@ -58,7 +58,7 @@ const emojis = reactive(['😀', '😎', '❤️', '👍', '🎉']) // 示例表
 // })
 
 // 响应式状态
-const activeId = ref(null)
+
 const inputMessage = ref('')
 
 // 新增方法
@@ -97,13 +97,13 @@ const insertEmoji = (emoji): void => {
 
 // 方法
 const selectChat = (id): void => {
-  activeId.value = id
+  socketStore.activeClient = id
 }
 
 const sendMessage = (): void => {
-  if (!activeId.value || !inputMessage.value.trim()) return
+  if (!socketStore.activeClient || !inputMessage.value.trim()) return
 
-  appStore.sendMessage(activeId.value, inputMessage.value.trim())
+  socketStore.sendMessage(inputMessage.value.trim())
   inputMessage.value = ''
 }
 </script>
@@ -113,43 +113,47 @@ const sendMessage = (): void => {
     <a-layout-sider :width="221" class="left-sider">
       <div class="message-header">消息列表</div>
       <a-list :bordered="false" class="message-list" :style="{ width: `220px` }">
-        <a-list-item
-          v-for="id in appStore.onlineSocketIds"
-          :key="id"
-          :class="{ 'active-item': id === activeId }"
-          @click="selectChat(id)"
-        >
-          <template #extra>
-            <span class="message-time"
-              >{{ dayjs(appStore.onlineSocketUser[id].connectTime).format('HH:mm') }}
-            </span>
-          </template>
-          <a-list-item-meta>
-            <template #avatar>
-              <a-avatar :size="40" :style="{ backgroundColor: '#14a9f8' }">
-                {{ appStore.onlineSocketUser[id].userAgent.os.name }}
-                <!--                <img :src="msg.avatar" />-->
-              </a-avatar>
+        <template :key="id" v-for="id in socketStore.onlineSocketIds">
+          <a-list-item
+            v-if="id !== socketStore.socket?.id"
+            :class="{ 'active-item': id === socketStore.activeClient }"
+            @click="selectChat(id)"
+          >
+            <template #extra>
+              <span class="message-time"
+                >{{ dayjs(socketStore.onlineSocketUser[id].connectTime).format('HH:mm') }}
+              </span>
             </template>
-            <template #title>
-              <span>{{ appStore.onlineSocketUser[id].userAgent.device.model }}</span>
-            </template>
-            <template #description>
-              <div class="message-preview">
-                {{ appStore.onlineSocketUser[id].clientIp }}
-              </div>
-            </template>
-          </a-list-item-meta>
-        </a-list-item>
+            <a-list-item-meta>
+              <template #avatar>
+                <a-avatar :size="40" :style="{ backgroundColor: '#14a9f8' }">
+                  {{ socketStore.onlineSocketUser[id].userAgent.os.name }}
+                  <!--                <img :src="msg.avatar" />-->
+                </a-avatar>
+              </template>
+              <template #title>
+                <span>{{
+                  socketStore.onlineSocketUser[id].name ||
+                  socketStore.onlineSocketUser[id].userAgent.device.model
+                }}</span>
+              </template>
+              <template #description>
+                <div class="message-preview">
+                  {{ socketStore.onlineSocketUser[id].clientIp }}
+                </div>
+              </template>
+            </a-list-item-meta>
+          </a-list-item>
+        </template>
       </a-list>
     </a-layout-sider>
 
     <!-- 右侧聊天区域 -->
     <a-layout class="right-layout">
       <a-layout-content class="chat-content">
-        <div v-if="activeId" class="chat-messages">
+        <div v-if="socketStore.activeClient" class="chat-messages">
           <div
-            v-for="(message, index) in appStore.userMessage[activeId]"
+            v-for="(message, index) in socketStore.userMessage[socketStore.activeClient]"
             :key="index"
             :class="['message-bubble', { 'self-message': message.isSelf }]"
           >
@@ -205,7 +209,12 @@ const sendMessage = (): void => {
             :auto-size="{ minRows: 1, maxRows: 4 }"
             @press-enter="sendMessage"
           />
-          <a-button type="primary" class="send-btn" @click="sendMessage">
+          <a-button
+            type="primary"
+            class="send-btn"
+            @click="sendMessage"
+            :disabled="!socketStore.activeClient"
+          >
             <template #icon>
               <icon-send />
             </template>

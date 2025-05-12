@@ -8,9 +8,9 @@ import LeftMenu from '@renderer/layout/LeftMenu.vue'
 const appStore = useAppStore()
 const router = useRouter()
 
-onMounted(() => {
-  appStore.initTheme()
+onMounted(async () => {
   router.replace('/')
+  appStore.initTheme()
 })
 </script>
 

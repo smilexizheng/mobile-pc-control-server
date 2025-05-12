@@ -8,9 +8,6 @@ export const useRemoteStore = defineStore('remote', () => {
   const devicePort = ref<number>(3000)
   const isLoading = ref<boolean>(false)
 
-  const serverPort = ref<number>()
-  const ips = ref<string[]>([])
-
   window.electron.ipcRenderer.on('openWindow-resp', (_, success: boolean) => {
     isLoading.value = false
     if (success) {
@@ -42,5 +39,5 @@ export const useRemoteStore = defineStore('remote', () => {
     cornersDotOptions: { type: 'dot', color: '#f75802' }
   }
 
-  return { deviceCode, devicePort, isLoading, ips, serverPort, openRemoteWindow, qrOptions }
+  return { deviceCode, devicePort, isLoading, openRemoteWindow, qrOptions }
 })

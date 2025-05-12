@@ -7,7 +7,7 @@ import { getJobList, runJob } from './src/eventSchedule'
 import { db } from './src/database'
 import { ExtendedError } from 'socket.io/dist/namespace'
 
-let io
+let io: Server
 const InitWinControlServer = (port: number, hostname: string): Promise<number> => {
   return new Promise((resolve, reject) => {
     const webExpress = express()
@@ -96,13 +96,4 @@ const disconnectSockets = (): void => {
   io.emit('reconnected')
 }
 
-const sendMessage = (id: string, message: string): void => {
-  if (!io) {
-    console.error('disconnectSockets:socket.io is not running')
-    return
-  }
-  console.log('发送消息', id, message)
-  io.to(id).emit('pc-socket-message', message)
-}
-
-export { InitWinControlServer, disconnectSockets, sendMessage }
+export { InitWinControlServer, disconnectSockets }

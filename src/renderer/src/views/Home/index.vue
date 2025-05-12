@@ -10,10 +10,9 @@ const qrContainer = ref<HTMLDivElement>()
 const qrCode = ref(new QRCodeStyling(remoteStore.qrOptions))
 onMounted(async () => {
   qrCode.value.append(qrContainer.value as HTMLDivElement)
-  remoteStore.serverPort = await window.api.getControlServerPort()
-  remoteStore.ips = await window.api.getLocalIPs()
-  if (remoteStore.ips && remoteStore.ips.length) {
-    qrCode.value.update({ data: `http://${remoteStore.ips![0]}:${remoteStore.devicePort}` })
+  await appStore.initSetting()
+  if (appStore.ips && appStore.ips.length) {
+    qrCode.value.update({ data: `http://${appStore.ips![0]}:${remoteStore.devicePort}` })
   } else {
     Message.error('获取本机的网卡信息识别！')
   }

@@ -19,55 +19,17 @@ import { mouse, Point } from '@nut-tree-fork/nut-js'
 import { TransferFile } from './TransferFile'
 import { createJob, deleteJob, getJobList, toggleJob } from './eventSchedule'
 import { db } from './database'
-import { UAParser } from 'ua-parser-js'
-// 记录在线的用户
-const onlineSocket = {}
-const registerSocketHandlers = (io): void => {
+import { Server } from 'socket.io'
+
+import { initChat } from './Chat'
+
+const registerSocketHandlers = (io: Server): void => {
   // 前端触摸时的pos
   let touchPos: Point
   let mobileScreenSize = { width: 400, height: 800 }
   io.on('connection', (socket) => {
-    // 获取客户端IP地址
-    const clientIp = socket.handshake.address
-    // 获取请求头信息
-    const headers = socket.handshake.headers
-    // 获取用户代理(User-Agent)
-    const userAgent = new UAParser(headers['user-agent']).getResult()
-    // 获取连接时间
-    const connectTime = new Date(socket.handshake.time)
-    onlineSocket[socket.id] = { id: socket.id, connectTime, userAgent, clientIp }
-    sendOnlineSocket()
     // socket.emit(CE.RESPONSE, {success: true, msg: 'client connected'})
-    // 保存原始的 on 方法
-    const originalOn = socket.on
-    // 覆盖 socket.on 方法
-    socket.on = function (eventName, listener): void {
-      // 包装监听器，添加错误捕获
-      const wrappedListener = async (...args): Promise<void> => {
-        try {
-          await listener.apply(this, args)
-        } catch (error) {
-          // 全局错误处理
-          console.error(error, eventName, socket)
-          socket.emit(CE.RESPONSE, {
-            success: false,
-            msg: error,
-            event: eventName,
-            time: Date.now() - socket.data[`${eventName}-time`]
-          })
-        } finally {
-          // todo 某些事件不需要提示
-          // socket.emit(CE.RESPONSE, {
-          //   success: true,
-          //   event: eventName,
-          //   time: Date.now() - socket.data[`${eventName}-time`]
-          // })
-        }
-      }
-      // 注册包装后的监听器
-      return originalOn.call(this, eventName, wrappedListener)
-    }
-
+    initChat(io, socket)
     // 监听所有入口事件
     socket.onAny((event) => {
       // console.log(`goto ${event} ${args}`);
@@ -77,15 +39,16 @@ const registerSocketHandlers = (io): void => {
     // 监听所有出口事件
     socket.onAnyOutgoing(() => {
       // console.log(`outgoing ${event}  ${args}`);
+      // socket.emit(CE.RESPONSE, {
+      //   success: false,
+      //   msg: error,
+      //   event: eventName,
+      //   time: Date.now() - socket.data[`${eventName}-time`]
+      // })
     })
 
     // 文件上传
     TransferFile(socket)
-    // 收到移动端消息
-    socket.on('web-socket-msg', async (message) => {
-      console.log('收到消息')
-      global.mainWindow.webContents.send('web-socket-msg', { id: socket.id, message })
-    })
 
     // 任务计划
     socket.on(CE.SCHEDULE_ADD, async (data) => {
@@ -106,7 +69,7 @@ const registerSocketHandlers = (io): void => {
       socket.emit(CE.SCHEDULE_GET, await getJobList())
     })
 
-    const sendEventList = () => {
+    const sendEventList = (): void => {
       db.getAll(db.events).then((data) => io.emit(CE.EVENTS_GET, data))
     }
     sendEventList()
@@ -261,18 +224,7 @@ const registerSocketHandlers = (io): void => {
         .toPngSync()
       socket.emit(CE.WINDOW_IMG, buffer)
     })
-
-    // 处理客户端断开连接
-    socket.on('disconnect', () => {
-      console.log('Client disconnected', socket.id)
-      delete onlineSocket[socket.id]
-      sendOnlineSocket()
-    })
   })
-
-  const sendOnlineSocket = (): void => {
-    global.mainWindow.webContents.send('online-socket-user', onlineSocket)
-  }
 
   // 配置参数优化
   const config = {
