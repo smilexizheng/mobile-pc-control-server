@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { Setting } from '../env'
 import { useAppStore } from '../store/app'
 import Versions from '@renderer/components/Versions.vue'
@@ -29,17 +29,17 @@ const handleSubmit = (): void => {
     </a-button>
     <template #content>
       <a-doption @click="appStore.settingsVisible = true">系统设置</a-doption>
-      <a-doption @click="appStore.aboutVisible = true" :value="{ value: 'about' }">关于</a-doption>
+      <a-doption :value="{ value: 'about' }" @click="appStore.aboutVisible = true">关于</a-doption>
     </template>
   </a-dropdown>
   <a-modal
     v-model:visible="appStore.settingsVisible"
     width="600px"
     title="系统设置"
-    @before-open="() => (settingForm = { ...appStore.settings } as Setting)"
     :footer="false"
     :unmount-on-close="true"
     title-align="start"
+    @before-open="() => (settingForm = { ...appStore.settings } as Setting)"
   >
     <a-form :model="settingForm" @submit="handleSubmit">
       <a-form-item field="hostname" tooltip="默认绑定所有网络IP接口,可手动指定" label="主机IP">
