@@ -15,10 +15,11 @@ const initChat = (io, socket): void => {
 
   // 收到socket消息
   socket.on('chat-message', async (message: ChatMessage) => {
-    console.log('收到消息')
+    console.log('收到消息', message)
     io.to(message.to).emit('chat-message', {
       ...message,
-      form: socket.id
+      form: socket.id,
+      msgType: message.msgType || 'txt'
     } as ChatMessage)
   })
   // 通知客户端列表s

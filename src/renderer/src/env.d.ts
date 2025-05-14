@@ -31,6 +31,12 @@ type UserMessage = {
   isSelf: boolean
   content: string
   time: string
+  form?: string
+  to?: string
+  group?: string
+  msgType?: 'txt' | 'file' | 'image'
+  fileName?: string
+  fileId?: string
 }
 
 /**

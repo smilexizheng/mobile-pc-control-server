@@ -3,82 +3,24 @@ import { ref, reactive } from 'vue'
 import { IconSend, IconFaceSmileFill, IconFolderAdd, IconImage } from '@arco-design/web-vue/es/icon'
 import { useSocketStore } from '@renderer/store/socket'
 import dayjs from 'dayjs'
+import { useSystemStore } from '@renderer/store/system'
 const socketStore = useSocketStore()
+const systemStore = useSystemStore()
 
-// 新增状态
-const showEmojiPicker = ref(false)
-const fileInput = ref<HTMLInputElement>()
 const imageInput = ref<HTMLInputElement>()
-const emojis = reactive(['😀', '😎', '❤️', '👍', '🎉']) // 示例表情
-
-// 模拟数据
-// const messageList = reactive([
-//   {
-//     id: 1,
-//     name: '张三',
-//     avatar: 'https://example.com/avatar1.png',
-//     lastMessage: '你好，最近怎么样？',
-//     time: '10:30'
-//   },
-//   {
-//     id: 2,
-//     name: '李四',
-//     avatar: 'https://example.com/avatar2.png',
-//     lastMessage: '项目文档已发送',
-//     time: '09:15'
-//   }
-// ])
-
-// const chatData = reactive({
-//   abcd: {
-//     avatar: 'https://example.com/avatar1.png',
-//     messages: [
-//       {
-//         content: '你好，最近怎么样？',
-//         time: '10:30',
-//         isSelf: false
-//       },
-//       {
-//         content: '还不错，项目进展顺利',
-//         time: '10:31',
-//         isSelf: true
-//       }
-//     ]
-//   },
-//   efg: {
-//     avatar: 'https://example.com/avatar2.png',
-//     messages: [
-//       {
-//         content: '项目文档已发送',
-//         time: '09:15',
-//         isSelf: false
-//       }
-//     ]
-//   }
-// })
+const emojis = reactive(['😀', '😅', '😘', '🏸', '😎', '❤️', '👍', '🎉'])
 
 // 响应式状态
-
 const inputMessage = ref('')
 
-// 新增方法
-const toggleEmojiPicker = (): void => {
-  showEmojiPicker.value = !showEmojiPicker.value
-}
-
-const triggerFileInput = (): void => {
-  fileInput.value?.click()
-}
-
-const triggerImageInput = (): void => {
-  imageInput.value?.click()
-}
-
-const handleFileSelect = (e): void => {
-  const file = e.target.files[0]
-  if (file) {
-    // 处理文件上传逻辑
-    console.log('Selected file:', file)
+const triggerFileInput = async (extensions: string[]): Promise<void> => {
+  const filePath = await systemStore.chooseFile('选择文件', extensions)
+  if (filePath) {
+    const fileId = await window.electron.ipcRenderer.invoke('addAllowDownFile', {
+      filePath,
+      fileName: filePath.split('/').pop()
+    })
+    socketStore.sendMessage({ msgType: 'file', fileId, fileName: filePath.split('/').pop() })
   }
 }
 
@@ -92,7 +34,6 @@ const handleImageSelect = (e): void => {
 
 const insertEmoji = (emoji): void => {
   inputMessage.value += emoji
-  showEmojiPicker.value = false
 }
 
 // 方法
@@ -103,7 +44,7 @@ const selectChat = (id): void => {
 const sendMessage = (): void => {
   if (!socketStore.activeClient || !inputMessage.value.trim()) return
 
-  socketStore.sendMessage(inputMessage.value.trim())
+  socketStore.sendMessage({ msgType: 'txt', content: inputMessage.value.trim() })
   inputMessage.value = ''
 }
 </script>
@@ -113,7 +54,7 @@ const sendMessage = (): void => {
     <a-layout-sider :width="221" class="left-sider">
       <div class="message-header">消息列表</div>
       <a-list :bordered="false" class="message-list" :style="{ width: `220px` }">
-        <template :key="id" v-for="id in socketStore.onlineSocketIds">
+        <template v-for="id in socketStore.onlineSocketIds" :key="id">
           <a-list-item
             v-if="id !== socketStore.socket?.id"
             :class="{ 'active-item': id === socketStore.activeClient }"
@@ -158,8 +99,23 @@ const sendMessage = (): void => {
             :class="['message-bubble', { 'self-message': message.isSelf }]"
           >
             <a-avatar v-if="!message.isSelf">A</a-avatar>
-            <div class="bubble-content">
+            <div v-if="message.msgType === 'txt'" class="bubble-content">
               <div class="message-text">{{ message.content }}</div>
+              <div class="message-time">{{ message.time }}</div>
+            </div>
+            <div v-if="message.msgType === 'file'" class="bubble-content">
+              <div class="message-text">{{ message.fileName }}</div>
+              <a-space>
+                <a-button type="primary" size="mini" @click="systemStore.shellOpen(message.fileId)"
+                  >打开</a-button
+                >
+                <a-button
+                  type="primary"
+                  size="mini"
+                  @click="systemStore.showItemInFolder(message.fileId)"
+                  >打开文件夹</a-button
+                ></a-space
+              >
               <div class="message-time">{{ message.time }}</div>
             </div>
           </div>
@@ -170,16 +126,35 @@ const sendMessage = (): void => {
       <!-- 输入区域 -->
       <a-layout-footer class="toolbar-footer">
         <div class="toolbar">
-          <a-button type="text" class="toolbar-btn" @click="toggleEmojiPicker">
-            <icon-face-smile-fill />
-          </a-button>
-          <a-button type="text" class="toolbar-btn" @click="triggerFileInput">
+          <a-trigger position="top" auto-fit-position :unmount-on-close="false">
+            <a-button type="text" class="toolbar-btn">
+              <icon-face-smile-fill />
+            </a-button>
+            <template #content>
+              <div class="emoji-picker">
+                <!-- 这里可以接入表情库 -->
+                <span
+                  v-for="emoji in emojis"
+                  :key="emoji"
+                  class="emoji-item"
+                  @click="insertEmoji(emoji)"
+                  >{{ emoji }}</span
+                >
+              </div>
+            </template>
+          </a-trigger>
+
+          <a-button type="text" class="toolbar-btn" @click="triggerFileInput(['*'])">
             <icon-folder-add />
           </a-button>
-          <a-button type="text" class="toolbar-btn" @click="triggerImageInput">
+          <a-button
+            type="text"
+            class="toolbar-btn"
+            @click="triggerFileInput(['png', 'jpg', 'jpeg'])"
+          >
             <icon-image />
           </a-button>
-          <input ref="fileInput" type="file" style="display: none" @change="handleFileSelect" />
+
           <input
             ref="imageInput"
             type="file"
@@ -187,18 +162,6 @@ const sendMessage = (): void => {
             style="display: none"
             @change="handleImageSelect"
           />
-        </div>
-
-        <!-- 表情选择面板 -->
-        <div v-if="showEmojiPicker" class="emoji-picker">
-          <!-- 这里可以接入表情库 -->
-          <span
-            v-for="emoji in emojis"
-            :key="emoji"
-            class="emoji-item"
-            @click="insertEmoji(emoji)"
-            >{{ emoji }}</span
-          >
         </div>
 
         <!-- 输入区域 -->

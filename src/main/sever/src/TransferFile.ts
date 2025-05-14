@@ -5,10 +5,17 @@ import upath from 'upath'
 import { CLIENT_EMIT_EVENTS as CE } from './constant/client-emit.js'
 import { app, Notification, shell } from 'electron'
 import { getAppIcon } from '../../utils/common'
+import { is } from '@electron-toolkit/utils'
 
 const uploads = new Map()
-const downloadDir = app.getPath('downloads')
-
+const downloadDir = !is.dev ? upath.join(process.cwd(), 'downloads') : app.getPath('downloads')
+global.downloadDir = downloadDir
+if (!fs.existsSync(downloadDir)) {
+  fs.mkdirSync(downloadDir)
+  console.log('已创建：' + downloadDir)
+}
+// 记录已上传文件
+global.allowDownFiles = {}
 // 心跳检测清理僵尸任务
 setInterval(
   () => {
@@ -25,11 +32,9 @@ setInterval(
   5 * 60 * 1000
 ) // 每5分钟检查一次
 
-const TransferFile = (socket): void => {
+const TransferFile = (io, socket): void => {
   // 处理文件开始传输
-  socket.on(CE.FILE_START, ({ fileName, fileSize, fileId }) => {
-    // const fileId = crypto.randomUUID();
-
+  socket.on(CE.FILE_START, ({ fileName, fileSize, fileId, to }) => {
     let filePath = upath.join(downloadDir, `${fileName}`)
     if (existsSync(filePath)) {
       filePath = upath.join(downloadDir, `${fileId.at(2)}_${fileName}`)
@@ -39,6 +44,7 @@ const TransferFile = (socket): void => {
     uploads.set(fileId, {
       fileName,
       filePath,
+      to,
       bytesReceived: 0,
       fileSize,
       lastModified: Date.now(),
@@ -66,21 +72,36 @@ const TransferFile = (socket): void => {
   socket.on(CE.FILE_END, ({ fileId }) => {
     const upload = uploads.get(fileId)
     if (!upload) return
-
-    const notification = new Notification({
-      title: `上传完成`,
-      body: `${upload.fileName}已上传到系统下载目录`,
-      icon: getAppIcon()
-    })
-    notification.show()
-    notification.on('click', () => {
-      shell.showItemInFolder(downloadDir)
-    })
-
-    upload.writeStream.end()
-    fs.renameSync(upload.filePath, upload.filePath.replace('_pending', ''))
     uploads.delete(fileId)
+    upload.writeStream.end()
+    const filePath = upload.filePath.replace('_pending', '')
+    fs.renameSync(upload.filePath, filePath)
     socket.emit(CE.FILE_COMPLETE, fileId)
+    // 聊天文件传输
+    if (upload.to) {
+      global.allowDownFiles[upload.id] = {
+        filePath,
+        fileName: upload.fileName
+      }
+      io.to(upload.to).emit('chat-message', {
+        form: socket.id,
+        msgType: 'file',
+        fileId: upload.id,
+        fileName: upload.fileName
+      })
+    } else {
+      // 系统通知
+      const notification = new Notification({
+        title: `上传完成`,
+        body: `${upload.fileName}点击查看`,
+        icon: getAppIcon()
+      })
+      notification.on('click', () => {
+        console.log(filePath)
+        shell.showItemInFolder(filePath)
+      })
+      notification.show()
+    }
   })
 }
 

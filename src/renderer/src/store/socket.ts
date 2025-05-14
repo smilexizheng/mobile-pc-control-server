@@ -14,7 +14,7 @@ export const useSocketStore = defineStore('socket-io', () => {
   const onlineSocketIds = computed(() => {
     return Object.keys(onlineSocketUser.value)
   })
-  const activeClient = ref(null)
+  const activeClient = ref<string | null>()
 
   const connect = (): void => {
     const { settings, realUrl } = useAppStore()
@@ -44,17 +44,17 @@ export const useSocketStore = defineStore('socket-io', () => {
             }
           })
 
-          socket.value?.on('chat-message', (message) => {
-            const { form, content } = message
+          socket.value?.on('chat-message', (data) => {
+            const { form } = data
             Notification.info({
-              content: `收到消息 ${message.content}`
+              content: `收到消息 ${data.content || data.fileName}`
             })
             if (!userMessage.value[form]) {
               userMessage.value[form] = []
             }
             userMessage.value[form].push({
               isSelf: false,
-              content: content,
+              ...data,
               time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             })
           })
@@ -94,17 +94,18 @@ export const useSocketStore = defineStore('socket-io', () => {
     socket.value?.once(event, data)
   }
 
-  const sendMessage = (content): void => {
+  const sendMessage = (data): void => {
     if (activeClient.value) {
       if (!userMessage.value[activeClient.value]) {
         userMessage.value[activeClient.value] = []
       }
       userMessage.value[activeClient.value].push({
         isSelf: true,
-        content,
+        ...data,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       })
-      emit('chat-message', { to: activeClient.value, content })
+      console.log({ to: activeClient.value, ...data })
+      emit('chat-message', { to: activeClient.value, ...data })
     }
   }
 

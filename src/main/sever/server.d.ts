@@ -77,4 +77,6 @@ type ChatMessage = {
   group?: string
   msgType: 'txt' | 'file' | 'image'
   content: string | object | Buffer
+  fileName?: string
+  fileId?: string
 }

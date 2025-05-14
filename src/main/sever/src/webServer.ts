@@ -14,15 +14,30 @@ const startWebServer = (webExpress: Express): void => {
   webExpress.use(express.static(webPath))
 
   webExpress.get('/getInfo', (_, res): void => {
-    res.json({version: app.getVersion()})
+    res.json({ version: app.getVersion() })
+  })
+
+  webExpress.get('/downloadFile', (req, res): void => {
+    const fileId = req.query.fileId
+    if (!fileId) {
+      res.status(400).send('文件不存在')
+    } else {
+      console.log(global.allowDownFiles[fileId as string])
+      res.download(
+        global.allowDownFiles[fileId as string].filePath,
+        global.allowDownFiles[fileId as string].fileName,
+        (err: Error) => {
+          console.error(`file download fail>>>> ${fileId}`)
+          console.error(err)
+        }
+      )
+    }
   })
 
   // 根路由指向 index.html
   webExpress.get(/.*/, (_, res): void => {
     res.sendFile(upath.join(webPath, 'index.html'))
   })
-
-
 }
 
 export default startWebServer

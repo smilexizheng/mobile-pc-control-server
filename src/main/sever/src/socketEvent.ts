@@ -48,7 +48,7 @@ const registerSocketHandlers = (io: Server): void => {
     })
 
     // 文件上传
-    TransferFile(socket)
+    TransferFile(io, socket)
 
     // 任务计划
     socket.on(CE.SCHEDULE_ADD, async (data) => {

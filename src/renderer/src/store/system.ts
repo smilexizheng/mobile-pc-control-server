@@ -1,6 +1,14 @@
 import { defineStore } from 'pinia'
 
 export const useSystemStore = defineStore('system', () => {
+  const showItemInFolder = (fileId): void => {
+    window.electron.ipcRenderer.send('showItemInFolder', fileId)
+  }
+
+  const shellOpen = (fileId): void => {
+    window.electron.ipcRenderer.send('shellOpen', fileId)
+  }
+
   /**
    * 选择文件
    * @param name 标题名曾
@@ -28,5 +36,5 @@ export const useSystemStore = defineStore('system', () => {
     return null
   }
 
-  return { chooseFile, chooseFolder }
+  return { chooseFile, chooseFolder, showItemInFolder, shellOpen }
 })
