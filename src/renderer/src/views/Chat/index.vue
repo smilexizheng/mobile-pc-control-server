@@ -75,7 +75,8 @@ const sendMessage = (): void => {
               <template #title>
                 <span>{{
                   socketStore.onlineSocketUser[id].name ||
-                  socketStore.onlineSocketUser[id].userAgent.device.model
+                  socketStore.onlineSocketUser[id].userAgent.device.model ||
+                  socketStore.onlineSocketUser[id].userAgent.os.name
                 }}</span>
               </template>
               <template #description>
@@ -127,7 +128,7 @@ const sendMessage = (): void => {
       <a-layout-footer class="toolbar-footer">
         <div class="toolbar">
           <a-trigger position="top" auto-fit-position :unmount-on-close="false">
-            <a-button type="text" class="toolbar-btn">
+            <a-button class="toolbar-btn">
               <icon-face-smile-fill />
             </a-button>
             <template #content>
@@ -144,14 +145,10 @@ const sendMessage = (): void => {
             </template>
           </a-trigger>
 
-          <a-button type="text" class="toolbar-btn" @click="triggerFileInput(['*'])">
+          <a-button class="toolbar-btn" @click="triggerFileInput(['*'])">
             <icon-folder-add />
           </a-button>
-          <a-button
-            type="text"
-            class="toolbar-btn"
-            @click="triggerFileInput(['png', 'jpg', 'jpeg'])"
-          >
+          <a-button class="toolbar-btn" @click="triggerFileInput(['png', 'jpg', 'jpeg'])">
             <icon-image />
           </a-button>
 
@@ -209,7 +206,6 @@ const sendMessage = (): void => {
 }
 
 .message-list {
-  height: calc(100vh - 100px);
   overflow-y: auto;
 }
 
@@ -269,6 +265,8 @@ const sendMessage = (): void => {
 
 .message-text {
   color: var(--color-text-1);
+  white-space: break-spaces;
+  word-break: break-all;
 }
 
 .input-footer {
@@ -280,14 +278,12 @@ const sendMessage = (): void => {
 /* 新增工具栏样式 */
 .toolbar-footer {
   height: auto;
-  padding: 8px 16px;
+  padding: 2px 16px 8px 16px;
   border-top: 1px solid var(--color-border);
 }
 
 .toolbar {
   display: flex;
-  gap: 4px;
-  padding-bottom: 8px;
 }
 
 .toolbar-btn {
