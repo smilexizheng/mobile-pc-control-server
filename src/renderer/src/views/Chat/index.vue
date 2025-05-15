@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch, nextTick, onMounted } from 'vue'
 import { IconSend, IconFaceSmileFill, IconFolderAdd, IconImage } from '@arco-design/web-vue/es/icon'
 import { useSocketStore } from '@renderer/store/socket'
 import dayjs from 'dayjs'
@@ -7,10 +7,25 @@ import { useSystemStore } from '@renderer/store/system'
 const socketStore = useSocketStore()
 const systemStore = useSystemStore()
 
-const imageInput = ref<HTMLInputElement>()
 const emojis = reactive(['😀', '😅', '😘', '🏸', '😎', '❤️', '👍', '🎉'])
+const chatContent = ref<HTMLDivElement>()
 
-// 响应式状态
+// 滚动到底部的函数
+const scrollToBottom = (): void => {
+  nextTick(() => {
+    if (chatContent.value) {
+      chatContent.value.scrollTop = chatContent.value.scrollHeight
+    }
+  })
+}
+watch(socketStore.userMessage, () => {
+  scrollToBottom()
+})
+
+onMounted(() => {
+  scrollToBottom()
+})
+
 const inputMessage = ref('')
 
 const triggerFileInput = async (extensions: string[]): Promise<void> => {
@@ -21,14 +36,6 @@ const triggerFileInput = async (extensions: string[]): Promise<void> => {
       fileName: filePath.split('/').pop()
     })
     socketStore.sendMessage({ msgType: 'file', fileId, fileName: filePath.split('/').pop() })
-  }
-}
-
-const handleImageSelect = (e): void => {
-  const file = e.target.files[0]
-  if (file) {
-    // 处理图片上传逻辑
-    console.log('Selected image:', file)
   }
 }
 
@@ -93,7 +100,7 @@ const sendMessage = (): void => {
     <!-- 右侧聊天区域 -->
     <a-layout class="right-layout">
       <a-layout-content class="chat-content">
-        <div v-if="socketStore.activeClient" class="chat-messages">
+        <div v-if="socketStore.activeClient" ref="chatContent" class="chat-messages">
           <div
             v-for="(message, index) in socketStore.userMessage[socketStore.activeClient]"
             :key="index"
@@ -151,14 +158,6 @@ const sendMessage = (): void => {
           <a-button class="toolbar-btn" @click="triggerFileInput(['png', 'jpg', 'jpeg'])">
             <icon-image />
           </a-button>
-
-          <input
-            ref="imageInput"
-            type="file"
-            accept="image/*"
-            style="display: none"
-            @change="handleImageSelect"
-          />
         </div>
 
         <!-- 输入区域 -->
@@ -228,18 +227,15 @@ const sendMessage = (): void => {
 }
 
 .chat-content {
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - 80px);
-  padding: 16px;
-  overflow-y: auto;
+  padding-bottom: 10px;
 }
 
 .chat-messages {
-  height: 10px;
+  height: calc(100vh - 116px);
   display: flex;
   flex-direction: column;
   gap: 16px;
+  overflow-y: auto;
 }
 
 .message-bubble {

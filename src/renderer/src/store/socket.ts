@@ -104,7 +104,6 @@ export const useSocketStore = defineStore('socket-io', () => {
         ...data,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       })
-      console.log({ to: activeClient.value, ...data })
       emit('chat-message', { to: activeClient.value, ...data })
     }
   }
