@@ -4,17 +4,19 @@ import { IconSend, IconFaceSmileFill, IconFolderAdd, IconImage } from '@arco-des
 import { useSocketStore } from '@renderer/store/socket'
 import dayjs from 'dayjs'
 import { useSystemStore } from '@renderer/store/system'
+import type { ScrollbarInstance } from '@arco-design/web-vue'
+
 const socketStore = useSocketStore()
 const systemStore = useSystemStore()
 
 const emojis = reactive(['😀', '😅', '😘', '🏸', '😎', '❤️', '👍', '🎉'])
-const chatContent = ref<HTMLDivElement>()
+const chatContent = ref<ScrollbarInstance>()
 
 // 滚动到底部的函数
 const scrollToBottom = (): void => {
   nextTick(() => {
-    if (chatContent.value) {
-      chatContent.value.scrollTop = chatContent.value.scrollHeight
+    if (chatContent.value?.containerRef) {
+      chatContent.value.containerRef.scrollTop = chatContent.value.containerRef.scrollHeight
     }
   })
 }
@@ -100,35 +102,40 @@ const sendMessage = (): void => {
     <!-- 右侧聊天区域 -->
     <a-layout class="right-layout">
       <a-layout-content class="chat-content">
-        <div v-if="socketStore.activeClient" ref="chatContent" class="chat-messages">
-          <div
-            v-for="(message, index) in socketStore.userMessage[socketStore.activeClient]"
-            :key="index"
-            :class="['message-bubble', { 'self-message': message.isSelf }]"
-          >
-            <a-avatar v-if="!message.isSelf">A</a-avatar>
-            <div v-if="message.msgType === 'txt'" class="bubble-content">
-              <div class="message-text">{{ message.content }}</div>
-              <div class="message-time">{{ message.time }}</div>
-            </div>
-            <div v-if="message.msgType === 'file'" class="bubble-content">
-              <div class="message-text">{{ message.fileName }}</div>
-              <a-space>
-                <a-button type="primary" size="mini" @click="systemStore.shellOpen(message.fileId)"
-                  >打开</a-button
+        <a-scrollbar ref="chatContent" style="height: calc(100vh - 116px); overflow: auto">
+          <div v-if="socketStore.activeClient" class="chat-messages">
+            <div
+              v-for="(message, index) in socketStore.userMessage[socketStore.activeClient]"
+              :key="index"
+              :class="['message-bubble', { 'self-message': message.isSelf }]"
+            >
+              <a-avatar v-if="!message.isSelf">A</a-avatar>
+              <div v-if="message.msgType === 'txt'" class="bubble-content">
+                <div class="message-text">{{ message.content }}</div>
+                <div class="message-time">{{ message.time }}</div>
+              </div>
+              <div v-if="message.msgType === 'file'" class="bubble-content">
+                <div class="message-text">{{ message.fileName }}</div>
+                <a-space>
+                  <a-button
+                    type="primary"
+                    size="mini"
+                    @click="systemStore.shellOpen(message.fileId)"
+                    >打开</a-button
+                  >
+                  <a-button
+                    type="primary"
+                    size="mini"
+                    @click="systemStore.showItemInFolder(message.fileId)"
+                    >打开文件夹</a-button
+                  ></a-space
                 >
-                <a-button
-                  type="primary"
-                  size="mini"
-                  @click="systemStore.showItemInFolder(message.fileId)"
-                  >打开文件夹</a-button
-                ></a-space
-              >
-              <div class="message-time">{{ message.time }}</div>
+                <div class="message-time">{{ message.time }}</div>
+              </div>
             </div>
           </div>
-        </div>
-        <div v-else class="empty-chat">请选择聊天</div>
+          <div v-else class="empty-chat">请选择聊天</div>
+        </a-scrollbar>
       </a-layout-content>
 
       <!-- 输入区域 -->
@@ -226,21 +233,16 @@ const sendMessage = (): void => {
   text-overflow: ellipsis;
 }
 
-.chat-content {
-  padding-bottom: 10px;
-}
-
 .chat-messages {
-  height: calc(100vh - 116px);
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  overflow-y: auto;
+  gap: 12px;
+  padding: 0 10px;
 }
 
 .message-bubble {
   display: flex;
-  gap: 12px;
+  gap: 6px;
   max-width: 70%;
 }
 
