@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
 import { OcrResult } from '@renderer/env'
 import { createKeybindingsHandler } from 'tinykeys'
 import { useResizeObserver, useToggle, useMouseInElement, useScroll } from '@vueuse/core'
@@ -11,6 +11,9 @@ import { DrawMode, WH, IChildDrawStore } from '@renderer/store/ocr/type'
 type ChildStoreGetter = () => IChildDrawStore
 
 export const useOcrStore = defineStore('ocr', () => {
+  const transformer = useTemplateRef<Konva.Transformer>('transformer')
+  const selectShapeId = ref<Array<number>>([])
+  const layerRef = ref<Konva.Layer | null>()
   // 开启涂鸦
   const graffitiMode = ref(false)
   // 涂鸦绘制模式
@@ -87,6 +90,15 @@ export const useOcrStore = defineStore('ocr', () => {
       // }
       console.log(path)
       ocrImage(path)
+    },
+    delete: () => {
+      if (layerRef.value && selectShapeId.value) {
+        const children = layerRef.value.getChildren()
+        const nodes = children?.filter((child) => selectShapeId.value.includes(child._id))
+        nodes.forEach((node) => node.destroy())
+        selectShapeId.value = []
+        layerRef.value.draw()
+      }
     }
   })
 
@@ -279,7 +291,7 @@ export const useOcrStore = defineStore('ocr', () => {
     }
   }
 
-  // knova stage 事件监听
+  // 鼠标按下
   const stageMouseDown = (e: Konva.KonvaPointerEvent): void => {
     console.log('stageMouseDown', e)
     // 开启涂鸦模式
@@ -287,21 +299,66 @@ export const useOcrStore = defineStore('ocr', () => {
       drawStore.value?.startDrawing(e)
     }
   }
-
+  // 鼠标移动
   const stageMouseMove = (e: Konva.KonvaPointerEvent): void => {
     // console.log('stageMouseMove', e)
     if (graffitiMode.value) {
       drawStore.value?.updateDrawing(e)
     }
   }
-
+  //鼠标抬起
   const stageMouseUp = (e: Konva.KonvaPointerEvent): void => {
     console.log('stageMouseUp', e)
     if (graffitiMode.value) {
       drawStore.value?.endDrawing(e)
     }
   }
+  // 鼠标点击
+  const stageClick = (e: Konva.KonvaPointerEvent): void => {
+    const layer = e.target.getLayer()
 
+    // if clicked  on  rectangles
+    if (e.target.attrs.id && e.target.attrs.id.indexOf('draw') > -1) {
+      layerRef.value = layer
+      // do we pressed shift or ctrl?
+      const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey
+      const clickedId = e.target._id
+      const isSelected = selectShapeId.value.includes(clickedId)
+      // console.log(selectShapeId.value, clickedId, metaPressed, isSelected)
+      if (!metaPressed && !isSelected) {
+        // if no key pressed and the node is not selected
+        // select just one
+        selectShapeId.value = [clickedId]
+      } else if (metaPressed && isSelected) {
+        // if we pressed keys and node was selected
+        // we need to remove it from selection:
+        selectShapeId.value = selectShapeId.value.filter((id) => id !== clickedId)
+      } else if (metaPressed && !isSelected) {
+        // add the node into selection
+        selectShapeId.value = [...selectShapeId.value, clickedId]
+      }
+    } else {
+      // if click on empty area - remove all selections
+      if (e.target === e.target.getStage() || e.target.attrs.id === 'ocrImg') {
+        selectShapeId.value = []
+        return
+      }
+    }
+  }
+
+  watch(selectShapeId, () => {
+    if (!transformer.value || !layerRef.value) return
+    // 获取图层中所有节点
+    const children = layerRef.value.getChildren()
+    const nodes = children?.filter((child) => selectShapeId.value.includes(child._id))
+    const tf = transformer.value?.getNode() as Konva.Transformer
+
+    if (nodes) {
+      tf.nodes(nodes)
+    }
+  })
+
+  // 鼠标离开
   const stageMouseLeave = (e: Konva.KonvaPointerEvent): void => {
     console.log('stageMouseLeave', e)
     if (graffitiMode.value) {
@@ -309,20 +366,35 @@ export const useOcrStore = defineStore('ocr', () => {
     }
   }
 
+  const stageWheel = (e: Konva.KonvaPointerEvent): void => {
+    console.log('stageWheel', e)
+  }
+
   const stageDragStart = (e: Konva.KonvaPointerEvent): void => {
     console.log('stageDragStart', e)
+    if (graffitiMode.value) {
+      drawStore.value?.resetDrawing(e)
+    }
   }
 
   const stageDragEnd = (e: Konva.KonvaPointerEvent): void => {
     console.log('stageDragEnd', e)
   }
 
-  const stageWheel = (e: Konva.KonvaPointerEvent): void => {
-    console.log('stageWheel', e)
+  const transformStart = (e: Konva.KonvaPointerEvent): void => {
+    console.log(e.evt.button)
+    if (e.evt.button !== 0) {
+      transformer.value?.stopTransform()
+    }
   }
 
-  const stageClick = (e: Konva.KonvaPointerEvent): void => {
-    console.log('stageClick', e)
+  // 监听变换，矩形框和旋转框和关键点框
+  const transformEnd = (e: Konva.KonvaPointerEvent): void => {
+    // 标注中不处理
+    if (!graffitiMode.value) {
+      return
+    }
+    console.log('transformEnd', e)
   }
 
   return {
@@ -355,6 +427,8 @@ export const useOcrStore = defineStore('ocr', () => {
     stageMouseMove,
     stageDragStart,
     stageDragEnd,
-    stageWheel
+    stageWheel,
+    transformStart,
+    transformEnd
   }
 })

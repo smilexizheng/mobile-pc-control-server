@@ -2,6 +2,7 @@
 import { useOcrStore } from '@renderer/store/ocr'
 import { onMounted, onUnmounted } from 'vue'
 import Rectangles from '@renderer/views/OCR/Rectangles.vue'
+
 const ocrStore = useOcrStore()
 
 onMounted(() => {
@@ -17,7 +18,8 @@ onUnmounted(() => {
   <div class="layer-1">
     <div style="height: 50px; padding: 10px">
       <a-space size="small">
-        涂鸦 <a-switch v-model="ocrStore.graffitiMode" size="small" />
+        涂鸦
+        <a-switch v-model="ocrStore.graffitiMode" size="small" />
         缩放
         <a-input-number
           v-model="ocrStore.scale"
@@ -56,8 +58,8 @@ onUnmounted(() => {
 
     <div :ref="(r: any) => ocrStore.setMainLayer(r)" class="layer-2">
       <a-spin :loading="ocrStore.isLoading" dot>
-        <div
-          :ref="(r: any) => ocrStore.setScrollDivRef(r)"
+        <a-scrollbar
+          :ref="(r: any) => ocrStore.setScrollDivRef(r?.containerRef)"
           :style="{
             width: `${ocrStore.mainLayerWH.width}px`,
             height: `${ocrStore.mainLayerWH.height}px`,
@@ -70,7 +72,7 @@ onUnmounted(() => {
               height: `${ocrStore.stageConfig.height}px`
             }"
           ></div>
-        </div>
+        </a-scrollbar>
         <div
           :style="{
             position: 'absolute',
@@ -105,6 +107,7 @@ onUnmounted(() => {
               <k-image
                 v-show="ocrStore.image"
                 :config="{
+                  id: 'ocrImg',
                   image: ocrStore.image
                 }"
               />
@@ -158,6 +161,22 @@ onUnmounted(() => {
               }"
             >
               <Rectangles />
+              <k-transformer
+                id="transformer"
+                ref="transformer"
+                :config="{
+                  flipEnabled: false, //禁止翻转
+                  keepRatio: false,
+                  borderStrokeWidth: 2,
+                  anchorSize: 12,
+                  anchorCornerRadius: 6, // 圆角半径
+                  anchorStrokeWidth: 1, // 设置Handle的边框宽度
+                  rotateEnabled: true,
+                  enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right'] // 只显示四个点
+                }"
+                @transformstart="ocrStore.transformStart"
+                @transformend="ocrStore.transformEnd"
+              />
             </k-layer>
           </k-stage>
         </div>

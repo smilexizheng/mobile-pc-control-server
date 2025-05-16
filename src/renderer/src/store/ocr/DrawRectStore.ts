@@ -56,8 +56,7 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
       if (!isDrawing.value || !currentRect.value) {
         return
       }
-
-      if (currentRect.value.width > 1 && currentRect.value.height > 1) {
+      if (currentRect.value.width > 30 && currentRect.value.height > 30) {
         rectangles.value.push({ ...currentRect.value })
       }
 
