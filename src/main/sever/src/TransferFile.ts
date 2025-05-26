@@ -8,7 +8,9 @@ import { getAppIcon } from '../../utils/common'
 import { is } from '@electron-toolkit/utils'
 
 const uploads = new Map()
-const downloadDir = !is.dev ? upath.join(process.cwd(), 'downloads') : app.getPath('downloads')
+const downloadDir = !is.dev
+  ? upath.join(upath.dirname(process.execPath), 'downloads')
+  : app.getPath('downloads')
 global.downloadDir = downloadDir
 if (!fs.existsSync(downloadDir)) {
   fs.mkdirSync(downloadDir)

@@ -4,7 +4,7 @@ import { app } from 'electron'
 
 const startWebServer = (webExpress: Express): void => {
   // const webPath = app.isPackaged
-  //  ? upath.join(process.resourcesPath, 'app.asar.unpacked', 'resources','web') : upath.join(process.cwd(), 'resources','web')
+  //  ? upath.join(process.resourcesPath, 'app.asar.unpacked', 'resources','web') : upath.join(app.getAppPath(), 'resources','web')
 
   const webPath = app.isPackaged
     ? upath.join(__dirname, '../web')
