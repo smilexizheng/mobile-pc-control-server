@@ -21,6 +21,9 @@ export const useRemoteStore = defineStore('remote', () => {
     isLoading.value = true
     window.electron.ipcRenderer.send('openRemoteWindow', data)
   }
+  const openCustomWindow = (data): void => {
+    window.electron.ipcRenderer.send('openCustomWindow', data)
+  }
 
   // 配置二维码参数
   const qrOptions: Partial<Options> = {
@@ -39,5 +42,5 @@ export const useRemoteStore = defineStore('remote', () => {
     cornersDotOptions: { type: 'dot', color: '#f75802' }
   }
 
-  return { deviceCode, devicePort, isLoading, openRemoteWindow, qrOptions }
+  return { deviceCode, devicePort, isLoading, openRemoteWindow, openCustomWindow, qrOptions }
 })

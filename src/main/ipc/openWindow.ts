@@ -37,6 +37,10 @@ ipcMain.on('openRemoteWindow', (event, { id, url, title }) => {
     })
 })
 
+ipcMain.on('openCustomWindow', (_, { id, url, title }) => {
+  createWindow(id, url, title)
+})
+
 const createWindow = (id: string, url: string, title: string) => {
   const childWindow = new BrowserWindow({
     title: id,
@@ -58,7 +62,7 @@ const createWindow = (id: string, url: string, title: string) => {
   childWindow.setMenu(null)
   childWindow.setAlwaysOnTop(true, 'status')
   childWindow.on('ready-to-show', () => {
-    childWindow.setTitle(title || '我的控制')
+    childWindow.setTitle(title)
     childWindow?.show()
   })
 

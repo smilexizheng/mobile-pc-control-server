@@ -2,8 +2,10 @@
 import { useRouter } from 'vue-router'
 import { Message } from '@arco-design/web-vue'
 import { useAppStore } from '../store/app'
+import { useRemoteStore } from '../store/remote'
 const router = useRouter()
 const appStore = useAppStore()
+const remoteStore = useRemoteStore()
 const onClickMenuItem = (key): void => {
   switch (key) {
     case 'home':
@@ -14,6 +16,9 @@ const onClickMenuItem = (key): void => {
       break
     case 'chat':
       router.push('/chat')
+      break
+    case 'game':
+      // router.push('/game')
       break
     case 'sys-setting':
       appStore.settingsVisible = true
@@ -64,7 +69,17 @@ const onClickMenuItem = (key): void => {
         <template #title>
           <span><icon-more />更多</span>
         </template>
-        <a-menu-item key="tools"><icon-send />工具箱</a-menu-item>
+        <a-menu-item
+          key="game"
+          @click="
+            remoteStore.openCustomWindow({
+              id: `EmulatorJS`,
+              title: `EmulatorJS`,
+              url: `http://${remoteStore.deviceCode}:${remoteStore.devicePort}/game`
+            })
+          "
+          ><icon-send />EmulatorJS</a-menu-item
+        >
         <!--        <a-sub-menu key="config" title="配置">-->
         <a-menu-item key="sys-setting"><icon-settings />系统设置</a-menu-item>
         <!--        </a-sub-menu>-->
