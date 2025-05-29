@@ -3,17 +3,12 @@ import upath from 'upath'
 import { getAppIcon } from '../utils/common'
 import { is } from '@electron-toolkit/utils'
 
-ipcMain.on('openWindow', (_, { id, url, title }) => {
+ipcMain.on('openWindow', (_, { id, url, title, option }) => {
   console.log(`openWindow ${id} ${url}`)
-
-  if (global.childWindow[id]) {
-    global.childWindow[id].show()
-    return
-  }
-  createWindow(id, url, title)
+  createWindow(id, url, title, option)
 })
 
-ipcMain.on('openRemoteWindow', (event, { id, url, title }) => {
+ipcMain.on('openRemoteWindow', (event, { id, url, title, option }) => {
   console.log(`openRemoteWindow ${id} ${url}`)
 
   if (global.childWindow[id]) {
@@ -29,7 +24,7 @@ ipcMain.on('openRemoteWindow', (event, { id, url, title }) => {
       if (is.dev && id === 'self') {
         url = 'http://localhost:3002/'
       }
-      createWindow(id, url, title)
+      createWindow(id, url, title, option)
     })
     .catch((err) => {
       console.error(err)
@@ -37,11 +32,16 @@ ipcMain.on('openRemoteWindow', (event, { id, url, title }) => {
     })
 })
 
-ipcMain.on('openCustomWindow', (_, { id, url, title }) => {
-  createWindow(id, url, title)
-})
-
-const createWindow = (id: string, url: string, title: string) => {
+const createWindow = (
+  id: string,
+  url: string,
+  title: string,
+  option?: Electron.BrowserWindow
+): void => {
+  if (global.childWindow[id]) {
+    global.childWindow[id].show()
+    return
+  }
   const childWindow = new BrowserWindow({
     title: id,
     width: 430,
@@ -57,7 +57,8 @@ const createWindow = (id: string, url: string, title: string) => {
       webSecurity: false,
       preload: upath.join(__dirname, '../preload/index.js'),
       sandbox: false
-    }
+    },
+    ...option
   })
   childWindow.setMenu(null)
   childWindow.setAlwaysOnTop(true, 'status')
@@ -83,7 +84,7 @@ const createWindow = (id: string, url: string, title: string) => {
   })
 
   console.log('openWindow', url)
-  childWindow.loadURL(url)
+  childWindow.loadURL(url).then()
 
   global.childWindow[id] = childWindow
 }

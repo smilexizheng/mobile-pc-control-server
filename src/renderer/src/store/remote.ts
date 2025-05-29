@@ -22,7 +22,7 @@ export const useRemoteStore = defineStore('remote', () => {
     window.electron.ipcRenderer.send('openRemoteWindow', data)
   }
   const openCustomWindow = (data): void => {
-    window.electron.ipcRenderer.send('openCustomWindow', data)
+    window.electron.ipcRenderer.send('openWindow', data)
   }
 
   // 配置二维码参数

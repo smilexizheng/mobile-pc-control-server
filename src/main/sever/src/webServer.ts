@@ -19,7 +19,7 @@ const startWebServer = (webExpress: Express): void => {
 
   webExpress.get('/downloadFile', (req, res): void => {
     const fileId = req.query.fileId
-    if (!fileId) {
+    if (!fileId && !global.allowDownFiles[fileId as string]) {
       res.status(400).send('文件不存在')
     } else {
       console.log(global.allowDownFiles[fileId as string])
