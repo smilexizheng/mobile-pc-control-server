@@ -1,32 +1,22 @@
 <script setup lang="ts">
-import { ref, reactive, watch, nextTick, onMounted } from 'vue'
+import { ref, reactive, watch, onMounted } from 'vue'
 import { IconSend, IconFaceSmileFill, IconFolderAdd, IconImage } from '@arco-design/web-vue/es/icon'
 import { useSocketStore } from '@renderer/store/socket'
 import dayjs from 'dayjs'
 import { useSystemStore } from '@renderer/store/system'
-import type { ScrollbarInstance } from '@arco-design/web-vue'
 
 const socketStore = useSocketStore()
 const systemStore = useSystemStore()
 
-const emojis = reactive(['😀', '😅', '😘', '🏸', '😎', '❤️', '👍', '🎉'])
-const chatContent = ref<ScrollbarInstance>()
+const emojis = reactive(['😀', '😂', '😅', '😘', '🏸', '😎', '❤️', '👍', '🎉'])
+const chatContent = ref<HTMLDivElement>()
 
-// 滚动到底部的函数
-const scrollToBottom = (): void => {
-  nextTick(() => {
-    if (chatContent.value?.containerRef) {
-      chatContent.value.containerRef.scrollTop = chatContent.value.containerRef.scrollHeight
-    }
-  })
-}
+// Auto-scroll to bottom when messages
 watch(socketStore.userMessage, () => {
-  scrollToBottom()
+  chatContent.value?.scrollIntoView({ block: 'end', behavior: 'instant' })
 })
 
-onMounted(() => {
-  scrollToBottom()
-})
+onMounted(() => {})
 
 const inputMessage = ref('')
 
@@ -102,8 +92,8 @@ const sendMessage = (): void => {
     <!-- 右侧聊天区域 -->
     <a-layout class="right-layout">
       <a-layout-content class="chat-content">
-        <a-scrollbar ref="chatContent" style="height: calc(100vh - 116px); overflow: auto">
-          <div v-if="socketStore.activeClient" class="chat-messages">
+        <a-scrollbar style="height: calc(100vh - 116px); overflow: auto">
+          <div v-if="socketStore.activeClient" ref="chatContent" class="chat-messages">
             <div
               v-for="(message, index) in socketStore.userMessage[socketStore.activeClient]"
               :key="index"
@@ -293,11 +283,12 @@ const sendMessage = (): void => {
   display: flex;
   gap: 8px;
   padding: 8px;
-  background: var(--color-bg-2);
+  margin: 0 10%;
+  background: var(--color-bg-4);
   border-radius: 4px;
-  margin-bottom: 8px;
   flex-wrap: wrap;
-  max-height: 120px;
+  max-height: 160px;
+  width: 80%;
   overflow-y: auto;
 }
 

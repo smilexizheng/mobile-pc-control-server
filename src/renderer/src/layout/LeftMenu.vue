@@ -59,19 +59,16 @@ const onClickMenuItem = (key): void => {
         <icon-image />
         OCR识别
       </a-menu-item>
-      <a-menu-item key="asr"> <iconVoice /> ASR语音识别 </a-menu-item>
-      <a-menu-item key="tts">
-        <icon-chinese-fill />
-        TTS文字转换
-      </a-menu-item>
+      <!--      <a-menu-item key="asr"> <iconVoice /> ASR语音识别 </a-menu-item>-->
+      <!--      <a-menu-item key="tts">-->
+      <!--        <icon-chinese-fill />-->
+      <!--        TTS文字转换-->
+      <!--      </a-menu-item>-->
       <a-sub-menu key="more">
         <template #title>
           <span><icon-more />更多</span>
         </template>
-        <a-menu-item
-          key="game"
-          ><icon-send />EmulatorJS</a-menu-item
-        >
+        <!--        <a-menu-item key="game"><icon-send />EmulatorJS</a-menu-item>-->
         <!--        <a-sub-menu key="config" title="配置">-->
         <a-menu-item key="sys-setting"><icon-settings />系统设置</a-menu-item>
         <!--        </a-sub-menu>-->
