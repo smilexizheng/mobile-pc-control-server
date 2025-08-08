@@ -19,7 +19,9 @@ onMounted(async () => {
     <a-layout-header><TitleBar /> </a-layout-header>
     <a-layout>
       <LeftMenu />
-      <a-layout-content ref="mainLayout"> <RouterView /></a-layout-content>
+      <a-layout-content ref="mainLayout">
+        <RouterView />
+      </a-layout-content>
     </a-layout>
     <a-layout-footer></a-layout-footer>
   </a-layout>

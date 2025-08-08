@@ -43,6 +43,7 @@
     "loudness": "^0.4.2",
     "lucide-vue-next": "^0.537.0",
     "mic": "^2.1.2",
+    "motion-v": "^1.7.0",
     "naudiodon2": "^2.4.0",
     "node-schedule": "^2.1.1",
     "node-screenshots": "^0.2.3",
