@@ -26,7 +26,6 @@
     "@electron-toolkit/utils": "^4.0.0",
     "@ffprobe-installer/ffprobe": "2.1.2",
     "@nut-tree-fork/nut-js": "^4.2.6",
-
     "@vueuse/core": "^13.1.0",
     "dayjs": "^1.11.13",
     "electron-log": "^5.3.2",
@@ -42,6 +41,7 @@
     "level-supports": "^6.0.0",
     "level-transcoder": "^1.0.1",
     "loudness": "^0.4.2",
+    "lucide-vue-next": "^0.537.0",
     "mic": "^2.1.2",
     "naudiodon2": "^2.4.0",
     "node-schedule": "^2.1.1",
@@ -61,7 +61,6 @@
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
-    "@types/socket.io-client": "^1.4.36",
     "@arco-design/web-vue": "^2.57.0",
     "@electron-toolkit/eslint-config-prettier": "3.0.0",
     "@electron-toolkit/eslint-config-ts": "^3.0.0",
@@ -69,6 +68,7 @@
     "@types/express": "^5.0.1",
     "@types/node": "^22.13.13",
     "@types/node-schedule": "^2.1.7",
+    "@types/socket.io-client": "^1.4.36",
     "@vitejs/plugin-vue": "^5.2.3",
     "electron": "^35.0.3",
     "electron-builder": "^25.1.8",

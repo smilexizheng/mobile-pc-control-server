@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import Settings from '../components/Settings.vue'
-
+import { Minus, X, Square } from 'lucide-vue-next'
 const title = ref(window.document.title)
 const handleMinimize = () => window.electron.ipcRenderer.send('window-minimize')
 const handleClose = () => window.electron.ipcRenderer.send('window-close')
@@ -13,11 +13,13 @@ const handleClose = () => window.electron.ipcRenderer.send('window-close')
     {{ title }}
     <div class="window-controls">
       <Settings />
-      <button class="control-btn minimize" @click="handleMinimize">一</button>
-      <!--      <button class="control-btn minimize">-->
-      <!--        ❏❑-->
+      <button class="control-btn minimize" @click="handleMinimize">
+        <Minus :size="22" />
+      </button>
+      <!--      <button class="control-btn">-->
+      <!--        <Square :size="16" />-->
       <!--      </button>-->
-      <button class="control-btn close" @click="handleClose">✖</button>
+      <button class="control-btn close" @click="handleClose"><X :size="22" /></button>
     </div>
   </div>
 </template>
@@ -72,12 +74,14 @@ const handleClose = () => window.electron.ipcRenderer.send('window-close')
 
 /* Windows 风格悬停效果 */
 @media (hover: hover) {
-  .control-btn.minimize:hover {
+  .minimize:hover {
+    cursor: pointer;
     background: var(--color-border-3);
   }
 
-  .control-btn.close:hover {
+  .close:hover {
     background: #e81123;
+    cursor: pointer;
   }
 }
 </style>
