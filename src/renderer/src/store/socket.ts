@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import io from 'socket.io-client'
 import { ref, computed } from 'vue'
 import { useAppStore } from './app'
+import { Message } from '@arco-design/web-vue'
 import Socket = SocketIOClient.Socket
 import { Notification } from '@arco-design/web-vue'
 import { UserMessage } from '../env'
@@ -14,7 +15,7 @@ export const useSocketStore = defineStore('socket-io', () => {
   const onlineSocketIds = computed(() => {
     return Object.keys(onlineSocketUser.value)
   })
-  const activeClient = ref<string | null>()
+  const activeClient = ref()
 
   const connect = (): void => {
     const { settings, realUrl } = useAppStore()
@@ -38,10 +39,11 @@ export const useSocketStore = defineStore('socket-io', () => {
               activeClient.value = null
             }
           })
-          socket.value?.on('client-leave', (data) => {
-            if (userMessage.value[data]) {
-              delete userMessage.value[data]
-            }
+          socket.value?.on('client-leave', () => {
+            Message.info('客户端离线')
+            // if (userMessage.value[data]) {
+            // delete userMessage.value[data]
+            // }
           })
 
           socket.value?.on('chat-message', (data) => {
@@ -49,10 +51,11 @@ export const useSocketStore = defineStore('socket-io', () => {
             Notification.info({
               content: `收到消息 ${data.content || data.fileName}`
             })
-            if (!userMessage.value[form]) {
-              userMessage.value[form] = []
+            const ip = onlineSocketUser.value[form].clientIp
+            if (!userMessage.value[ip]) {
+              userMessage.value[ip] = []
             }
-            userMessage.value[form].push({
+            userMessage.value[ip].push({
               isSelf: false,
               ...data,
               time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -96,15 +99,16 @@ export const useSocketStore = defineStore('socket-io', () => {
 
   const sendMessage = (data): void => {
     if (activeClient.value) {
-      if (!userMessage.value[activeClient.value]) {
-        userMessage.value[activeClient.value] = []
+      const ip = activeClient.value.clientIp
+      if (!userMessage.value[ip]) {
+        userMessage.value[ip] = []
       }
-      userMessage.value[activeClient.value].push({
+      userMessage.value[ip].push({
         isSelf: true,
         ...data,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       })
-      emit('chat-message', { to: activeClient.value, ...data })
+      emit('chat-message', { to: activeClient.value.id, ...data })
     }
   }
 

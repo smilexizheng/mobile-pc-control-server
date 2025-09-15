@@ -4,6 +4,7 @@ import { IconSend, IconFaceSmileFill, IconFolderAdd, IconImage } from '@arco-des
 import { useSocketStore } from '@renderer/store/socket'
 import dayjs from 'dayjs'
 import { useSystemStore } from '@renderer/store/system'
+import { copyText } from '@renderer/utils/util'
 
 const socketStore = useSocketStore()
 const systemStore = useSystemStore()
@@ -37,7 +38,7 @@ const insertEmoji = (emoji): void => {
 
 // 方法
 const selectChat = (id): void => {
-  socketStore.activeClient = id
+  socketStore.activeClient = socketStore.onlineSocketUser[id]
 }
 
 const sendMessage = (): void => {
@@ -56,7 +57,7 @@ const sendMessage = (): void => {
         <template v-for="id in socketStore.onlineSocketIds" :key="id">
           <a-list-item
             v-if="id !== socketStore.socket?.id"
-            :class="{ 'active-item': id === socketStore.activeClient }"
+            :class="{ 'active-item': id === socketStore.activeClient?.id }"
             @click="selectChat(id)"
           >
             <template #extra>
@@ -95,15 +96,21 @@ const sendMessage = (): void => {
         <a-scrollbar style="height: calc(100vh - 116px); overflow: auto">
           <div v-if="socketStore.activeClient" ref="chatContent" class="chat-messages">
             <div
-              v-for="(message, index) in socketStore.userMessage[socketStore.activeClient]"
+              v-for="(message, index) in socketStore.userMessage[socketStore.activeClient.clientIp]"
               :key="index"
               :class="['message-bubble', { 'self-message': message.isSelf }]"
             >
-              <a-avatar v-if="!message.isSelf">A</a-avatar>
+              <!--              <a-avatar v-if="!message.isSelf">A</a-avatar>-->
               <div v-if="message.msgType === 'txt'" class="bubble-content">
                 <div class="message-text">{{ message.content }}</div>
                 <div class="message-time">{{ message.time }}</div>
+                <a-space>
+                  <a-button type="primary" size="mini" @click="copyText(message.content)"
+                    >复制
+                  </a-button>
+                </a-space>
               </div>
+
               <div v-if="message.msgType === 'file'" class="bubble-content">
                 <div class="message-text">{{ message.fileName }}</div>
                 <a-space>
@@ -118,8 +125,8 @@ const sendMessage = (): void => {
                     size="mini"
                     @click="systemStore.showItemInFolder(message.fileId)"
                     >打开文件夹</a-button
-                  ></a-space
-                >
+                  >
+                </a-space>
                 <div class="message-time">{{ message.time }}</div>
               </div>
             </div>
@@ -252,6 +259,7 @@ const sendMessage = (): void => {
 }
 
 .message-text {
+  user-select: text;
   color: var(--color-text-1);
   white-space: break-spaces;
   word-break: break-all;

@@ -7,6 +7,8 @@ import { useSystemStore } from '@renderer/store/system'
 import { Message } from '@arco-design/web-vue'
 import Konva from 'konva'
 import { useDrawRectStore } from '@renderer/store/ocr/DrawRectStore'
+import { copyText } from '@renderer/utils/util'
+
 import { DrawMode, WH, IChildDrawStore } from '@renderer/store/ocr/type'
 type ChildStoreGetter = () => IChildDrawStore
 
@@ -225,13 +227,6 @@ export const useOcrStore = defineStore('ocr', () => {
   const ocrRecognition = (img): void => window.electron.ipcRenderer.send('ocr-recognition', img)
   // 截取屏幕
   const ocrScreenshots = (): void => window.electron.ipcRenderer.send('ocr-screenshots')
-  const copyText = (text): void => {
-    if (window.api.copyText(text)) {
-      Message.success('已复制到粘贴板')
-    } else {
-      Message.error('复制文字失败')
-    }
-  }
 
   const copyAllText = (): void => {
     copyText(ocrResult.value.map((item) => item.text).join('\n'))
