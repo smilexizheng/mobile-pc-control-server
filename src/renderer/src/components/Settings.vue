@@ -59,7 +59,7 @@ const handleSubmit = (): void => {
           v-model="settingForm.quality"
           :min="10"
           :max="100"
-          placeholder="请输入连接令牌"
+          placeholder="请输入10-100"
           allow-clear
         />
       </a-form-item>
