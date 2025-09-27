@@ -5,7 +5,13 @@ import { useAppStore } from '../store/app'
 import Versions from '@renderer/components/Versions.vue'
 
 const appStore = useAppStore()
-const settingForm = ref<Setting>({ token: '', port: 0, hostname: '', quality: 50 })
+const settingForm = ref<Setting>({
+  token: '',
+  port: 0,
+  hostname: '',
+  quality: 50,
+  autoStart: true
+})
 
 const handleSubmit = (): void => {
   appStore.updateSettings(settingForm.value)
@@ -62,6 +68,9 @@ const handleSubmit = (): void => {
           placeholder="请输入10-100"
           allow-clear
         />
+      </a-form-item>
+      <a-form-item field="autoStart" tooltip="开机自启" label="开机自启">
+        <a-switch v-model="settingForm.autoStart" />
       </a-form-item>
 
       <a-form-item>

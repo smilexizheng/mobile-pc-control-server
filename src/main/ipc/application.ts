@@ -18,6 +18,12 @@ ipcMain.on('update-settings', (_, { settings }) => {
     if (global.setting.token !== settings.token) {
       disconnectSockets()
     }
+    if (global.setting.autoStart !== settings.autoStart) {
+      app.setLoginItemSettings({
+        openAtLogin: settings.autoStart
+      })
+    }
+
     global.setting = settings
     console.log(global.setting)
   })
