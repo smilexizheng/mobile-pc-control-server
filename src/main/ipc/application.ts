@@ -19,6 +19,7 @@ ipcMain.on('update-settings', (_, { settings }) => {
       disconnectSockets()
     }
     global.setting = settings
+    console.log(global.setting)
   })
 })
 ipcMain.handle('get-settings', async () => {

@@ -39,6 +39,7 @@ export const useAppStore = defineStore('app', () => {
   }
 
   const updateSettings = (value: Setting): void => {
+    settings.value = value
     window.electron.ipcRenderer.send('update-settings', {
       settings: { ...value }
     })

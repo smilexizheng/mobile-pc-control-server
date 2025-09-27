@@ -182,7 +182,7 @@ const grabRegion = async (mouseX, mouseY, captureWidth, captureHeight): Promise<
         width: captureWidth,
         height: captureHeight
       })
-      .toFormat('webp', { quality: 30 })
+      .toFormat('webp', { quality: global.setting.quality || 30 })
       .toBuffer()
   }
 }
