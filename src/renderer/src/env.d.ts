@@ -25,6 +25,8 @@ type Setting = {
   token: string
   port: number
   hostname: string
+  quality: number
+  autoStart: boolean
 }
 
 type UserMessage = {

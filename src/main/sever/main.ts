@@ -18,7 +18,6 @@ const InitWinControlServer = (port: number, hostname: string): Promise<number> =
       maxHttpBufferSize: 1024 * 1024 * 50
       // options
     })
-
     io.use((socket, next) => {
       const token = socket.handshake.auth.token
       const decoded = token === global.setting.token

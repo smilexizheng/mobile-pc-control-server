@@ -229,7 +229,7 @@ const registerSocketHandlers = (io: Server): void => {
   // 配置参数优化
   const config = {
     scale: 1, // 分辨率缩放比例（从 100% 降至 50%）
-    quality: 10 // JPEG质量降至可接受范围
+    quality: global.setting.quality || 30 // JPEG质量降至可接受范围
   }
   const captureInterval = 18 // 截图间隔（毫秒）
 

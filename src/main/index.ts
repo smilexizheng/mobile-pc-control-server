@@ -52,7 +52,12 @@ async function createWindow(): Promise<void> {
   InitTray()
   // 注册协议
   initProtocol()
-
+  // 开机自启
+  if (app.isPackaged) {
+    app.setLoginItemSettings({
+      openAtLogin: global.setting.autoStart
+    })
+  }
   // todo win11 bugs titleBarOverlay冲突  https://github.com/electron/electron/issues/42409  createWindow setTimeout 100ms  正常
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -115,12 +120,6 @@ if (!gotTheLock) {
         handleArgv(commandLine)
       }
     })
-
-    if (app.isPackaged) {
-      app.setLoginItemSettings({
-        openAtLogin: true
-      })
-    }
 
     protocol.handle('app-cse', (request) => {
       let pathName = new URL(request.url).pathname

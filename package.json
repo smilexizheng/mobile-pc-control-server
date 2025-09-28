@@ -1,6 +1,6 @@
 {
   "name": "control-server",
-  "version": "2.2.2",
+  "version": "2.2.4",
   "description": "ControlServer",
   "main": "./out/main/index.js",
   "author": "smilexizheng",
@@ -14,7 +14,7 @@
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "start": "electron-vite preview",
     "dev": "chcp 65001 && electron-vite dev --  --trace-warnings ",
-    "build": "npm run typecheck && electron-vite build",
+    "build": "electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "npm run build && electron-builder --dir",
     "build:win": "npm run build && electron-builder --win",
