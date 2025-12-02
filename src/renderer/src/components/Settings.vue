@@ -3,7 +3,8 @@ import { ref } from 'vue'
 import { Setting } from '../env'
 import { useAppStore } from '../store/app'
 import Versions from '@renderer/components/Versions.vue'
-
+import { CircleArrowUp } from 'lucide-vue-next'
+import { Message } from '@arco-design/web-vue'
 const appStore = useAppStore()
 const settingForm = ref<Setting>({
   token: '',
@@ -17,9 +18,19 @@ const handleSubmit = (): void => {
   appStore.updateSettings(settingForm.value)
   appStore.settingsVisible = false
 }
+
+const checkUpdate = async () => {
+  await window.api.checkForUpdate()
+}
 </script>
 
 <template>
+  <a-button type="text" @click="checkUpdate">
+    <template #icon>
+      <CircleArrowUp :size="16" />
+    </template>
+  </a-button>
+
   <a-button type="text" @click="appStore.toggleTheme()">
     <template #icon>
       <icon-moon-fill v-if="appStore.isDark" />

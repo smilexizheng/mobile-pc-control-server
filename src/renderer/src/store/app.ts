@@ -3,8 +3,55 @@ import { computed, ref, useTemplateRef } from 'vue'
 import { Setting, ThemeType } from '../env'
 import { useResizeObserver, useStorage } from '@vueuse/core'
 import { useSocketStore } from '@renderer/store/socket'
+import { Message, Modal } from '@arco-design/web-vue'
 
 export const useAppStore = defineStore('app', () => {
+  const ipcRenderer = window.electron.ipcRenderer
+
+  ipcRenderer.on('updateNotAvailable', () => {
+    Message.success('当前为最新版本')
+  })
+  ipcRenderer.on('updateError', () => {
+    Message.error('检查更新失败，稍后重试...')
+  })
+  ipcRenderer.on('updateAvailable', (_, info) => {
+    Message.success('发现新版本 v' + info.version)
+  })
+  ipcRenderer.on('downloadProgress', (_, info) => {
+    // 1. 文件大小换算
+    // const totalMB = info.total / (1024 * 1024) // ≈ 157.7 MB
+    // const transferredMB = info.transferred / (1024 * 1024) // ≈ 17.9 MB
+
+    // 2. 剩余下载量
+    // const remainingBytes = info.total - info.transferred // 146,602,321 字节
+    // const remainingMB = remainingBytes / (1024 * 1024) // ≈ 139.8 MB
+
+    // 3. 预计剩余时间
+    // const remainingSeconds = remainingBytes / info.bytesPerSecond // ≈ 640 秒
+    // const remainingMinutes = (remainingSeconds / 60).toFixed(2) // ≈ 10.7 分钟
+
+    // 4. 当前下载速度
+    // const speedKBps = info.bytesPerSecond / 1024 // ≈ 223.7 KB/s
+    const speedMBps = info.bytesPerSecond / (1024 * 1024) // ≈ 0.218 MB/s
+
+    // 5. 下载进度百分比（精确计算）
+    const calculatedPercent = ((info.transferred / info.total) * 100).toFixed(2) // 11.35%
+    Message.info({
+      id: 'updateDownloadProgress',
+      content: `下载进度 ${calculatedPercent}%-${speedMBps.toFixed(2)}MB/s`,
+      duration: 2000
+    })
+  })
+  ipcRenderer.on('updateDownloaded', (_, info) => {
+    Modal.success({
+      title: '安装更新',
+      content: `v${info.version}准备就绪，点击确认安装更新`,
+      onOk: () => {
+        window.api.quitAndInstall()
+      }
+    })
+  })
+
   // 主区域ref
   const mainLayout = useTemplateRef<HTMLDivElement>('mainLayout')
   // 主区域大小

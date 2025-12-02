@@ -1,0 +1,1 @@
+SCHTASKS /CREATE   /TN "MyWinControll"   /TR "E:\project\win-controll\script\start.bat"   /SC ONLOGON   /RL HIGHEST   /F

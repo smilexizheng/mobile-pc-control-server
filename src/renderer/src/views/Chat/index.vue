@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, watch, onMounted } from 'vue'
+import { ref, reactive, watch, onMounted, nextTick } from 'vue'
 import { IconSend, IconFaceSmileFill, IconFolderAdd, IconImage } from '@arco-design/web-vue/es/icon'
 import { useSocketStore } from '@renderer/store/socket'
 import dayjs from 'dayjs'
@@ -14,7 +14,10 @@ const chatContent = ref<HTMLDivElement>()
 
 // Auto-scroll to bottom when messages
 watch(socketStore.userMessage, () => {
-  chatContent.value?.scrollIntoView({ block: 'end', behavior: 'instant' })
+  // console.log('更新了')
+  nextTick(() => {
+    chatContent.value?.scrollIntoView({ block: 'end', behavior: 'instant' })
+  })
 })
 
 onMounted(() => {})

@@ -29,8 +29,12 @@ const api = {
     clipboard.write(data)
   },
   readText: (): string => clipboard.readText(),
-  readImage: (): Buffer => clipboard.readImage().toPNG()
+  readImage: (): Buffer => clipboard.readImage().toPNG(),
+  checkForUpdate: () => ipcRenderer.invoke('checkForUpdate'),
+  quitAndInstall: () => ipcRenderer.invoke('quitAndInstall'),
+  cancelDownload: () => ipcRenderer.invoke('cancelDownload')
 }
+export type WindowApi = typeof api
 
 // Use `contextBridge` APIs to expose Electron APIs to
 // renderer only if context isolation is enabled, otherwise

@@ -2,6 +2,7 @@ import { ipcMain, app } from 'electron'
 import { getLocalIPs } from '../utils/common'
 import { db } from '../sever/src/database'
 import { disconnectSockets } from '../sever/main'
+import Update from '../utils/Update'
 
 ipcMain.on('ping', () => console.log('pong'))
 ipcMain.on('window-minimize', () => global.mainWindow.minimize())
@@ -42,4 +43,13 @@ ipcMain.handle('get-app-version', () => {
 
 ipcMain.handle('get-local-ips', (): string[] => {
   return getLocalIPs()
+})
+const appUpdater = new Update()
+ipcMain.handle('checkForUpdate', () => appUpdater.checkForUpdates())
+ipcMain.handle('quitAndInstall', () => appUpdater.quitAndInstall())
+ipcMain.handle('cancelDownload', () => appUpdater.cancelDownload())
+
+ipcMain.handle('setAutoUpdate', (_, isActive: boolean) => {
+  appUpdater.setAutoUpdate(isActive)
+  // configManager.setAutoUpdate(isActive)
 })

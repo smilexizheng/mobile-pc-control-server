@@ -15,7 +15,7 @@ files:
   - '!{.eslintignore,.eslintrc.cjs,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
-  - '!{.idea,.fastRequest,docs,db,logs,test}'
+  - '!{.idea,.fastRequest,docs,db,logs,test,script}'
   - '!*.md'
   - '!**/*.{map,ts,tsx,jsx,less,scss,sass,css.d.ts,d.cts,d.mts,md,markdown,yaml,yml}'
   - '!**/{test,tests,__tests__,coverage}/**'
@@ -60,6 +60,6 @@ appImage:
 npmRebuild: false
 publish:
   provider: generic
-  url: https://example.com/auto-updates
+  url: http://127.0.0.1:8022/cse-update
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/
