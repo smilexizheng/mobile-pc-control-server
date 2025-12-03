@@ -96,6 +96,7 @@ function resetWakeTimeout() {
 
 function handleCommand(text) {
   // 检测唤醒词 "小爱同学"
+  console.log('监听语音' + text)
   if (!isAwake && text.includes('小爱同学')) {
     isAwake = true
     console.log('唤醒成功，请说出指令...')

@@ -10,37 +10,57 @@ import { useDrawRectStore } from '@renderer/store/ocr/DrawRectStore'
 import { copyText } from '@renderer/utils/util'
 
 import { DrawMode, WH, IChildDrawStore } from '@renderer/store/ocr/type'
+import { useDrawCircleStore } from '@renderer/store/ocr/DrawCircleStore'
+import { useDrawArrowStore } from '@renderer/store/ocr/DrawArrowStore'
 type ChildStoreGetter = () => IChildDrawStore
 
 export const useOcrStore = defineStore('ocr', () => {
   const transformer = useTemplateRef<Konva.Transformer>('transformer')
   const selectShapeId = ref<Array<number>>([])
   const layerRef = ref<Konva.Layer | null>()
+
+  const modeType = [
+    {
+      value: 'rect',
+      label: '矩形'
+    },
+    {
+      value: 'circle',
+      label: '圆圈'
+    },
+    {
+      value: 'arrow',
+      label: '箭头'
+    }
+  ]
   // 开启涂鸦
   const graffitiMode = ref(false)
   // 涂鸦绘制模式
   const currentMode = ref<DrawMode>('rect')
   const storeMap: Record<DrawMode, ChildStoreGetter> = {
-    rect: () => useDrawRectStore() as IChildDrawStore
+    rect: () => useDrawRectStore() as IChildDrawStore,
+    circle: () => useDrawCircleStore() as IChildDrawStore,
+    arrow: () => useDrawArrowStore() as IChildDrawStore
   }
   const drawStore = ref<IChildDrawStore | null>(storeMap[currentMode.value]())
   const setDrawMode = (newMode: DrawMode): void => {
+    console.log(newMode)
     currentMode.value = newMode
     drawStore.value = storeMap[currentMode.value]()
   }
+  const ipcRenderer = window.electron.ipcRenderer
 
-  window.electron.ipcRenderer.on('ocr-result', (_, result) => {
+  ipcRenderer.on('ocr-result', (_, result) => {
     toggleLoading()
-    toggle()
     const box = JSON.parse(result)
     if (box.code === 100) {
       ocrResult.value = box.data
-    } else {
+    } else if (showOcr.value) {
       Message.error(box.data)
     }
   })
 
-  window.electron.ipcRenderer.on('ocr-screenshots-success', (_, path) => {
+  ipcRenderer.on('ocr-screenshots-success', (_, path) => {
     ocrImage(path)
   })
 
@@ -248,7 +268,6 @@ export const useOcrStore = defineStore('ocr', () => {
     const img = new Image()
     img.onload = (): void => {
       toggleLoading()
-      showOcr.value = false
       image.value = img
       calcScale()
       ocrResult.value = []
@@ -311,7 +330,7 @@ export const useOcrStore = defineStore('ocr', () => {
   // 鼠标点击
   const stageClick = (e: Konva.KonvaPointerEvent): void => {
     const layer = e.target.getLayer()
-
+    console.log(e.target.attrs.id)
     // if clicked  on  rectangles
     if (e.target.attrs.id && e.target.attrs.id.indexOf('draw') > -1) {
       layerRef.value = layer
@@ -414,6 +433,8 @@ export const useOcrStore = defineStore('ocr', () => {
     dynamicFontSize,
     shortcutKeyHandler,
     graffitiMode,
+    modeType,
+    currentMode,
     setDrawMode,
     stageMouseDown,
     stageClick,

@@ -2,6 +2,8 @@
 import { useOcrStore } from '@renderer/store/ocr'
 import { onMounted, onUnmounted } from 'vue'
 import Rectangles from '@renderer/views/OCR/Rectangles.vue'
+import Circle from '@renderer/views/OCR/Circle.vue'
+import Arrow from '@renderer/views/OCR/Arrow.vue'
 
 const ocrStore = useOcrStore()
 
@@ -18,9 +20,20 @@ onUnmounted(() => {
   <div class="layer-1">
     <div style="height: 50px; padding: 10px">
       <a-space size="small">
+        OCR
+        <a-switch :disabled="ocrStore.isLoading" v-model="ocrStore.showOcr" size="small" />
         涂鸦
         <a-switch v-model="ocrStore.graffitiMode" size="small" />
-        缩放
+
+        <a-select
+          v-if="ocrStore.graffitiMode"
+          v-model="ocrStore.currentMode"
+          @change="ocrStore.setDrawMode"
+          :style="{ width: '80px' }"
+        >
+          <a-option v-for="item of ocrStore.modeType" :value="item.value" :label="item.label" />
+        </a-select>
+
         <a-input-number
           v-model="ocrStore.scale"
           :style="{ width: '120px' }"
@@ -46,9 +59,9 @@ onUnmounted(() => {
           >截取屏幕
         </a-button>
 
-        <a-button size="mini" :disabled="ocrStore.isLoading" @click="ocrStore.toggle()"
-          >{{ ocrStore.showOcr ? '隐藏结果' : '显示结果' }}
-        </a-button>
+        <!--        <a-button size="mini" :disabled="ocrStore.isLoading" @click="ocrStore.toggle()"-->
+        <!--          >{{ ocrStore.showOcr ? '隐藏结果' : '显示结果' }}-->
+        <!--        </a-button>-->
 
         <a-button size="mini" :disabled="ocrStore.isLoading" @click="ocrStore.copyAllText()"
           >复制全部
@@ -161,6 +174,8 @@ onUnmounted(() => {
               }"
             >
               <Rectangles />
+              <Circle />
+              <Arrow />
               <k-transformer
                 id="transformer"
                 ref="transformer"
@@ -171,7 +186,7 @@ onUnmounted(() => {
                   anchorSize: 12,
                   anchorCornerRadius: 6, // 圆角半径
                   anchorStrokeWidth: 1, // 设置Handle的边框宽度
-                  rotateEnabled: true,
+                  rotateEnabled: true, //角度旋转
                   enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right'] // 只显示四个点
                 }"
                 @transformstart="ocrStore.transformStart"

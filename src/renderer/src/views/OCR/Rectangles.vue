@@ -7,15 +7,17 @@ const rectStore = useDrawRectStore()
   <!-- 已完成的矩形 -->
   <k-rect
     v-for="(rect, index) in rectStore.rectangles"
-    :key="'rect-' + index"
+    :key="`${rectStore.TYPE}_` + index"
     :config="{
       ...rect,
       draggable: true,
-      id: `rect_draw` + index,
-      fill: '#00D2FF80',
-      stroke: '#0099CC',
-      strokeWidth: 2
+      id: `${rectStore.TYPE}_` + index,
+      fill: '#00D2FF40',
+      stroke: '#0da7fa',
+      strokeWidth: 1.5
     }"
+    @onDragStart="rectStore.handleDragStart"
+    @onDragEnd="rectStore.handleDragEnd"
   />
   <!-- 正在绘制的矩形 -->
   <k-rect
@@ -23,7 +25,7 @@ const rectStore = useDrawRectStore()
     :config="{
       ...rectStore.currentRect,
       fill: '#00D2FF40',
-      stroke: '#006699',
+      stroke: '#0da7fa',
       strokeWidth: 1.5,
       dash: [4, 4]
     }"
