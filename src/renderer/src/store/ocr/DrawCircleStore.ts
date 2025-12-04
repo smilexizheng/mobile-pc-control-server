@@ -12,6 +12,8 @@ export const useDrawCircleStore = defineStore('draw-circle', () => {
   const isDrawing = ref(false)
   const error = ref<string | null>(null)
 
+  const setShapeType = (_): void => {}
+
   function startDrawing(e: Konva.KonvaPointerEvent): void {
     const pos = getPos(e)
     try {
@@ -59,8 +61,6 @@ export const useDrawCircleStore = defineStore('draw-circle', () => {
       if (currentShape.value.radius > 10) {
         shapes.value.push({ ...currentShape.value })
       }
-      resetDrawing()
-      error.value = null
     } catch (err) {
       handleError(err)
     }
@@ -102,6 +102,7 @@ export const useDrawCircleStore = defineStore('draw-circle', () => {
     currentShape,
     isDrawing,
     error,
+    setShapeType,
     startDrawing,
     updateDrawing,
     endDrawing,

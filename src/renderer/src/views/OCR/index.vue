@@ -4,6 +4,8 @@ import { onMounted, onUnmounted } from 'vue'
 import Rectangles from '@renderer/views/OCR/Rectangles.vue'
 import Circle from '@renderer/views/OCR/Circle.vue'
 import Arrow from '@renderer/views/OCR/Arrow.vue'
+import HeadToolBar from '@renderer/views/OCR/layout/HeadToolBar.vue'
+import GraffitiConfig from '@renderer/views/OCR/layout/GraffitiConfig.vue'
 
 const ocrStore = useOcrStore()
 
@@ -18,56 +20,9 @@ onUnmounted(() => {
 
 <template>
   <div class="layer-1">
-    <div style="height: 50px; padding: 10px">
-      <a-space size="small">
-        OCR
-        <a-switch :disabled="ocrStore.isLoading" v-model="ocrStore.showOcr" size="small" />
-        涂鸦
-        <a-switch v-model="ocrStore.graffitiMode" size="small" />
+    <GraffitiConfig />
 
-        <a-select
-          v-if="ocrStore.graffitiMode"
-          v-model="ocrStore.currentMode"
-          @change="ocrStore.setDrawMode"
-          :style="{ width: '80px' }"
-        >
-          <a-option v-for="item of ocrStore.modeType" :value="item.value" :label="item.label" />
-        </a-select>
-
-        <a-input-number
-          v-model="ocrStore.scale"
-          :style="{ width: '120px' }"
-          :step="5"
-          :min="10"
-          size="small"
-          :max="2000"
-          mode="button"
-        />
-        <a-button
-          type="primary"
-          size="mini"
-          :loading="ocrStore.isLoading"
-          @click="ocrStore.chooseFile()"
-          >打开图片
-        </a-button>
-
-        <a-button
-          type="primary"
-          size="mini"
-          :loading="ocrStore.isLoading"
-          @click="ocrStore.ocrScreenshots()"
-          >截取屏幕
-        </a-button>
-
-        <!--        <a-button size="mini" :disabled="ocrStore.isLoading" @click="ocrStore.toggle()"-->
-        <!--          >{{ ocrStore.showOcr ? '隐藏结果' : '显示结果' }}-->
-        <!--        </a-button>-->
-
-        <a-button size="mini" :disabled="ocrStore.isLoading" @click="ocrStore.copyAllText()"
-          >复制全部
-        </a-button>
-      </a-space>
-    </div>
+    <HeadToolBar />
 
     <div :ref="(r: any) => ocrStore.setMainLayer(r)" class="layer-2">
       <a-spin :loading="ocrStore.isLoading" dot>
@@ -94,6 +49,7 @@ onUnmounted(() => {
           @wheel="ocrStore.wheelHandler"
         >
           <k-stage
+            ref="stage"
             :config="{
               width: ocrStore.mainLayerWH.width - 16,
               height: ocrStore.mainLayerWH.height - 16
@@ -210,7 +166,7 @@ onUnmounted(() => {
 
 .layer-2 {
   width: calc(100%);
-  height: calc(100% - 50px);
+  height: calc(100% - 70px);
   background-color: var(--color-fill-3);
   position: absolute;
   overflow: hidden;

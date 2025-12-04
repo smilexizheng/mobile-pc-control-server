@@ -6,15 +6,15 @@ const drawStore = useDrawCircleStore()
 <template>
   <!-- 已完成的矩形 -->
   <k-circle
-    v-for="(rect, index) in drawStore.shapes"
+    v-for="(config, index) in drawStore.shapes"
     :key="`${drawStore.TYPE}_` + index"
     :config="{
-      ...rect,
       draggable: true,
-      id: `${drawStore.TYPE}_` + index,
       fill: '#00D2FF40',
+      id: `${drawStore.TYPE}_` + index,
       stroke: '#0da7fa',
-      strokeWidth: 1.5
+      strokeWidth: 1.5,
+      ...config
     }"
   />
   <!-- 正在绘制的矩形 -->

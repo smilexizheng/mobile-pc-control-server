@@ -10,6 +10,7 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
   const currentRect = ref<Rectangle | null>(null)
   const isDrawing = ref(false)
   const error = ref<string | null>(null)
+  const setShapeType = (_): void => {}
 
   function startDrawing(e: Konva.KonvaPointerEvent): void {
     const pos = getPos(e)
@@ -62,9 +63,6 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
       if (currentRect.value.width > 10 && currentRect.value.height > 10) {
         rectangles.value.push({ ...currentRect.value })
       }
-      console.log(currentRect.value)
-      resetDrawing()
-      error.value = null
     } catch (err) {
       handleError(err)
     }
@@ -106,6 +104,7 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
     currentRect,
     isDrawing,
     error,
+    setShapeType,
     startDrawing,
     updateDrawing,
     endDrawing,

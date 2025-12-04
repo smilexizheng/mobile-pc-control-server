@@ -1,5 +1,6 @@
 import { BrowserWindow, dialog, shell, ipcMain } from 'electron'
 import upath from 'upath'
+import * as fs from 'fs'
 
 ipcMain.handle('addAllowDownFile', async (_, { filePath, fileName }) => {
   const fileId = crypto.randomUUID().toString()
@@ -59,3 +60,24 @@ ipcMain.handle(
     return null
   }
 )
+
+ipcMain.handle('saveFile', async (_, { title, defaultPath, filters, fileData }) => {
+  const { canceled, filePath } = await dialog.showSaveDialog(global.mainWindow, {
+    title: title || '另存为',
+    defaultPath: defaultPath,
+    filters: [filters]
+  })
+
+  if (canceled) {
+    return false
+  } else {
+    try {
+      fs.writeFileSync(filePath, fileData)
+      shell.showItemInFolder(filePath)
+      return true
+    } catch (error) {
+      console.error('保存文件失败:', error)
+      return false
+    }
+  }
+})

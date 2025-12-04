@@ -6,17 +6,17 @@ const drawStore = useDrawArrowStore()
 <template>
   <!-- 已完成的矩形 -->
   <k-arrow
-    v-for="(rect, index) in drawStore.shapes"
+    v-for="(config, index) in drawStore.shapes"
     :key="`${drawStore.TYPE}_` + index"
     :config="{
-      ...rect,
       draggable: true,
       id: `${drawStore.TYPE}_` + index,
       pointerLength: 5,
       pointerWidth: 5,
-      fill: '#00D2FF40',
+      fill: '#0da7fa',
       stroke: '#0da7fa',
-      strokeWidth: 1.5
+      strokeWidth: 1.5,
+      ...config
     }"
   />
   <!-- 正在绘制的矩形 -->

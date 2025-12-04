@@ -4,13 +4,19 @@ import { ArrowConfig } from '@renderer/store/ocr/type'
 import { getPos } from '@renderer/store/ocr/utils'
 import Konva from 'konva'
 
+type ArrowType = 'straight' | 'curved' | 'polyline'
 export const useDrawArrowStore = defineStore('draw-arrow', () => {
   const TYPE = 'draw_arrow'
 
+  const arrowType = ref<ArrowType>('straight')
   const shapes = ref<ArrowConfig[]>([])
   const currentShape = ref<ArrowConfig | null>(null)
   const isDrawing = ref(false)
   const error = ref<string | null>(null)
+
+  const setShapeType = (type: ArrowType): void => {
+    arrowType.value = type
+  }
 
   function startDrawing(e: Konva.KonvaPointerEvent): void {
     const pos = getPos(e)
@@ -50,23 +56,31 @@ export const useDrawArrowStore = defineStore('draw-arrow', () => {
       if (!isDrawing.value || !currentShape.value) {
         return
       }
-      const pos = getPos(e)
-      const { points } = currentShape.value
 
-      currentShape.value = {
-        points: [points[0], points[1], pos.x, pos.y]
+      const { points } = currentShape.value
+      if (points.length > 4) {
+        const pos = getPos(e)
+        switch (arrowType.value) {
+          // 直线箭头
+          case 'straight':
+            currentShape.value = {
+              points: [points[0], points[1], pos.x, pos.y]
+            }
+            break
+          // 曲线箭头
+          case 'curved':
+            break
+        }
+
+        shapes.value.push({ ...currentShape.value })
       }
-      // if (currentShape.value.radius > 10) {
-      shapes.value.push({ ...currentShape.value })
-      // }
-      resetDrawing()
-      error.value = null
     } catch (err) {
       handleError(err)
     }
   }
 
   function resetDrawing(): void {
+    error.value = null
     isDrawing.value = false
     currentShape.value = null
   }
@@ -102,6 +116,7 @@ export const useDrawArrowStore = defineStore('draw-arrow', () => {
     currentShape,
     isDrawing,
     error,
+    setShapeType,
     startDrawing,
     updateDrawing,
     endDrawing,

@@ -1,5 +1,6 @@
-import { contextBridge, ipcRenderer, clipboard, nativeImage } from 'electron'
+import { contextBridge, ipcRenderer, clipboard } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { copyImage, toImage } from '../main/utils/img'
 
 // Custom APIs for renderer
 const api = {
@@ -14,16 +15,30 @@ const api = {
     }
     return false
   },
-  copyImage: async (buffer: Buffer | Blob): Promise<boolean> => {
-    if (buffer) {
-      if (buffer instanceof Blob) {
-        const arrayBuffer = await buffer.arrayBuffer()
-        buffer = Buffer.from(arrayBuffer)
-      }
-      clipboard.writeImage(nativeImage.createFromBuffer(buffer))
-      return true
-    }
-    return false
+  copyImage: async (buffer: Buffer | Blob | string | ArrayBuffer): Promise<boolean> => {
+    // if (buffer) {
+    //   if (buffer instanceof Blob) {
+    //     const arrayBuffer = await buffer.arrayBuffer()
+    //     buffer = Buffer.from(arrayBuffer)
+    //   }
+    //   clipboard.writeImage(nativeImage.createFromBuffer(buffer))
+    //   return true
+    // }
+    // return false
+    return await copyImage(buffer)
+  },
+  saveAsImg: async (fileName, buffer): Promise<boolean> => {
+    return await ipcRenderer.invoke('saveFile', {
+      defaultPath: fileName,
+      filters: { name: '图片', extensions: ['png', 'jpg'] },
+      fileData: await toImage(buffer)
+    })
+  },
+  saveFile: async (defaultPath, fileData): Promise<boolean> => {
+    return await ipcRenderer.invoke('saveFile', {
+      defaultPath,
+      fileData
+    })
   },
   writeClipboard: (data: Electron.Data): void => {
     clipboard.write(data)

@@ -9,45 +9,57 @@ import Konva from 'konva'
 import { useDrawRectStore } from '@renderer/store/ocr/DrawRectStore'
 import { copyText } from '@renderer/utils/util'
 
-import { DrawMode, WH, IChildDrawStore } from '@renderer/store/ocr/type'
+import { DrawMode, WH, IChildDrawStore, ShapeType } from '@renderer/store/ocr/type'
 import { useDrawCircleStore } from '@renderer/store/ocr/DrawCircleStore'
 import { useDrawArrowStore } from '@renderer/store/ocr/DrawArrowStore'
+
 type ChildStoreGetter = () => IChildDrawStore
 
 export const useOcrStore = defineStore('ocr', () => {
   const transformer = useTemplateRef<Konva.Transformer>('transformer')
+  const stageRef = useTemplateRef<Konva.Stage>('stage')
   const selectShapeId = ref<Array<number>>([])
   const layerRef = ref<Konva.Layer | null>()
 
-  const modeType = [
+  const modeType: Array<DrawMode> = [
     {
-      value: 'rect',
+      shape: 'rect',
       label: '矩形'
     },
     {
-      value: 'circle',
+      shape: 'circle',
       label: '圆圈'
     },
     {
-      value: 'arrow',
-      label: '箭头'
+      shape: 'arrow',
+      type: 'straight',
+      label: '直线箭头'
+    },
+    {
+      shape: 'arrow',
+      type: 'curved',
+      label: '曲线箭头'
     }
   ]
   // 开启涂鸦
-  const graffitiMode = ref(false)
+  const graffitiMode = ref(true)
   // 涂鸦绘制模式
-  const currentMode = ref<DrawMode>('rect')
-  const storeMap: Record<DrawMode, ChildStoreGetter> = {
+  const currentMode = ref<DrawMode>(modeType[0])
+  const storeMap: Record<ShapeType, ChildStoreGetter> = {
     rect: () => useDrawRectStore() as IChildDrawStore,
     circle: () => useDrawCircleStore() as IChildDrawStore,
     arrow: () => useDrawArrowStore() as IChildDrawStore
   }
-  const drawStore = ref<IChildDrawStore | null>(storeMap[currentMode.value]())
+  const drawStore = ref<IChildDrawStore | null>(storeMap[currentMode.value.shape]())
   const setDrawMode = (newMode: DrawMode): void => {
-    console.log(newMode)
     currentMode.value = newMode
-    drawStore.value = storeMap[currentMode.value]()
+    drawStore.value = storeMap[newMode.shape]()
+
+    if (newMode.type) {
+      drawStore.value?.setShapeType(newMode!.type)
+    }
   }
+
   const ipcRenderer = window.electron.ipcRenderer
 
   ipcRenderer.on('ocr-result', (_, result) => {
@@ -117,7 +129,13 @@ export const useOcrStore = defineStore('ocr', () => {
       if (layerRef.value && selectShapeId.value) {
         const children = layerRef.value.getChildren()
         const nodes = children?.filter((child) => selectShapeId.value.includes(child._id))
-        nodes.forEach((node) => node.destroy())
+        nodes.forEach((node) => {
+          const id = node.attrs.id
+          if (id.indexOf('draw') > -1) {
+            drawStore.value?.remove(+id.match(/\d+$/)?.[0] || 0)
+          }
+          node.destroy()
+        })
         selectShapeId.value = []
         layerRef.value.draw()
       }
@@ -324,7 +342,10 @@ export const useOcrStore = defineStore('ocr', () => {
   const stageMouseUp = (e: Konva.KonvaPointerEvent): void => {
     console.log('stageMouseUp', e)
     if (graffitiMode.value) {
+      // 结束绘制
       drawStore.value?.endDrawing(e)
+      //
+      drawStore.value?.resetDrawing()
     }
   }
   // 鼠标点击
@@ -376,7 +397,7 @@ export const useOcrStore = defineStore('ocr', () => {
   const stageMouseLeave = (e: Konva.KonvaPointerEvent): void => {
     console.log('stageMouseLeave', e)
     if (graffitiMode.value) {
-      drawStore.value?.resetDrawing(e)
+      drawStore.value?.resetDrawing()
     }
   }
 
@@ -387,7 +408,7 @@ export const useOcrStore = defineStore('ocr', () => {
   const stageDragStart = (e: Konva.KonvaPointerEvent): void => {
     console.log('stageDragStart', e)
     if (graffitiMode.value) {
-      drawStore.value?.resetDrawing(e)
+      drawStore.value?.resetDrawing()
     }
   }
 
@@ -409,6 +430,34 @@ export const useOcrStore = defineStore('ocr', () => {
       return
     }
     console.log('transformEnd', e)
+  }
+
+  const copyImg = async () => {
+    const stage = stageRef.value?.getStage()
+    if (stage) {
+      const base64 = (await stage.toImage({
+        mimeType: 'image/png',
+        pixelRatio: 2,
+        quality: 1
+      })) as HTMLImageElement
+      ;(await window.api.copyImage(base64.src))
+        ? Message.success('已复制到粘贴板')
+        : Message.error('复制图片异常')
+    }
+  }
+
+  const exportImg = async () => {
+    const stage = stageRef.value?.getStage()
+    if (stage) {
+      const base64 = (await stage.toImage({
+        mimeType: 'image/png',
+        pixelRatio: 2,
+        quality: 1
+      })) as HTMLImageElement
+      ;(await window.api.saveAsImg(Date.now() + '.png', base64.src))
+        ? Message.success('保存成功')
+        : Message.error('保存图片异常')
+    }
   }
 
   return {
@@ -445,6 +494,8 @@ export const useOcrStore = defineStore('ocr', () => {
     stageDragEnd,
     stageWheel,
     transformStart,
-    transformEnd
+    transformEnd,
+    exportImg,
+    copyImg
   }
 })
