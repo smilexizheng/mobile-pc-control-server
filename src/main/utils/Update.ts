@@ -8,9 +8,9 @@ import { generateUserAgent } from './systemInfo'
 
 // Language markers constants for multi-language release notes
 const LANG_MARKERS = {
-  EN_START: '<!--LANG:en-->',
-  ZH_CN_START: '<!--LANG:zh-CN-->',
-  END: '<!--LANG:END-->'
+  EN_START: '<!--NOTES:en-->',
+  ZH_CN_START: '<!--NOTES:zh-CN-->',
+  END: '<!--NOTES:END-->'
 } as const
 export default class Updater {
   autoUpdater: AppUpdater = autoUpdater
@@ -35,6 +35,7 @@ export default class Updater {
     autoUpdater.on('update-available', (releaseInfo: UpdateInfo) => {
       log.info('update available', releaseInfo)
       const processedReleaseInfo = this.processReleaseInfo(releaseInfo)
+      log.info('update available', processedReleaseInfo)
       global.mainWindow.webContents.send('updateAvailable', processedReleaseInfo)
     })
 
