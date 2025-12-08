@@ -104,9 +104,26 @@ const operation = ref([
       <template #split>
         <a-divider margin="0" direction="vertical" />
       </template>
-
-      {{ ocrStore.currentMode.label }}
-      <a-button :size="size" v-for="item of ocrStore.modeType" @click="ocrStore.setDrawMode(item)">
+      <a-select
+        :disabled="!ocrStore.graffitiMode"
+        v-model="ocrStore.currentMode.shape"
+        :style="{ width: '100px' }"
+        :size="size"
+      >
+        <a-option
+          v-for="item of ocrStore.modeType"
+          @click="ocrStore.setDrawMode(item)"
+          :value="item.shape"
+          :label="item.label"
+        />
+      </a-select>
+      <a-button
+        :size="size"
+        v-for="item of ocrStore.modeType"
+        @click="ocrStore.setDrawMode(item)"
+        :type="item.label === ocrStore.currentMode.label ? 'primary' : 'secondary'"
+        :disabled="!ocrStore.graffitiMode"
+      >
         <template #icon>
           <Circle v-if="item.shape === 'circle'" />
           <MoveUpRight v-else-if="item.shape === 'arrow' && item.type === 'straight'" @click="" />

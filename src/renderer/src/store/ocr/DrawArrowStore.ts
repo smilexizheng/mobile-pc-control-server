@@ -11,7 +11,7 @@ export const useDrawArrowStore = defineStore('draw-arrow', () => {
   const arrowType = ref<ArrowType>('straight')
   const shapes = ref<ArrowConfig[]>([])
   const currentShape = ref<ArrowConfig | null>(null)
-  const isDrawing = ref(false)
+
   const error = ref<string | null>(null)
 
   const setShapeType = (type: ArrowType): void => {
@@ -21,10 +21,6 @@ export const useDrawArrowStore = defineStore('draw-arrow', () => {
   function startDrawing(e: Konva.KonvaPointerEvent): void {
     const pos = getPos(e)
     try {
-      if (isDrawing.value) {
-        return
-      }
-      isDrawing.value = true
       currentShape.value = {
         points: [pos.x, pos.y]
       }
@@ -36,7 +32,7 @@ export const useDrawArrowStore = defineStore('draw-arrow', () => {
 
   function updateDrawing(e: Konva.KonvaPointerEvent): void {
     try {
-      if (!isDrawing.value || currentShape.value === null) {
+      if (currentShape.value === null) {
         return
       }
       // // 详细运动轨迹
@@ -53,7 +49,7 @@ export const useDrawArrowStore = defineStore('draw-arrow', () => {
 
   function endDrawing(e: Konva.KonvaPointerEvent): void {
     try {
-      if (!isDrawing.value || !currentShape.value) {
+      if (!currentShape.value) {
         return
       }
 
@@ -80,8 +76,6 @@ export const useDrawArrowStore = defineStore('draw-arrow', () => {
   }
 
   function resetDrawing(): void {
-    error.value = null
-    isDrawing.value = false
     currentShape.value = null
   }
 
@@ -114,7 +108,6 @@ export const useDrawArrowStore = defineStore('draw-arrow', () => {
     TYPE,
     shapes,
     currentShape,
-    isDrawing,
     error,
     setShapeType,
     startDrawing,

@@ -51,6 +51,9 @@ export const useOcrStore = defineStore('ocr', () => {
     arrow: () => useDrawArrowStore() as IChildDrawStore
   }
   const drawStore = ref<IChildDrawStore | null>(storeMap[currentMode.value.shape]())
+
+  const isDrawing = ref(false)
+
   const setDrawMode = (newMode: DrawMode): void => {
     currentMode.value = newMode
     drawStore.value = storeMap[newMode.shape]()
@@ -326,26 +329,28 @@ export const useOcrStore = defineStore('ocr', () => {
   // 鼠标按下
   const stageMouseDown = (e: Konva.KonvaPointerEvent): void => {
     console.log('stageMouseDown', e)
+
     // 开启涂鸦模式
-    if (graffitiMode.value) {
+    if (!isDrawing.value && graffitiMode.value) {
+      isDrawing.value = true
       drawStore.value?.startDrawing(e)
     }
   }
   // 鼠标移动
   const stageMouseMove = (e: Konva.KonvaPointerEvent): void => {
     // console.log('stageMouseMove', e)
-    if (graffitiMode.value) {
+
+    if (graffitiMode.value && isDrawing.value) {
       drawStore.value?.updateDrawing(e)
     }
   }
   //鼠标抬起
   const stageMouseUp = (e: Konva.KonvaPointerEvent): void => {
     console.log('stageMouseUp', e)
-    if (graffitiMode.value) {
+    if (isDrawing.value && graffitiMode.value) {
       // 结束绘制
       drawStore.value?.endDrawing(e)
-      //
-      drawStore.value?.resetDrawing()
+      isDrawing.value = false
     }
   }
   // 鼠标点击
@@ -397,6 +402,7 @@ export const useOcrStore = defineStore('ocr', () => {
   const stageMouseLeave = (e: Konva.KonvaPointerEvent): void => {
     console.log('stageMouseLeave', e)
     if (graffitiMode.value) {
+      isDrawing.value = false
       drawStore.value?.resetDrawing()
     }
   }
@@ -408,6 +414,7 @@ export const useOcrStore = defineStore('ocr', () => {
   const stageDragStart = (e: Konva.KonvaPointerEvent): void => {
     console.log('stageDragStart', e)
     if (graffitiMode.value) {
+      isDrawing.value = false
       drawStore.value?.resetDrawing()
     }
   }
