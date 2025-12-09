@@ -8,6 +8,7 @@ import { Message } from '@arco-design/web-vue'
 import Konva from 'konva'
 import { useDrawRectStore } from '@renderer/store/ocr/DrawRectStore'
 import { copyText } from '@renderer/utils/util'
+import { KonvaExportUtil } from './konva/KonvaExportUtil'
 
 import { DrawMode, WH, IChildDrawStore, ShapeType } from '@renderer/store/ocr/type'
 import { useDrawCircleStore } from '@renderer/store/ocr/DrawCircleStore'
@@ -54,6 +55,9 @@ export const useOcrStore = defineStore('ocr', () => {
 
   const isDrawing = ref(false)
 
+  // 导出配置
+  const exportModalVisible = ref(false)
+
   const setDrawMode = (newMode: DrawMode): void => {
     currentMode.value = newMode
     drawStore.value = storeMap[newMode.shape]()
@@ -91,7 +95,7 @@ export const useOcrStore = defineStore('ocr', () => {
     return scale.value / 100
   })
 
-  useResizeObserver(document.documentElement, (): void => {
+  useResizeObserver(mainLayerDiv, (): void => {
     calcScale()
   })
 
@@ -424,53 +428,70 @@ export const useOcrStore = defineStore('ocr', () => {
   }
 
   const transformStart = (e: Konva.KonvaPointerEvent): void => {
-    console.log(e.evt.button)
+    console.log('transformStart', e.evt.button)
     if (e.evt.button !== 0) {
       transformer.value?.stopTransform()
     }
   }
 
-  // 监听变换，矩形框和旋转框和关键点框
+  // 监听变换，矩形框和旋转框
   const transformEnd = (e: Konva.KonvaPointerEvent): void => {
+    console.log('transformEnd', e)
     // 标注中不处理
     if (!graffitiMode.value) {
       return
     }
-    console.log('transformEnd', e)
   }
 
   const copyImg = async () => {
     const stage = stageRef.value?.getStage()
     if (stage) {
-      const base64 = (await stage.toImage({
+      const blob = (await stage.toBlob({
         mimeType: 'image/png',
         pixelRatio: 2,
         quality: 1
-      })) as HTMLImageElement
-      ;(await window.api.copyImage(base64.src))
-        ? Message.success('已复制到粘贴板')
+      })) as Blob
+      ;(await window.api.copyImage(blob))
+        ? Message.success('已复制到剪切板')
         : Message.error('复制图片异常')
     }
   }
 
-  const exportImg = async () => {
+  /**
+   * 画布完整导出的参数
+   * @param options
+   */
+  const handleExport = async (options) => {
+    console.log(options)
     const stage = stageRef.value?.getStage()
-    if (stage) {
-      const base64 = (await stage.toImage({
-        mimeType: 'image/png',
-        pixelRatio: 2,
-        quality: 1
-      })) as HTMLImageElement
-      ;(await window.api.saveAsImg(Date.now() + '.png', base64.src))
-        ? Message.success('保存成功')
-        : Message.error('保存图片异常')
+    if (!stage) {
+      Message.error('客户端参数异常，请重启')
+      return
     }
+    const layer = stage.getLayers()
+    if (!layer) return
+    let dataUrl: Blob
+    options.bgWidth = image.value.width
+    options.bgHeight = image.value.height
+    options.realScale = realScale.value
+    options.layerConfig = layerConfig.value
+    console.log(options)
+    if (options.exportType === 'full') {
+      dataUrl = await KonvaExportUtil.exportFullContent(stage, layer, options)
+    } else {
+      dataUrl = await KonvaExportUtil.exportCurrentView(stage, options)
+    }
+
+    ;(await window.api.saveAsImg(Date.now() + '.png', dataUrl))
+      ? Message.success('保存成功')
+      : Message.error('保存图片异常')
   }
 
   return {
     scale,
     realScale,
     mainLayerWH,
+    ocrImageWH,
     setMainLayer,
     setScrollDivRef,
     stageConfig,
@@ -491,6 +512,7 @@ export const useOcrStore = defineStore('ocr', () => {
     graffitiMode,
     modeType,
     currentMode,
+    exportModalVisible,
     setDrawMode,
     stageMouseDown,
     stageClick,
@@ -502,7 +524,7 @@ export const useOcrStore = defineStore('ocr', () => {
     stageWheel,
     transformStart,
     transformEnd,
-    exportImg,
-    copyImg
+    copyImg,
+    handleExport
   }
 })

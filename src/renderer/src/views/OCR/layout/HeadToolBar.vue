@@ -2,6 +2,7 @@
 import { Menu, Circle, MoveUpRight, RectangleHorizontal, Redo } from 'lucide-vue-next'
 import { useOcrStore } from '@renderer/store/ocr'
 import { ref } from 'vue'
+import ExportModal from '@renderer/views/OCR/modal/ExportModal.vue'
 
 const ocrStore = useOcrStore()
 
@@ -24,23 +25,24 @@ const operation = ref([
   },
   {
     value: 'copyOcrText',
-    label: '复制OCR文字',
+    label: '复制ocr全文',
     event: () => {
       ocrStore.copyAllText()
     }
   },
   {
     value: 'copyImg',
-    label: '复制图片到粘贴板',
+    label: '复制可见图',
     event: () => {
       ocrStore.copyImg()
     }
   },
+
   {
     value: 'export',
-    label: '另存为',
+    label: '导出',
     event: () => {
-      ocrStore.exportImg()
+      ocrStore.exportModalVisible = true
     }
   }
 ])
@@ -48,8 +50,9 @@ const operation = ref([
 
 <template>
   <div style="height: 70px; padding: 5px 10px">
+    <ExportModal />
     <a-space :size="size">
-      <a-dropdown trigger="hover">
+      <a-dropdown trigger="hover" :popup-max-height="false">
         <a-button :size="size">
           <template #icon> <Menu color="blue" /> </template
         ></a-button>
@@ -91,13 +94,6 @@ const operation = ref([
       <!--        <a-button :size="size" :disabled="ocrStore.isLoading" @click="ocrStore.toggle()"-->
       <!--          >{{ ocrStore.showOcr ? '隐藏结果' : '显示结果' }}-->
       <!--        </a-button>-->
-
-      <a-button :size="size" :disabled="ocrStore.isLoading" @click="ocrStore.copyAllText()"
-        >ocr文字
-      </a-button>
-      <a-button :size="size" :disabled="ocrStore.isLoading" @click="ocrStore.copyImg()"
-        >复制图片
-      </a-button>
     </a-space>
     <a-divider margin="0" />
     <a-space :size="size" style="margin-top: 5px">
@@ -126,8 +122,8 @@ const operation = ref([
       >
         <template #icon>
           <Circle v-if="item.shape === 'circle'" />
-          <MoveUpRight v-else-if="item.shape === 'arrow' && item.type === 'straight'" @click="" />
-          <Redo v-else-if="item.shape === 'arrow' && item.type === 'curved'" @click="" />
+          <MoveUpRight v-else-if="item.shape === 'arrow' && item.type === 'straight'" />
+          <Redo v-else-if="item.shape === 'arrow' && item.type === 'curved'" />
           <RectangleHorizontal v-else /> </template
       ></a-button>
     </a-space>

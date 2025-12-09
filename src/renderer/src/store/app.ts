@@ -44,8 +44,8 @@ export const useAppStore = defineStore('app', () => {
   })
   ipcRenderer.on('updateDownloaded', (_, info) => {
     Modal.success({
-      title: '安装更新',
-      content: `v${info.version}准备就绪，点击确认安装更新`,
+      title: '更新提示',
+      content: `v${info.version}准备就绪，点击确认开始安装`,
       onOk: () => {
         window.api.quitAndInstall()
       }

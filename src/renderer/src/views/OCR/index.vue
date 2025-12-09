@@ -21,7 +21,6 @@ onUnmounted(() => {
 <template>
   <div class="layer-1">
     <GraffitiConfig />
-
     <HeadToolBar />
 
     <div :ref="(r: any) => ocrStore.setMainLayer(r)" class="layer-2">
@@ -36,8 +35,8 @@ onUnmounted(() => {
         >
           <div
             :style="{
-              width: `${ocrStore.stageConfig.width}px`,
-              height: `${ocrStore.stageConfig.height}px`
+              width: `${ocrStore.stageConfig.width + 16}px`,
+              height: `${ocrStore.stageConfig.height + 16}px`
             }"
           ></div>
         </a-scrollbar>
