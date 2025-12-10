@@ -1,24 +1,26 @@
 import { defineStore } from 'pinia'
-import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { OcrResult } from '@renderer/env'
 import { createKeybindingsHandler } from 'tinykeys'
 import { useResizeObserver, useToggle, useMouseInElement, useScroll } from '@vueuse/core'
 import { useSystemStore } from '@renderer/store/system'
 import { Message } from '@arco-design/web-vue'
 import Konva from 'konva'
-import { useDrawRectStore } from '@renderer/store/ocr/DrawRectStore'
+import { useDrawRectStore } from '@renderer/store/draw/DrawRectStore'
 import { copyText } from '@renderer/utils/util'
 import { KonvaExportUtil } from './konva/KonvaExportUtil'
 
-import { DrawMode, WH, IChildDrawStore, ShapeType } from '@renderer/store/ocr/type'
-import { useDrawCircleStore } from '@renderer/store/ocr/DrawCircleStore'
-import { useDrawArrowStore } from '@renderer/store/ocr/DrawArrowStore'
+import { DrawMode, WH, IChildDrawStore, ShapeType } from '@renderer/store/draw/type'
+import { useDrawCircleStore } from '@renderer/store/draw/DrawCircleStore'
+import { useDrawArrowStore } from '@renderer/store/draw/DrawArrowStore'
 
 type ChildStoreGetter = () => IChildDrawStore
 
-export const useOcrStore = defineStore('ocr', () => {
-  const transformer = useTemplateRef<Konva.Transformer>('transformer')
-  const stageRef = useTemplateRef<Konva.Stage>('stage')
+export const useDrawStore = defineStore('draw', () => {
+  const transformerRef = ref<Konva.Transformer | null>()
+  const stageRef = ref<Konva.Stage | null>()
+  const mainLayerRef = ref<HTMLDivElement | null>()
+  const scrollRef = ref<HTMLDivElement | null>()
   const selectShapeId = ref<Array<number>>([])
   const layerRef = ref<Konva.Layer | null>()
 
@@ -67,6 +69,18 @@ export const useOcrStore = defineStore('ocr', () => {
     }
   }
 
+  const setRef = (
+    stage: Konva.Stage | null,
+    transformer: Konva.Transformer | null,
+    mainLayer: HTMLDivElement | null,
+    scroll: HTMLDivElement | null
+  ): void => {
+    stageRef.value = stage
+    transformerRef.value = transformer
+    mainLayerRef.value = mainLayer
+    scrollRef.value = scroll
+  }
+
   const ipcRenderer = window.electron.ipcRenderer
 
   ipcRenderer.on('ocr-result', (_, result) => {
@@ -83,10 +97,8 @@ export const useOcrStore = defineStore('ocr', () => {
     ocrImage(path)
   })
 
-  const mainLayerDiv = ref<HTMLDivElement | null>(null)
-  const scrollDiv = ref<HTMLDivElement | null>(null)
-  const { elementX: layerDivX, elementY: layerDivY } = useMouseInElement(mainLayerDiv)
-  const { x: divScrollX, y: divScrollY } = useScroll(scrollDiv)
+  const { elementX: layerDivX, elementY: layerDivY } = useMouseInElement(mainLayerRef)
+  const { x: divScrollX, y: divScrollY } = useScroll(scrollRef)
 
   const mainLayerWH = ref<WH>({ width: 0, height: 0 })
   // 缩放倍数
@@ -95,13 +107,13 @@ export const useOcrStore = defineStore('ocr', () => {
     return scale.value / 100
   })
 
-  useResizeObserver(mainLayerDiv, (): void => {
+  useResizeObserver(mainLayerRef, (): void => {
     calcScale()
   })
 
   const calcScale = (): void => {
-    if (mainLayerDiv.value) {
-      const { clientWidth, clientHeight } = mainLayerDiv.value
+    if (mainLayerRef.value) {
+      const { clientWidth, clientHeight } = mainLayerRef.value
       mainLayerWH.value = { width: clientWidth, height: clientHeight }
     }
 
@@ -136,12 +148,12 @@ export const useOcrStore = defineStore('ocr', () => {
       if (layerRef.value && selectShapeId.value) {
         const children = layerRef.value.getChildren()
         const nodes = children?.filter((child) => selectShapeId.value.includes(child._id))
+
         nodes.forEach((node) => {
           const id = node.attrs.id
           if (id.indexOf('draw') > -1) {
             drawStore.value?.remove(+id.match(/\d+$/)?.[0] || 0)
           }
-          node.destroy()
         })
         selectShapeId.value = []
         layerRef.value.draw()
@@ -178,14 +190,6 @@ export const useOcrStore = defineStore('ocr', () => {
     }
   }
 
-  const setMainLayer = (ref: HTMLDivElement): void => {
-    mainLayerDiv.value = ref
-  }
-
-  const setScrollDivRef = (ref: HTMLDivElement): void => {
-    scrollDiv.value = ref
-  }
-
   //ocr的处理的图片
   const image = ref()
 
@@ -205,10 +209,6 @@ export const useOcrStore = defineStore('ocr', () => {
   })
 
   const stageConfig = computed<WH>(() => {
-    if (!image.value) {
-      return { ...mainLayerWH.value }
-    }
-
     return {
       width: Math.max(ocrImageWH.value.width, mainLayerWH.value.width) || 0,
       height: Math.max(ocrImageWH.value.height, mainLayerWH.value.height) || 0
@@ -227,12 +227,12 @@ export const useOcrStore = defineStore('ocr', () => {
     }
 
     const x =
-      ocrImageWH.value.width >= stageConfig.value.width
+      ocrImageWH.value.width === 0 || ocrImageWH.value.width >= stageConfig.value.width
         ? 0
         : (stageConfig.value.width - ocrImageWH.value.width) / 2
 
     const y =
-      ocrImageWH.value.height >= stageConfig.value.height
+      ocrImageWH.value.height === 0 || ocrImageWH.value.height >= stageConfig.value.height
         ? 0
         : (stageConfig.value.height - ocrImageWH.value.height) / 2
 
@@ -296,7 +296,7 @@ export const useOcrStore = defineStore('ocr', () => {
       image.value = img
       calcScale()
       ocrResult.value = []
-      drawStore.value?.removeAll()
+      removeAllDraw()
     }
     img.src = imgSrc
   }
@@ -328,6 +328,10 @@ export const useOcrStore = defineStore('ocr', () => {
       divScrollX.value = divScrollX.value + e.deltaX
       divScrollY.value = divScrollY.value + e.deltaY
     }
+  }
+
+  const removeAllDraw = () => {
+    Object.values(storeMap).map((store) => store()?.removeAll())
   }
 
   // 鼠标按下
@@ -391,11 +395,11 @@ export const useOcrStore = defineStore('ocr', () => {
   }
 
   watch(selectShapeId, () => {
-    if (!transformer.value || !layerRef.value) return
+    if (!transformerRef.value || !layerRef.value) return
     // 获取图层中所有节点
     const children = layerRef.value.getChildren()
     const nodes = children?.filter((child) => selectShapeId.value.includes(child._id))
-    const tf = transformer.value?.getNode() as Konva.Transformer
+    const tf = transformerRef.value?.getNode() as Konva.Transformer
 
     if (nodes) {
       tf.nodes(nodes)
@@ -430,7 +434,7 @@ export const useOcrStore = defineStore('ocr', () => {
   const transformStart = (e: Konva.KonvaPointerEvent): void => {
     console.log('transformStart', e.evt.button)
     if (e.evt.button !== 0) {
-      transformer.value?.stopTransform()
+      transformerRef.value?.stopTransform()
     }
   }
 
@@ -471,9 +475,9 @@ export const useOcrStore = defineStore('ocr', () => {
     const layer = stage.getLayers()
     if (!layer) return
     let dataUrl: Blob
-    options.bgWidth = image.value.width
-    options.bgHeight = image.value.height
-    options.realScale = realScale.value
+    ;(options.bgWidth = image.value?.width || mainLayerWH.value.width),
+      (options.bgHeight = image.value?.height || mainLayerWH.value.height),
+      (options.realScale = realScale.value)
     options.layerConfig = layerConfig.value
     console.log(options)
     if (options.exportType === 'full') {
@@ -488,12 +492,11 @@ export const useOcrStore = defineStore('ocr', () => {
   }
 
   return {
+    setRef,
     scale,
     realScale,
     mainLayerWH,
     ocrImageWH,
-    setMainLayer,
-    setScrollDivRef,
     stageConfig,
     image,
     ocrResult,

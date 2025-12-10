@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Menu, Circle, MoveUpRight, RectangleHorizontal, Redo } from 'lucide-vue-next'
-import { useOcrStore } from '@renderer/store/ocr'
+import { useDrawStore } from '@renderer/store/draw'
 import { ref } from 'vue'
-import ExportModal from '@renderer/views/OCR/modal/ExportModal.vue'
+import ExportModal from '@renderer/views/Draw/konva/ExportModal.vue'
 
-const ocrStore = useOcrStore()
+const drawStore = useDrawStore()
 
 const size = ref<'mini' | 'medium' | 'large' | 'small'>('mini')
 
@@ -13,28 +13,28 @@ const operation = ref([
     value: 'open',
     label: '打开图片',
     event: () => {
-      ocrStore.chooseFile()
+      drawStore.chooseFile()
     }
   },
   {
     value: 'screenshot',
     label: '截取屏幕',
     event: () => {
-      ocrStore.ocrScreenshots()
+      drawStore.ocrScreenshots()
     }
   },
   {
     value: 'copyOcrText',
     label: '复制ocr全文',
     event: () => {
-      ocrStore.copyAllText()
+      drawStore.copyAllText()
     }
   },
   {
     value: 'copyImg',
     label: '复制可见图',
     event: () => {
-      ocrStore.copyImg()
+      drawStore.copyImg()
     }
   },
 
@@ -42,7 +42,7 @@ const operation = ref([
     value: 'export',
     label: '导出',
     event: () => {
-      ocrStore.exportModalVisible = true
+      drawStore.exportModalVisible = true
     }
   }
 ])
@@ -62,12 +62,12 @@ const operation = ref([
       </a-dropdown>
 
       OCR
-      <a-switch :disabled="ocrStore.isLoading" v-model="ocrStore.showOcr" size="small" />
+      <a-switch :disabled="drawStore.isLoading" v-model="drawStore.showOcr" size="small" />
       涂鸦
-      <a-switch v-model="ocrStore.graffitiMode" size="small" />
+      <a-switch v-model="drawStore.graffitiMode" size="small" />
 
       <a-input-number
-        v-model="ocrStore.scale"
+        v-model="drawStore.scale"
         :style="{ width: '100px' }"
         :step="5"
         :min="10"
@@ -78,21 +78,21 @@ const operation = ref([
       <a-button
         type="primary"
         :size="size"
-        :loading="ocrStore.isLoading"
-        @click="ocrStore.chooseFile()"
+        :loading="drawStore.isLoading"
+        @click="drawStore.chooseFile()"
         >打开
       </a-button>
 
       <a-button
         type="primary"
         :size="size"
-        :loading="ocrStore.isLoading"
-        @click="ocrStore.ocrScreenshots()"
+        :loading="drawStore.isLoading"
+        @click="drawStore.ocrScreenshots()"
         >截屏
       </a-button>
 
-      <!--        <a-button :size="size" :disabled="ocrStore.isLoading" @click="ocrStore.toggle()"-->
-      <!--          >{{ ocrStore.showOcr ? '隐藏结果' : '显示结果' }}-->
+      <!--        <a-button :size="size" :disabled="drawStore.isLoading" @click="drawStore.toggle()"-->
+      <!--          >{{ drawStore.showOcr ? '隐藏结果' : '显示结果' }}-->
       <!--        </a-button>-->
     </a-space>
     <a-divider margin="0" />
@@ -101,24 +101,24 @@ const operation = ref([
         <a-divider margin="0" direction="vertical" />
       </template>
       <a-select
-        :disabled="!ocrStore.graffitiMode"
-        v-model="ocrStore.currentMode.shape"
+        :disabled="!drawStore.graffitiMode"
+        v-model="drawStore.currentMode.shape"
         :style="{ width: '100px' }"
         :size="size"
       >
         <a-option
-          v-for="item of ocrStore.modeType"
-          @click="ocrStore.setDrawMode(item)"
+          v-for="item of drawStore.modeType"
+          @click="drawStore.setDrawMode(item)"
           :value="item.shape"
           :label="item.label"
         />
       </a-select>
       <a-button
         :size="size"
-        v-for="item of ocrStore.modeType"
-        @click="ocrStore.setDrawMode(item)"
-        :type="item.label === ocrStore.currentMode.label ? 'primary' : 'secondary'"
-        :disabled="!ocrStore.graffitiMode"
+        v-for="item of drawStore.modeType"
+        @click="drawStore.setDrawMode(item)"
+        :type="item.label === drawStore.currentMode.label ? 'primary' : 'secondary'"
+        :disabled="!drawStore.graffitiMode"
       >
         <template #icon>
           <Circle v-if="item.shape === 'circle'" />

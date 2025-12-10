@@ -10,8 +10,8 @@ const onClickMenuItem = (key): void => {
     case 'home':
       router.push('/')
       break
-    case 'ocr':
-      router.push('/ocr')
+    case 'draw':
+      router.push('/draw')
       break
     case 'chat':
       router.push('/chat')
@@ -55,9 +55,9 @@ const onClickMenuItem = (key): void => {
         <icon-message />
         消息互传
       </a-menu-item>
-      <a-menu-item key="ocr">
+      <a-menu-item key="draw">
         <icon-image />
-        OCR/涂鸦
+        绘画涂鸦/OCR
       </a-menu-item>
       <!--      <a-menu-item key="asr"> <iconVoice /> ASR语音识别 </a-menu-item>-->
       <!--      <a-menu-item key="tts">-->

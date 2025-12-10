@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useDrawRectStore } from '@renderer/store/ocr/DrawRectStore'
+import { useDrawRectStore } from '@renderer/store/draw/DrawRectStore'
 const rectStore = useDrawRectStore()
 </script>
 

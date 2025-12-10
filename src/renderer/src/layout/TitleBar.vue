@@ -1,25 +1,26 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import Settings from '../components/Settings.vue'
-import { Minus, X, Square } from 'lucide-vue-next'
+import { Minus, X, Square, Copy } from 'lucide-vue-next'
+import { useAppStore } from '@renderer/store/app'
 const title = ref(window.document.title)
-const handleMinimize = () => window.electron.ipcRenderer.send('window-minimize')
-const handleClose = () => window.electron.ipcRenderer.send('window-close')
+const appStore = useAppStore()
 </script>
 
 <template>
   <div class="title-bar">
-    <!--    <img alt="logo" class="min-logo" src="../assets/logo.svg" />-->
+    <img alt="logo" class="min-logo" src="../assets/logo.svg" />
     {{ title }}
     <div class="window-controls">
       <Settings />
-      <button class="control-btn minimize" @click="handleMinimize">
+      <button class="control-btn minimize" @click="appStore.handleMinimize">
         <Minus :size="22" />
       </button>
-      <!--      <button class="control-btn">-->
-      <!--        <Square :size="16" />-->
-      <!--      </button>-->
-      <button class="control-btn close" @click="handleClose"><X :size="22" /></button>
+      <button class="control-btn maximize" @click="appStore.handleMaximize">
+        <Copy v-if="appStore.isMaximize" :size="16" />
+        <Square v-else :size="16" />
+      </button>
+      <button class="control-btn close" @click="appStore.handleClose"><X :size="22" /></button>
     </div>
   </div>
 </template>
@@ -54,7 +55,7 @@ const handleClose = () => window.electron.ipcRenderer.send('window-close')
 }
 
 .control-btn {
-  color: var(--color-text-3);
+  color: var(--color-text-2);
   font-size: 16px;
   width: 32px;
   height: 30px;
@@ -68,20 +69,22 @@ const handleClose = () => window.electron.ipcRenderer.send('window-close')
 }
 
 .control-btn:hover {
+  cursor: pointer;
   color: #fff;
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--color-border-3);
+}
+.maximize {
+  transform: rotate(90deg);
 }
 
 /* Windows 风格悬停效果 */
 @media (hover: hover) {
   .minimize:hover {
-    cursor: pointer;
     background: var(--color-border-3);
   }
 
   .close:hover {
     background: #e81123;
-    cursor: pointer;
   }
 }
 </style>

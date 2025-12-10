@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useDrawArrowStore } from '@renderer/store/ocr/DrawArrowStore'
+import { useDrawArrowStore } from '@renderer/store/draw/DrawArrowStore'
 const drawStore = useDrawArrowStore()
 </script>
 

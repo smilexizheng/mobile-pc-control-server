@@ -4,6 +4,10 @@ import { copyImage, toImage } from '../main/utils/img'
 
 // Custom APIs for renderer
 const api = {
+  handleMinimize: () => ipcRenderer.send('window-minimize'),
+  handleMaximize: () => ipcRenderer.invoke('window-maximize'),
+  handleClose: () => ipcRenderer.send('window-close'),
+
   getControlServerPort: (): Promise<number> => ipcRenderer.invoke('get-control-server-port'),
   getLocalIPs: (): Promise<string[]> => ipcRenderer.invoke('get-local-ips'),
   getAppVersion: (): Promise<string> => ipcRenderer.invoke('get-app-version'),

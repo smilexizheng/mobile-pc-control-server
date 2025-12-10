@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useDrawCircleStore } from '@renderer/store/ocr/DrawCircleStore'
+import { useDrawCircleStore } from '@renderer/store/draw/DrawCircleStore'
 const drawStore = useDrawCircleStore()
 </script>
 

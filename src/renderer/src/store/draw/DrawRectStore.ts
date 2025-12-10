@@ -1,25 +1,25 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { CircleConfig } from '@renderer/store/ocr/type'
-import { getPos } from '@renderer/store/ocr/utils'
+import { Rectangle } from '@renderer/store/draw/type'
+import { getPos } from '@renderer/store/draw/utils'
 import Konva from 'konva'
 
-export const useDrawCircleStore = defineStore('draw-circle', () => {
-  const TYPE = 'draw_circle'
+export const useDrawRectStore = defineStore('draw-rect', () => {
+  const TYPE = 'draw_rect'
+  const rectangles = ref<Rectangle[]>([])
+  const currentRect = ref<Rectangle | null>(null)
 
-  const shapes = ref<CircleConfig[]>([])
-  const currentShape = ref<CircleConfig | null>(null)
   const error = ref<string | null>(null)
-
   const setShapeType = (_): void => {}
 
   function startDrawing(e: Konva.KonvaPointerEvent): void {
     const pos = getPos(e)
     try {
-      currentShape.value = {
+      currentRect.value = {
         x: pos.x,
         y: pos.y,
-        radius: 0
+        width: 0,
+        height: 0
       }
       error.value = null
     } catch (err) {
@@ -29,18 +29,19 @@ export const useDrawCircleStore = defineStore('draw-circle', () => {
 
   function updateDrawing(e: Konva.KonvaPointerEvent): void {
     try {
-      if (currentShape.value === null) {
+      if (currentRect.value === null) {
         return
       }
       const pos = getPos(e)
-      const { x: startX, y: startY } = currentShape.value
+      const { x: startX, y: startY } = currentRect.value
       const newWidth = pos.x - startX
       const newHeight = pos.y - startY
 
-      currentShape.value = {
+      currentRect.value = {
         x: newWidth > 0 ? startX : pos.x,
         y: newHeight > 0 ? startY : pos.y,
-        radius: Math.abs(newWidth)
+        width: Math.abs(newWidth),
+        height: Math.abs(newHeight)
       }
       error.value = null
     } catch (err) {
@@ -50,11 +51,11 @@ export const useDrawCircleStore = defineStore('draw-circle', () => {
 
   function endDrawing(): void {
     try {
-      if (!currentShape.value) {
+      if (!currentRect.value) {
         return
       }
-      if (currentShape.value.radius > 10) {
-        shapes.value.push({ ...currentShape.value })
+      if (currentRect.value.width > 10 && currentRect.value.height > 10) {
+        rectangles.value.push({ ...currentRect.value })
       }
       resetDrawing()
     } catch (err) {
@@ -63,17 +64,17 @@ export const useDrawCircleStore = defineStore('draw-circle', () => {
   }
 
   function resetDrawing(): void {
-    currentShape.value = null
+    currentRect.value = null
   }
 
   function remove(index: number): void {
     resetDrawing()
-    shapes.value.splice(index, 1)
+    rectangles.value.splice(index, 1)
   }
 
   function removeAll(): void {
     resetDrawing()
-    shapes.value = []
+    rectangles.value = []
   }
 
   function handleError(err: unknown): void {
@@ -93,8 +94,8 @@ export const useDrawCircleStore = defineStore('draw-circle', () => {
   }
   return {
     TYPE,
-    shapes,
-    currentShape,
+    rectangles,
+    currentRect,
     error,
     setShapeType,
     startDrawing,

@@ -1,5 +1,5 @@
 import Konva from 'konva'
-import { useOcrStore } from '@renderer/store/ocr/index'
+import { useDrawStore } from '@renderer/store/draw/index'
 
 /**
  * 获取指针在 图像中的绝对坐标位置
@@ -8,7 +8,7 @@ import { useOcrStore } from '@renderer/store/ocr/index'
 const getPos = <T>(
   e: Konva.KonvaPointerEvent | Konva.KonvaEventObject<T>
 ): { x: number; y: number } => {
-  const ocrStore = useOcrStore()
+  const drawStore = useDrawStore()
   const layer = e.target.getLayer()
   const pos = e.target.getStage()!.getPointerPosition()!
   const posX = pos.x ?? 0
@@ -19,8 +19,8 @@ const getPos = <T>(
   const offsetY = layer?.offsetY() ?? 0
 
   return {
-    x: (posX - x) / ocrStore.realScale + offsetX,
-    y: (posY - y) / ocrStore.realScale + offsetY
+    x: (posX - x) / drawStore.realScale + offsetX,
+    y: (posY - y) / drawStore.realScale + offsetY
   }
 }
 

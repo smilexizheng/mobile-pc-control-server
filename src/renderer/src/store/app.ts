@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia'
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, ref } from 'vue'
 import { Setting, ThemeType } from '../env'
-import { useResizeObserver, useStorage } from '@vueuse/core'
+import { useStorage } from '@vueuse/core'
 import { useSocketStore } from '@renderer/store/socket'
 import { Message, Modal } from '@arco-design/web-vue'
 
 export const useAppStore = defineStore('app', () => {
   const ipcRenderer = window.electron.ipcRenderer
-
+  const isMaximize = ref(false)
   ipcRenderer.on('updateNotAvailable', () => {
     Message.success('当前为最新版本')
   })
@@ -52,18 +52,15 @@ export const useAppStore = defineStore('app', () => {
     })
   })
 
-  // 主区域ref
-  const mainLayout = useTemplateRef<HTMLDivElement>('mainLayout')
   // 主区域大小
   const mainLayoutWH = ref<{ width: number; height: number }>({
-    width: mainLayout.value?.offsetWidth || 600,
-    height: mainLayout.value?.offsetHeight || 500
+    width: 0,
+    height: 0
   })
-  useResizeObserver(mainLayout, (entries) => {
-    const entry = entries[0]
-    const { width, height } = entry.contentRect
+
+  const setMainLayoutWH = (width, height) => {
     mainLayoutWH.value = { width, height }
-  })
+  }
 
   // 系统设置参数
   const settingsVisible = ref(false)
@@ -122,6 +119,12 @@ export const useAppStore = defineStore('app', () => {
     return { width: mainLayoutWH.value.width, height: mainLayoutWH.value.height }
   })
 
+  const handleMinimize = () => window.api.handleMinimize()
+  const handleClose = () => window.api.handleClose()
+  const handleMaximize = async () => {
+    isMaximize.value = await window.api.handleMaximize()
+  }
+
   return {
     mainLayoutWH,
     contentWH,
@@ -132,7 +135,11 @@ export const useAppStore = defineStore('app', () => {
     settingsVisible,
     aboutVisible,
     isDark,
-
+    isMaximize,
+    setMainLayoutWH,
+    handleMaximize,
+    handleClose,
+    handleMinimize,
     initSetting,
     updateSettings,
     toggleTheme,

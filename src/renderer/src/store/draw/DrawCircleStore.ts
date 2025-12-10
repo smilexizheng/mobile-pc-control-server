@@ -1,28 +1,25 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { ArrowConfig } from '@renderer/store/ocr/type'
-import { getPos } from '@renderer/store/ocr/utils'
+import { CircleConfig } from '@renderer/store/draw/type'
+import { getPos } from '@renderer/store/draw/utils'
 import Konva from 'konva'
 
-type ArrowType = 'straight' | 'curved' | 'polyline'
-export const useDrawArrowStore = defineStore('draw-arrow', () => {
-  const TYPE = 'draw_arrow'
+export const useDrawCircleStore = defineStore('draw-circle', () => {
+  const TYPE = 'draw_circle'
 
-  const arrowType = ref<ArrowType>('straight')
-  const shapes = ref<ArrowConfig[]>([])
-  const currentShape = ref<ArrowConfig | null>(null)
-
+  const shapes = ref<CircleConfig[]>([])
+  const currentShape = ref<CircleConfig | null>(null)
   const error = ref<string | null>(null)
 
-  const setShapeType = (type: ArrowType): void => {
-    arrowType.value = type
-  }
+  const setShapeType = (_): void => {}
 
   function startDrawing(e: Konva.KonvaPointerEvent): void {
     const pos = getPos(e)
     try {
       currentShape.value = {
-        points: [pos.x, pos.y]
+        x: pos.x,
+        y: pos.y,
+        radius: 0
       }
       error.value = null
     } catch (err) {
@@ -35,11 +32,15 @@ export const useDrawArrowStore = defineStore('draw-arrow', () => {
       if (currentShape.value === null) {
         return
       }
-      // // 详细运动轨迹
       const pos = getPos(e)
-      const { points } = currentShape.value
+      const { x: startX, y: startY } = currentShape.value
+      const newWidth = pos.x - startX
+      const newHeight = pos.y - startY
+
       currentShape.value = {
-        points: [...points, pos.x, pos.y]
+        x: newWidth > 0 ? startX : pos.x,
+        y: newHeight > 0 ? startY : pos.y,
+        radius: Math.abs(newWidth)
       }
       error.value = null
     } catch (err) {
@@ -47,29 +48,15 @@ export const useDrawArrowStore = defineStore('draw-arrow', () => {
     }
   }
 
-  function endDrawing(e: Konva.KonvaPointerEvent): void {
+  function endDrawing(): void {
     try {
       if (!currentShape.value) {
         return
       }
-
-      const { points } = currentShape.value
-      if (points.length > 4) {
-        const pos = getPos(e)
-        switch (arrowType.value) {
-          // 直线箭头
-          case 'straight':
-            currentShape.value = {
-              points: [points[0], points[1], pos.x, pos.y]
-            }
-            break
-          // 曲线箭头
-          case 'curved':
-            break
-        }
-
+      if (currentShape.value.radius > 10) {
         shapes.value.push({ ...currentShape.value })
       }
+      resetDrawing()
     } catch (err) {
       handleError(err)
     }

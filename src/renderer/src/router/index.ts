@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '@renderer/views/Home/index.vue'
-import Ocr from '@renderer/views/OCR/index.vue'
+import Draw from '@renderer/views/Draw/index.vue'
 import Chat from '@renderer/views/Chat/index.vue'
 import Game from '@renderer/views/Game/index.vue'
 
@@ -13,9 +13,9 @@ const router = createRouter({
       component: Home
     },
     {
-      path: '/ocr',
-      name: 'ocr',
-      component: Ocr
+      path: '/draw',
+      name: 'Draw',
+      component: Draw
     },
     {
       path: '/chat',

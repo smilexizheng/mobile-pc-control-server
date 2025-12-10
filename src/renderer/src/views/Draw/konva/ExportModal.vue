@@ -9,8 +9,8 @@ import {
   Slider as ASlider
 } from '@arco-design/web-vue'
 import type { FormInstance } from '@arco-design/web-vue'
-import { useOcrStore } from '@renderer/store/ocr'
-const ocrStore = useOcrStore()
+import { useDrawStore } from '@renderer/store/draw'
+const drawStore = useDrawStore()
 
 // 表单数据
 const formData = ref({
@@ -32,8 +32,8 @@ const loading = ref(false)
 // 处理分辨率变化
 const handleResolutionChange = (value: string) => {
   if (value !== 'custom') {
-    formData.value.customWidth = ocrStore.stageConfig.width
-    formData.value.customHeight = ocrStore.stageConfig.height
+    formData.value.customWidth = drawStore.stageConfig.width
+    formData.value.customHeight = drawStore.stageConfig.height
   }
 }
 
@@ -41,8 +41,8 @@ const handleResolutionChange = (value: string) => {
 const getTargetDimensions = () => {
   if (formData.value.resolution === 'original') {
     return {
-      targetWidth: ocrStore.image.width,
-      targetHeight: ocrStore.image.height
+      targetWidth: drawStore.image?.width || drawStore.mainLayerWH.width,
+      targetHeight: drawStore.image?.height || drawStore.mainLayerWH.height
     }
   } else if (formData.value.resolution === 'custom') {
     return { targetWidth: formData.value.customWidth, targetHeight: formData.value.customHeight }
@@ -67,7 +67,7 @@ const handleExport = async () => {
       ...getTargetDimensions()
     }
 
-    await ocrStore.handleExport(options)
+    await drawStore.handleExport(options)
   } finally {
     loading.value = false
   }
@@ -75,7 +75,7 @@ const handleExport = async () => {
 
 // 监听 visible 变化，重置表单
 watch(
-  () => ocrStore.exportModalVisible,
+  () => drawStore.exportModalVisible,
   (newVal) => {
     if (newVal) {
       formData.value = {
@@ -93,7 +93,7 @@ watch(
 </script>
 <template>
   <a-modal
-    v-model:visible="ocrStore.exportModalVisible"
+    v-model:visible="drawStore.exportModalVisible"
     auto-label-width
     title="导出图像"
     :ok-loading="loading"
@@ -127,10 +127,12 @@ watch(
           @change="handleResolutionChange"
         >
           <a-option v-if="formData.exportType === 'full'" value="original">
-            原图({{ ocrStore.image?.width || 500 }}x{{ ocrStore.image?.height || 500 }})</a-option
+            原图({{ drawStore.image?.width || drawStore.mainLayerWH.width }}x{{
+              drawStore.image?.height || drawStore.mainLayerWH.height
+            }})</a-option
           >
           <a-option v-else value="original">
-            当前窗口({{ ocrStore.mainLayerWH.width }}x{{ ocrStore.mainLayerWH.height }})</a-option
+            当前窗口({{ drawStore.mainLayerWH.width }}x{{ drawStore.mainLayerWH.height }})</a-option
           >
           <a-option value="1920x1080">Full HD (1920x1080)</a-option>
           <a-option value="2560x1440">2K (2560x1440)</a-option>

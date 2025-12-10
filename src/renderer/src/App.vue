@@ -1,12 +1,20 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { onMounted } from 'vue'
+import { onMounted, useTemplateRef } from 'vue'
 import { useAppStore } from '@renderer/store/app'
 
 import TitleBar from '@renderer/layout/TitleBar.vue'
 import LeftMenu from '@renderer/layout/LeftMenu.vue'
+import { useResizeObserver } from '@vueuse/core'
 const appStore = useAppStore()
 const router = useRouter()
+
+const mainLayout = useTemplateRef<HTMLDivElement>('mainLayout')
+useResizeObserver(mainLayout, (entries) => {
+  const entry = entries[0]
+  const { width, height } = entry.contentRect
+  appStore.setMainLayoutWH(width, height)
+})
 
 onMounted(async () => {
   router.replace('/')

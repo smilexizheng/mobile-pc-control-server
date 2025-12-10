@@ -23,15 +23,12 @@ export class KonvaExportUtil {
     // 克隆原 Layer 并添加到临时 Stage
     const clonedLayer = layer.clone()
     tempStage.add(clonedLayer)
-
-    // // 调整 clonedLayer 的位置，使其从 (0,0) 开始（抵消原偏移）
-
     // 如果指定目标分辨率，应用缩放以填充目标大小（stretch）
     if (options.targetWidth || options.targetHeight) {
       // 计算 现图层 缩放目标大小的比例
       const scaleX = options.targetWidth / options.bgWidth
       const scaleY = options.targetHeight / options.bgHeight
-
+      // 调整 clonedLayer 的位置，使其从 (0,0) 开始（抵消原偏移）
       clonedLayer.position({
         x: (options.layerConfig.left / options.realScale) * scaleX,
         y: (options.layerConfig.top / options.realScale) * scaleY

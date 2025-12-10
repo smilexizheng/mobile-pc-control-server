@@ -1,42 +1,42 @@
 <script setup lang="ts">
-import { useOcrStore } from '@renderer/store/ocr'
-import { onMounted, onUnmounted } from 'vue'
-import Rectangles from '@renderer/views/OCR/Rectangles.vue'
-import Circle from '@renderer/views/OCR/Circle.vue'
-import Arrow from '@renderer/views/OCR/Arrow.vue'
-import HeadToolBar from '@renderer/views/OCR/layout/HeadToolBar.vue'
-import GraffitiConfig from '@renderer/views/OCR/layout/GraffitiConfig.vue'
+import { useDrawStore } from '@renderer/store/draw'
+import { onMounted, onUnmounted, useTemplateRef } from 'vue'
+import Rectangles from '@renderer/views/Draw/konva/shapes/Rectangles.vue'
+import Circle from '@renderer/views/Draw/konva/shapes/Circle.vue'
+import Arrow from '@renderer/views/Draw/konva/shapes/Arrow.vue'
+import Konva from 'konva'
 
-const ocrStore = useOcrStore()
-
+const drawStore = useDrawStore()
+const transformer = useTemplateRef<Konva.Transformer>('transformer')
+const stageRef = useTemplateRef<Konva.Stage>('stage')
+const mainLayerRef = useTemplateRef<HTMLDivElement>('mainLayer')
+const scrollRef = useTemplateRef<HTMLDivElement>('scrollRef')
 onMounted(() => {
-  window.addEventListener('keydown', ocrStore.shortcutKeyHandler)
+  drawStore.setRef(stageRef.value, transformer.value, mainLayerRef.value, scrollRef.value)
+  window.addEventListener('keydown', drawStore.shortcutKeyHandler)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', ocrStore.shortcutKeyHandler)
+  window.removeEventListener('keydown', drawStore.shortcutKeyHandler)
 })
 </script>
 
 <template>
   <div class="layer-1">
-    <GraffitiConfig />
-    <HeadToolBar />
-
-    <div :ref="(r: any) => ocrStore.setMainLayer(r)" class="layer-2">
-      <a-spin :loading="ocrStore.isLoading" dot>
+    <div ref="mainLayer" class="layer-2">
+      <a-spin :loading="drawStore.isLoading" dot>
         <a-scrollbar
-          :ref="(r: any) => ocrStore.setScrollDivRef(r?.containerRef)"
+          ref="scrollRef"
           :style="{
-            width: `${ocrStore.mainLayerWH.width}px`,
-            height: `${ocrStore.mainLayerWH.height}px`,
+            width: `${drawStore.mainLayerWH.width}px`,
+            height: `${drawStore.mainLayerWH.height}px`,
             overflow: 'auto'
           }"
         >
           <div
             :style="{
-              width: `${ocrStore.stageConfig.width + 16}px`,
-              height: `${ocrStore.stageConfig.height + 16}px`
+              width: `${drawStore.stageConfig.width + 16}px`,
+              height: `${drawStore.stageConfig.height + 16}px`
             }"
           ></div>
         </a-scrollbar>
@@ -45,52 +45,52 @@ onUnmounted(() => {
             position: 'absolute',
             top: 0
           }"
-          @wheel="ocrStore.wheelHandler"
+          @wheel="drawStore.wheelHandler"
         >
           <k-stage
             ref="stage"
             :config="{
-              width: ocrStore.mainLayerWH.width - 16,
-              height: ocrStore.mainLayerWH.height - 16
+              width: drawStore.mainLayerWH.width - 16,
+              height: drawStore.mainLayerWH.height - 16
             }"
-            @mousedown="ocrStore.stageMouseDown"
-            @mousemove="ocrStore.stageMouseMove"
-            @mouseup="ocrStore.stageMouseUp"
-            @mouseleave="ocrStore.stageMouseLeave"
-            @dragstart="ocrStore.stageDragStart"
-            @dragend="ocrStore.stageDragEnd"
-            @wheel="ocrStore.stageWheel"
-            @click="ocrStore.stageClick"
+            @mousedown="drawStore.stageMouseDown"
+            @mousemove="drawStore.stageMouseMove"
+            @mouseup="drawStore.stageMouseUp"
+            @mouseleave="drawStore.stageMouseLeave"
+            @dragstart="drawStore.stageDragStart"
+            @dragend="drawStore.stageDragEnd"
+            @wheel="drawStore.stageWheel"
+            @click="drawStore.stageClick"
           >
             <k-layer
               :config="{
-                scaleX: ocrStore.realScale,
-                scaleY: ocrStore.realScale,
-                x: ocrStore.layerConfig.x,
-                y: ocrStore.layerConfig.y,
-                offsetX: ocrStore.layerConfig.offsetX,
-                offsetY: ocrStore.layerConfig.offsetY
+                scaleX: drawStore.realScale,
+                scaleY: drawStore.realScale,
+                x: drawStore.layerConfig.x,
+                y: drawStore.layerConfig.y,
+                offsetX: drawStore.layerConfig.offsetX,
+                offsetY: drawStore.layerConfig.offsetY
               }"
             >
               <k-image
-                v-show="ocrStore.image"
+                v-show="drawStore.image"
                 :config="{
                   id: 'ocrImg',
-                  image: ocrStore.image
+                  image: drawStore.image
                 }"
               />
 
               <k-group
-                v-for="(data, i) in ocrStore.ocrResult"
+                v-for="(data, i) in drawStore.ocrResult"
                 :key="`index_${i}`"
                 :config="{
                   x: data.box[0][0],
                   y: data.box[0][1]
                 }"
-                @click="!ocrStore.graffitiMode && ocrStore.copyText(data.text)"
+                @click="!drawStore.graffitiMode && drawStore.copyText(data.text)"
               >
                 <k-rect
-                  v-if="ocrStore.showOcr"
+                  v-if="drawStore.showOcr"
                   :config="{
                     width: data.box[2][0] - data.box[0][0],
                     height: data.box[2][1] - data.box[0][1],
@@ -105,11 +105,11 @@ onUnmounted(() => {
                 />
 
                 <k-text
-                  v-if="ocrStore.showOcr"
+                  v-if="drawStore.showOcr"
                   :config="{
                     width: data.box[2][0] - data.box[0][0],
                     height: data.box[2][1] - data.box[0][1],
-                    fontSize: ocrStore.dynamicFontSize(data.box[2][1] - data.box[0][1]),
+                    fontSize: drawStore.dynamicFontSize(data.box[2][1] - data.box[0][1]),
                     fill: 'red',
                     text: data.text,
                     verticalAlign: 'middle',
@@ -120,12 +120,12 @@ onUnmounted(() => {
             </k-layer>
             <k-layer
               :config="{
-                scaleX: ocrStore.realScale,
-                scaleY: ocrStore.realScale,
-                x: ocrStore.layerConfig.x,
-                y: ocrStore.layerConfig.y,
-                offsetX: ocrStore.layerConfig.offsetX,
-                offsetY: ocrStore.layerConfig.offsetY
+                scaleX: drawStore.realScale,
+                scaleY: drawStore.realScale,
+                x: drawStore.layerConfig.x,
+                y: drawStore.layerConfig.y,
+                offsetX: drawStore.layerConfig.offsetX,
+                offsetY: drawStore.layerConfig.offsetY
               }"
             >
               <Rectangles />
@@ -144,8 +144,8 @@ onUnmounted(() => {
                   rotateEnabled: true, //角度旋转
                   enabledAnchors: ['top-left', 'top-right', 'bottom-left', 'bottom-right'] // 只显示四个点
                 }"
-                @transformstart="ocrStore.transformStart"
-                @transformend="ocrStore.transformEnd"
+                @transformstart="drawStore.transformStart"
+                @transformend="drawStore.transformEnd"
               />
             </k-layer>
           </k-stage>
@@ -165,7 +165,7 @@ onUnmounted(() => {
 
 .layer-2 {
   width: calc(100%);
-  height: calc(100% - 70px);
+  height: calc(100%);
   background-color: var(--color-fill-3);
   position: absolute;
   overflow: hidden;

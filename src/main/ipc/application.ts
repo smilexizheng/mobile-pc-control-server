@@ -6,6 +6,15 @@ import Update from '../utils/Update'
 
 ipcMain.on('ping', () => console.log('pong'))
 ipcMain.on('window-minimize', () => global.mainWindow.minimize())
+ipcMain.handle('window-maximize', () => {
+  if (global.mainWindow.isMaximized()) {
+    global.mainWindow.restore() // 或 unmaximize()，恢复窗口
+  } else {
+    global.mainWindow.maximize() // 最大化
+  }
+  return global.mainWindow.isMaximized()
+})
+
 ipcMain.on('window-close', () => global.mainWindow.close())
 ipcMain.on('update-settings', (_, { settings }) => {
   db.app.put('app:settings', settings).then(() => {

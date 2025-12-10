@@ -1,25 +1,28 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { Rectangle } from '@renderer/store/ocr/type'
-import { getPos } from '@renderer/store/ocr/utils'
+import { ArrowConfig } from '@renderer/store/draw/type'
+import { getPos } from '@renderer/store/draw/utils'
 import Konva from 'konva'
 
-export const useDrawRectStore = defineStore('draw-rect', () => {
-  const TYPE = 'draw_rect'
-  const rectangles = ref<Rectangle[]>([])
-  const currentRect = ref<Rectangle | null>(null)
+type ArrowType = 'straight' | 'curved' | 'polyline'
+export const useDrawArrowStore = defineStore('draw-arrow', () => {
+  const TYPE = 'draw_arrow'
+
+  const arrowType = ref<ArrowType>('straight')
+  const shapes = ref<ArrowConfig[]>([])
+  const currentShape = ref<ArrowConfig | null>(null)
 
   const error = ref<string | null>(null)
-  const setShapeType = (_): void => {}
+
+  const setShapeType = (type: ArrowType): void => {
+    arrowType.value = type
+  }
 
   function startDrawing(e: Konva.KonvaPointerEvent): void {
     const pos = getPos(e)
     try {
-      currentRect.value = {
-        x: pos.x,
-        y: pos.y,
-        width: 0,
-        height: 0
+      currentShape.value = {
+        points: [pos.x, pos.y]
       }
       error.value = null
     } catch (err) {
@@ -29,19 +32,14 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
 
   function updateDrawing(e: Konva.KonvaPointerEvent): void {
     try {
-      if (currentRect.value === null) {
+      if (currentShape.value === null) {
         return
       }
+      // // 详细运动轨迹
       const pos = getPos(e)
-      const { x: startX, y: startY } = currentRect.value
-      const newWidth = pos.x - startX
-      const newHeight = pos.y - startY
-
-      currentRect.value = {
-        x: newWidth > 0 ? startX : pos.x,
-        y: newHeight > 0 ? startY : pos.y,
-        width: Math.abs(newWidth),
-        height: Math.abs(newHeight)
+      const { points } = currentShape.value
+      currentShape.value = {
+        points: [...points, pos.x, pos.y]
       }
       error.value = null
     } catch (err) {
@@ -49,15 +47,28 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
     }
   }
 
-  function endDrawing(): void {
-    console.log(rectangles.value.length)
-
+  function endDrawing(e: Konva.KonvaPointerEvent): void {
     try {
-      if (!currentRect.value) {
+      if (!currentShape.value) {
         return
       }
-      if (currentRect.value.width > 10 && currentRect.value.height > 10) {
-        rectangles.value.push({ ...currentRect.value })
+
+      const { points } = currentShape.value
+      if (points.length > 4) {
+        const pos = getPos(e)
+        switch (arrowType.value) {
+          // 直线箭头
+          case 'straight':
+            currentShape.value = {
+              points: [points[0], points[1], pos.x, pos.y]
+            }
+            break
+          // 曲线箭头
+          case 'curved':
+            break
+        }
+
+        shapes.value.push({ ...currentShape.value })
       }
       resetDrawing()
     } catch (err) {
@@ -66,17 +77,17 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
   }
 
   function resetDrawing(): void {
-    currentRect.value = null
+    currentShape.value = null
   }
 
   function remove(index: number): void {
     resetDrawing()
-    rectangles.value.splice(index, 1)
+    shapes.value.splice(index, 1)
   }
 
   function removeAll(): void {
     resetDrawing()
-    rectangles.value = []
+    shapes.value = []
   }
 
   function handleError(err: unknown): void {
@@ -96,8 +107,8 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
   }
   return {
     TYPE,
-    rectangles,
-    currentRect,
+    shapes,
+    currentShape,
     error,
     setShapeType,
     startDrawing,
