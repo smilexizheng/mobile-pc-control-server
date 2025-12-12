@@ -3,7 +3,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { OcrResult } from '@renderer/env'
 import { createKeybindingsHandler } from 'tinykeys'
 import { useResizeObserver, useToggle, useMouseInElement, useScroll } from '@vueuse/core'
-import { useSystemStore } from '@renderer/store/system'
+
 import { Message } from '@arco-design/web-vue'
 import Konva from 'konva'
 import { useDrawRectStore } from '@renderer/store/draw/DrawRectStore'
@@ -21,6 +21,10 @@ export const useDrawStore = defineStore('draw', () => {
   const stageRef = ref<Konva.Stage | null>()
   const mainLayerRef = ref<HTMLDivElement | null>()
   const scrollRef = ref<HTMLDivElement | null>()
+
+  const { elementX: layerDivX, elementY: layerDivY } = useMouseInElement(mainLayerRef)
+  const { x: divScrollX, y: divScrollY } = useScroll(scrollRef)
+
   const selectShapeId = ref<Array<number>>([])
   const layerRef = ref<Konva.Layer | null>()
 
@@ -69,16 +73,16 @@ export const useDrawStore = defineStore('draw', () => {
     }
   }
 
-  const setRef = (
+  const setRefs = (
     stage: Konva.Stage | null,
     transformer: Konva.Transformer | null,
-    mainLayer: HTMLDivElement | null,
-    scroll: HTMLDivElement | null
+    mainLayer,
+    scroll
   ): void => {
     stageRef.value = stage
     transformerRef.value = transformer
     mainLayerRef.value = mainLayer
-    scrollRef.value = scroll
+    scrollRef.value = scroll.containerRef
   }
 
   const ipcRenderer = window.electron.ipcRenderer
@@ -96,9 +100,6 @@ export const useDrawStore = defineStore('draw', () => {
   ipcRenderer.on('ocr-screenshots-success', (_, path) => {
     ocrImage(path)
   })
-
-  const { elementX: layerDivX, elementY: layerDivY } = useMouseInElement(mainLayerRef)
-  const { x: divScrollX, y: divScrollY } = useScroll(scrollRef)
 
   const mainLayerWH = ref<WH>({ width: 0, height: 0 })
   // 缩放倍数
@@ -304,9 +305,8 @@ export const useDrawStore = defineStore('draw', () => {
   /**
    * 选择ocr的图片
    */
-  const chooseFile = async (): Promise<void> => {
-    const systemStore = useSystemStore()
-    const img = await systemStore.chooseFile('打开图片', ['png', 'jpg', 'jpeg'])
+  const chooseImgFile = async (): Promise<void> => {
+    const img = await window.api.chooseFile('打开图片', ['png', 'jpg', 'jpeg'])
     if (img) {
       ocrImage(img)
     }
@@ -326,6 +326,7 @@ export const useDrawStore = defineStore('draw', () => {
       setScale(up ? scale.value + 10 : scale.value - 10)
     } else {
       divScrollX.value = divScrollX.value + e.deltaX
+
       divScrollY.value = divScrollY.value + e.deltaY
     }
   }
@@ -466,7 +467,6 @@ export const useDrawStore = defineStore('draw', () => {
    * @param options
    */
   const handleExport = async (options) => {
-    console.log(options)
     const stage = stageRef.value?.getStage()
     if (!stage) {
       Message.error('客户端参数异常，请重启')
@@ -479,7 +479,6 @@ export const useDrawStore = defineStore('draw', () => {
       (options.bgHeight = image.value?.height || mainLayerWH.value.height),
       (options.realScale = realScale.value)
     options.layerConfig = layerConfig.value
-    console.log(options)
     if (options.exportType === 'full') {
       dataUrl = await KonvaExportUtil.exportFullContent(stage, layer, options)
     } else {
@@ -492,7 +491,7 @@ export const useDrawStore = defineStore('draw', () => {
   }
 
   return {
-    setRef,
+    setRefs,
     scale,
     realScale,
     mainLayerWH,
@@ -508,7 +507,7 @@ export const useDrawStore = defineStore('draw', () => {
     copyAllText,
     toggle,
     toggleLoading,
-    chooseFile,
+    chooseImgFile,
     wheelHandler,
     dynamicFontSize,
     shortcutKeyHandler,

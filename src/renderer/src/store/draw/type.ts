@@ -20,16 +20,16 @@ export interface IChildDrawStore {
 }
 
 // 矩形框参数
-export interface Rectangle extends Konva.RectConfig {
-  x: number
-  y: number
-  width: number
-  height: number
+export interface RectangleConfig extends Konva.RectConfig {
+  // x: number
+  // y: number
+  // width: number
+  // height: number
 }
 
 export interface CircleConfig extends Konva.CircleConfig {
-  x: number
-  y: number
-  radius: number
+  // x: number
+  // y: number
+  // radius: number
 }
 export interface ArrowConfig extends Konva.ArrowConfig {}

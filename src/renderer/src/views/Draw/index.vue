@@ -2,7 +2,6 @@
 import HeadToolBar from '@renderer/views/Draw/layout/HeadToolBar.vue'
 import GraffitiConfig from '@renderer/views/Draw/layout/GraffitiConfig.vue'
 import DrawMain from '@renderer/views/Draw/konva/index.vue'
-import ShapeConfig from '@renderer/views/Draw/konva/ShapeConfig.vue'
 </script>
 
 <template>
@@ -10,9 +9,9 @@ import ShapeConfig from '@renderer/views/Draw/konva/ShapeConfig.vue'
     <a-layout>
       <a-layout-header> <GraffitiConfig /> <HeadToolBar /> </a-layout-header>
       <a-layout>
-        <a-layout-sider :resize-directions="['right']">
-          <ShapeConfig />
-        </a-layout-sider>
+        <!--        <a-layout-sider :resize-directions="['right']">-->
+        <!--          <ShapeConfig />-->
+        <!--        </a-layout-sider>-->
         <a-layout-content> <DrawMain /></a-layout-content>
       </a-layout>
     </a-layout>

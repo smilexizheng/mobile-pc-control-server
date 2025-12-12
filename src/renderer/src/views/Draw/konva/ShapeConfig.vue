@@ -1,10 +1,65 @@
+<script setup>
+import { ref, defineExpose } from 'vue'
+
+const shapeConfig = ref({
+  x: 0,
+  y: 0,
+  width: 100,
+  height: 100,
+  fill: '#ffffff',
+  stroke: '#000000',
+  strokeWidth: 1,
+  opacity: 1,
+  rotation: 0,
+  scaleX: 1,
+  scaleY: 1,
+  lineJoin: 'miter',
+  lineCap: 'butt',
+  shadowColor: '#000000',
+  shadowBlur: 0,
+  shadowOffsetX: 0,
+  shadowOffsetY: 0,
+  shadowOpacity: 1,
+  dash: '',
+  dashOffset: 0,
+  draggable: false,
+  visible: true,
+  cornerRadius: 0,
+  fillPatternRepeat: 'repeat',
+  strokeScaleEnabled: true,
+  shadowEnabled: true
+  // 可以根据需要添加更多默认值，例如 fillPatternImage 等（如果需要处理图像，可能需要额外逻辑）
+})
+
+const lineJoinOptions = [
+  { label: 'Miter', value: 'miter' },
+  { label: 'Round', value: 'round' },
+  { label: 'Bevel', value: 'bevel' }
+]
+
+const lineCapOptions = [
+  { label: 'Butt', value: 'butt' },
+  { label: 'Round', value: 'round' },
+  { label: 'Square', value: 'square' }
+]
+
+const fillPatternRepeatOptions = [
+  { label: 'Repeat', value: 'repeat' },
+  { label: 'Repeat-X', value: 'repeat-x' },
+  { label: 'Repeat-Y', value: 'repeat-y' },
+  { label: 'No-Repeat', value: 'no-repeat' }
+]
+
+defineExpose({ shapeConfig })
+</script>
+
 <template>
   <a-form
     :model="shapeConfig"
     layout="horizontal"
     auto-label-width
     size="mini"
-    :style="{ width: '200px', height: '100px' }"
+    :style="{ width: '200px' }"
   >
     <a-form-item label="X 位置" field="x">
       <a-input-number v-model="shapeConfig.x" :step="1" />
@@ -86,60 +141,5 @@
     </a-form-item>
   </a-form>
 </template>
-
-<script setup>
-import { ref, defineExpose } from 'vue'
-
-const shapeConfig = ref({
-  x: 0,
-  y: 0,
-  width: 100,
-  height: 100,
-  fill: '#ffffff',
-  stroke: '#000000',
-  strokeWidth: 1,
-  opacity: 1,
-  rotation: 0,
-  scaleX: 1,
-  scaleY: 1,
-  lineJoin: 'miter',
-  lineCap: 'butt',
-  shadowColor: '#000000',
-  shadowBlur: 0,
-  shadowOffsetX: 0,
-  shadowOffsetY: 0,
-  shadowOpacity: 1,
-  dash: '',
-  dashOffset: 0,
-  draggable: false,
-  visible: true,
-  cornerRadius: 0,
-  fillPatternRepeat: 'repeat',
-  strokeScaleEnabled: true,
-  shadowEnabled: true
-  // 可以根据需要添加更多默认值，例如 fillPatternImage 等（如果需要处理图像，可能需要额外逻辑）
-})
-
-const lineJoinOptions = [
-  { label: 'Miter', value: 'miter' },
-  { label: 'Round', value: 'round' },
-  { label: 'Bevel', value: 'bevel' }
-]
-
-const lineCapOptions = [
-  { label: 'Butt', value: 'butt' },
-  { label: 'Round', value: 'round' },
-  { label: 'Square', value: 'square' }
-]
-
-const fillPatternRepeatOptions = [
-  { label: 'Repeat', value: 'repeat' },
-  { label: 'Repeat-X', value: 'repeat-x' },
-  { label: 'Repeat-Y', value: 'repeat-y' },
-  { label: 'No-Repeat', value: 'no-repeat' }
-]
-
-defineExpose({ shapeConfig })
-</script>
 
 <style></style>

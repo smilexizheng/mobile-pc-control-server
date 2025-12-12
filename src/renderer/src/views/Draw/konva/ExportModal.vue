@@ -100,6 +100,7 @@ watch(
     :mask-closable="false"
     @ok="handleExport"
   >
+    {{ drawStore.layerConfig }}
     <a-form ref="formRef" :model="formData" layout="horizontal">
       <!-- 导出类型选择 -->
       <a-form-item

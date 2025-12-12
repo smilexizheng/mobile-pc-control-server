@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { Rectangle } from '@renderer/store/draw/type'
+import { RectangleConfig } from '@renderer/store/draw/type'
 import { getPos } from '@renderer/store/draw/utils'
 import Konva from 'konva'
 
 export const useDrawRectStore = defineStore('draw-rect', () => {
   const TYPE = 'draw_rect'
-  const rectangles = ref<Rectangle[]>([])
-  const currentRect = ref<Rectangle | null>(null)
+  const rectangles = ref<RectangleConfig[]>([])
+  const currentRect = ref<RectangleConfig | null>(null)
 
   const error = ref<string | null>(null)
   const setShapeType = (_): void => {}
@@ -34,8 +34,8 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
       }
       const pos = getPos(e)
       const { x: startX, y: startY } = currentRect.value
-      const newWidth = pos.x - startX
-      const newHeight = pos.y - startY
+      const newWidth = pos.x - startX!
+      const newHeight = pos.y - startY!
 
       currentRect.value = {
         x: newWidth > 0 ? startX : pos.x,
@@ -54,7 +54,7 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
       if (!currentRect.value) {
         return
       }
-      if (currentRect.value.width > 10 && currentRect.value.height > 10) {
+      if (currentRect.value.width! > 10 && currentRect.value.height! > 10) {
         rectangles.value.push({ ...currentRect.value })
       }
       resetDrawing()

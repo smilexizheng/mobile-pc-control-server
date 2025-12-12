@@ -3,6 +3,7 @@ import { Menu, Circle, MoveUpRight, RectangleHorizontal, Redo } from 'lucide-vue
 import { useDrawStore } from '@renderer/store/draw'
 import { ref } from 'vue'
 import ExportModal from '@renderer/views/Draw/konva/ExportModal.vue'
+import ShapeConfig from '@renderer/views/Draw/konva/ShapeConfig.vue'
 
 const drawStore = useDrawStore()
 
@@ -13,7 +14,7 @@ const operation = ref([
     value: 'open',
     label: '打开图片',
     event: () => {
-      drawStore.chooseFile()
+      drawStore.chooseImgFile()
     }
   },
   {
@@ -79,7 +80,7 @@ const operation = ref([
         type="primary"
         :size="size"
         :loading="drawStore.isLoading"
-        @click="drawStore.chooseFile()"
+        @click="drawStore.chooseImgFile()"
         >打开
       </a-button>
 
@@ -126,8 +127,22 @@ const operation = ref([
           <Redo v-else-if="item.shape === 'arrow' && item.type === 'curved'" />
           <RectangleHorizontal v-else /> </template
       ></a-button>
+
+      <a-trigger trigger="click" :unmount-on-close="false">
+        <a-button :size="size">配置</a-button>
+        <template #content>
+          <div class="base-shape-div"><ShapeConfig /></div
+        ></template>
+      </a-trigger>
     </a-space>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.base-shape-div {
+  width: 240px;
+  height: 450px;
+  background: var(--color-bg-1);
+  overflow-y: auto;
+}
+</style>

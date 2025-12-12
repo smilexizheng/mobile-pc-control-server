@@ -34,8 +34,8 @@ export const useDrawCircleStore = defineStore('draw-circle', () => {
       }
       const pos = getPos(e)
       const { x: startX, y: startY } = currentShape.value
-      const newWidth = pos.x - startX
-      const newHeight = pos.y - startY
+      const newWidth = pos.x - startX!
+      const newHeight = pos.y - startY!
 
       currentShape.value = {
         x: newWidth > 0 ? startX : pos.x,
@@ -53,7 +53,7 @@ export const useDrawCircleStore = defineStore('draw-circle', () => {
       if (!currentShape.value) {
         return
       }
-      if (currentShape.value.radius > 10) {
+      if (currentShape.value.radius! > 10) {
         shapes.value.push({ ...currentShape.value })
       }
       resetDrawing()

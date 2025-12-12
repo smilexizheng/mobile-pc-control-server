@@ -11,8 +11,9 @@ const transformer = useTemplateRef<Konva.Transformer>('transformer')
 const stageRef = useTemplateRef<Konva.Stage>('stage')
 const mainLayerRef = useTemplateRef<HTMLDivElement>('mainLayer')
 const scrollRef = useTemplateRef<HTMLDivElement>('scrollRef')
+
 onMounted(() => {
-  drawStore.setRef(stageRef.value, transformer.value, mainLayerRef.value, scrollRef.value)
+  drawStore.setRefs(stageRef.value, transformer.value, mainLayerRef.value, scrollRef.value)
   window.addEventListener('keydown', drawStore.shortcutKeyHandler)
 })
 

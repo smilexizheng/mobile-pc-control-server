@@ -3,11 +3,9 @@ import { ref, reactive, watch, onMounted, nextTick } from 'vue'
 import { IconSend, IconFaceSmileFill, IconFolderAdd, IconImage } from '@arco-design/web-vue/es/icon'
 import { useSocketStore } from '@renderer/store/socket'
 import dayjs from 'dayjs'
-import { useSystemStore } from '@renderer/store/system'
 import { copyText } from '@renderer/utils/util'
-
+import { Copy, FolderOpen, File } from 'lucide-vue-next'
 const socketStore = useSocketStore()
-const systemStore = useSystemStore()
 
 const emojis = reactive(['😀', '😂', '😅', '😘', '🏸', '😎', '❤️', '👍', '🎉'])
 const chatContent = ref<HTMLDivElement>()
@@ -25,7 +23,7 @@ onMounted(() => {})
 const inputMessage = ref('')
 
 const triggerFileInput = async (extensions: string[]): Promise<void> => {
-  const filePath = await systemStore.chooseFile('选择文件', extensions)
+  const filePath = await window.api.chooseFile('选择文件', extensions)
   if (filePath) {
     const fileId = await window.electron.ipcRenderer.invoke('addAllowDownFile', {
       filePath,
@@ -49,6 +47,13 @@ const sendMessage = (): void => {
 
   socketStore.sendMessage({ msgType: 'txt', content: inputMessage.value.trim() })
   inputMessage.value = ''
+}
+
+const openFile = (fileId) => {
+  window.api.shellOpen(fileId)
+}
+const showItemInFolder = (fileId) => {
+  window.api.showItemInFolder(fileId)
 }
 </script>
 <template>
@@ -105,32 +110,27 @@ const sendMessage = (): void => {
             >
               <!--              <a-avatar v-if="!message.isSelf">A</a-avatar>-->
               <div v-if="message.msgType === 'txt'" class="bubble-content">
-                <div class="message-text">{{ message.content }}</div>
                 <div class="message-time">{{ message.time }}</div>
+                <div class="message-text">{{ message.content }}</div>
+
                 <a-space>
-                  <a-button type="primary" size="mini" @click="copyText(message.content)"
-                    >复制
-                  </a-button>
+                  <a-link @click="copyText(message.content)">
+                    <template #icon> <Copy :size="16" /> </template>复制
+                  </a-link>
                 </a-space>
               </div>
 
               <div v-if="message.msgType === 'file'" class="bubble-content">
+                <div class="message-time">{{ message.time }}</div>
                 <div class="message-text">{{ message.fileName }}</div>
                 <a-space>
-                  <a-button
-                    type="primary"
-                    size="mini"
-                    @click="systemStore.shellOpen(message.fileId)"
-                    >打开</a-button
-                  >
-                  <a-button
-                    type="primary"
-                    size="mini"
-                    @click="systemStore.showItemInFolder(message.fileId)"
-                    >打开文件夹</a-button
-                  >
+                  <a-link @click="openFile(message.fileId)">
+                    <template #icon> <File :size="16" /> </template>文件
+                  </a-link>
+                  <a-link @click="showItemInFolder(message.fileId)">
+                    <template #icon> <FolderOpen :size="16" /> </template>文件夹
+                  </a-link>
                 </a-space>
-                <div class="message-time">{{ message.time }}</div>
               </div>
             </div>
           </div>
