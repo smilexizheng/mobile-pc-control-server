@@ -13,6 +13,7 @@ import { KonvaExportUtil } from './konva/KonvaExportUtil'
 import { DrawMode, WH, IChildDrawStore, ShapeType } from '@renderer/store/draw/type'
 import { useDrawCircleStore } from '@renderer/store/draw/DrawCircleStore'
 import { useDrawArrowStore } from '@renderer/store/draw/DrawArrowStore'
+import { getDrawInfo } from '@renderer/store/draw/utils'
 
 type ChildStoreGetter = () => IChildDrawStore
 
@@ -39,12 +40,12 @@ export const useDrawStore = defineStore('draw', () => {
     },
     {
       shape: 'arrow',
-      type: 'straight',
+      shapeParam: 'straight',
       label: '直线箭头'
     },
     {
       shape: 'arrow',
-      type: 'curved',
+      shapeParam: 'curved',
       label: '曲线箭头'
     }
   ]
@@ -68,8 +69,8 @@ export const useDrawStore = defineStore('draw', () => {
     currentMode.value = newMode
     drawStore.value = storeMap[newMode.shape]()
 
-    if (newMode.type) {
-      drawStore.value?.setShapeType(newMode!.type)
+    if (newMode.shapeParam) {
+      drawStore.value?.setShapeParams(newMode!.shapeParam)
     }
   }
 
@@ -151,9 +152,9 @@ export const useDrawStore = defineStore('draw', () => {
         const nodes = children?.filter((child) => selectShapeId.value.includes(child._id))
 
         nodes.forEach((node) => {
-          const id = node.attrs.id
-          if (id.indexOf('draw') > -1) {
-            drawStore.value?.remove(+id.match(/\d+$/)?.[0] || 0)
+          const info = getDrawInfo(node.attrs.id)
+          if (info.isDraw) {
+            storeMap[info.type!]()?.remove(info.index)
           }
         })
         selectShapeId.value = []
@@ -257,17 +258,6 @@ export const useDrawStore = defineStore('draw', () => {
       top: number
     }
   })
-
-  /**
-   * 字体大小 = 容器高度 × 比例系数（推荐 0.4-0.6）
-   * @param boxHeight
-   */
-  const dynamicFontSize = (boxHeight: number): number => {
-    return Math.max(
-      Math.min(Math.trunc(boxHeight * 0.4), 30), // 最大24px
-      12 // 最小8px
-    )
-  }
 
   // 发送ocr识别
   const ocrRecognition = (img): void => window.electron.ipcRenderer.send('ocr-recognition', img)
@@ -401,7 +391,7 @@ export const useDrawStore = defineStore('draw', () => {
     const children = layerRef.value.getChildren()
     const nodes = children?.filter((child) => selectShapeId.value.includes(child._id))
     const tf = transformerRef.value?.getNode() as Konva.Transformer
-
+    // console.log('选中节点', nodes, nodes[0].className)
     if (nodes) {
       tf.nodes(nodes)
     }
@@ -509,7 +499,6 @@ export const useDrawStore = defineStore('draw', () => {
     toggleLoading,
     chooseImgFile,
     wheelHandler,
-    dynamicFontSize,
     shortcutKeyHandler,
     graffitiMode,
     modeType,

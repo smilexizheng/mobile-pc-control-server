@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useDrawStore } from '@renderer/store/draw'
 import { onMounted, onUnmounted, useTemplateRef } from 'vue'
+import { dynamicFontSize } from '@renderer/store/draw/utils'
 import Rectangles from '@renderer/views/Draw/konva/shapes/Rectangles.vue'
 import Circle from '@renderer/views/Draw/konva/shapes/Circle.vue'
 import Arrow from '@renderer/views/Draw/konva/shapes/Arrow.vue'
@@ -110,7 +111,7 @@ onUnmounted(() => {
                   :config="{
                     width: data.box[2][0] - data.box[0][0],
                     height: data.box[2][1] - data.box[0][1],
-                    fontSize: drawStore.dynamicFontSize(data.box[2][1] - data.box[0][1]),
+                    fontSize: dynamicFontSize(data.box[2][1] - data.box[0][1]),
                     fill: 'red',
                     text: data.text,
                     verticalAlign: 'middle',

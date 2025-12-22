@@ -2,7 +2,7 @@
 //
 import portAudio from 'naudiodon2'
 
-console.log(portAudio.getDevices())
+// console.log(portAudio.getDevices())
 
 import sherpa_onnx from 'sherpa-onnx'
 
@@ -56,7 +56,22 @@ ai.on('data', (data) => {
   }
 
   const isEndpoint = recognizer.isEndpoint(stream)
-  const text = recognizer.getResult(stream).text
+  let text = recognizer.getResult(stream).text
+
+  if (isEndpoint) {
+    // Add tail padding for Paraformer models to ensure the last word/character is recognized
+    const tailPaddingLength = 0.4 // Adjust if needed (0.3-0.5 seconds often works well)
+    const tailPadding = new Float32Array(
+      recognizer.config.featConfig.sampleRate * tailPaddingLength
+    )
+    stream.acceptWaveform(recognizer.config.featConfig.sampleRate, tailPadding)
+
+    while (recognizer.isReady(stream)) {
+      recognizer.decode(stream)
+    }
+
+    text = recognizer.getResult(stream).text // Get the updated result after padding
+  }
 
   if (text.length > 0 && lastText !== text) {
     lastText = text

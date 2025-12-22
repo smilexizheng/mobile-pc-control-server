@@ -2,6 +2,19 @@ import Konva from 'konva'
 import { useDrawStore } from '@renderer/store/draw/index'
 
 /**
+ * 根据Draw ID 返回解析的数据
+ * @param id
+ */
+const getDrawInfo = (id: string) => {
+  if (id.indexOf('draw') > -1) {
+    const ids = id.split('_')
+    return { isDraw: true, id, type: ids[1], index: ids[2] }
+  }
+
+  return { isDraw: false, id }
+}
+
+/**
  * 获取指针在 图像中的绝对坐标位置
  * @param e
  */
@@ -24,4 +37,15 @@ const getPos = <T>(
   }
 }
 
-export { getPos }
+/**
+ * 字体大小 = 容器高度 × 比例系数（推荐 0.4-0.6）
+ * @param boxHeight
+ */
+const dynamicFontSize = (boxHeight: number): number => {
+  return Math.max(
+    Math.min(Math.trunc(boxHeight * 0.4), 30), // 最大24px
+    12 // 最小8px
+  )
+}
+
+export { getPos, getDrawInfo, dynamicFontSize }

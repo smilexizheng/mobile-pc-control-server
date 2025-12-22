@@ -14,7 +14,7 @@ export const useDrawArrowStore = defineStore('draw-arrow', () => {
 
   const error = ref<string | null>(null)
 
-  const setShapeType = (type: ArrowType): void => {
+  const setShapeParams = (type: ArrowType): void => {
     arrowType.value = type
   }
 
@@ -110,7 +110,7 @@ export const useDrawArrowStore = defineStore('draw-arrow', () => {
     shapes,
     currentShape,
     error,
-    setShapeType,
+    setShapeParams,
     startDrawing,
     updateDrawing,
     endDrawing,

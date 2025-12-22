@@ -10,7 +10,7 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
   const currentRect = ref<RectangleConfig | null>(null)
 
   const error = ref<string | null>(null)
-  const setShapeType = (_): void => {}
+  const setShapeParams = (_): void => {}
 
   function startDrawing(e: Konva.KonvaPointerEvent): void {
     const pos = getPos(e)
@@ -97,7 +97,7 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
     rectangles,
     currentRect,
     error,
-    setShapeType,
+    setShapeParams,
     startDrawing,
     updateDrawing,
     endDrawing,
