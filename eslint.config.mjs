@@ -26,7 +26,15 @@ export default tseslint.config(
       '@eslint-react/no-prop-types': 'error',
       'import-zod/prefer-zod-namespace': 'error',
       'vue/require-default-prop': 'off',
-      'vue/multi-word-component-names': 'off'
+      'vue/multi-word-component-names': 'off',
+      'vue/block-lang': [
+        'error',
+        {
+          script: {
+            lang: 'ts'
+          }
+        }
+      ]
     }
   },
   eslintConfigPrettier

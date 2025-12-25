@@ -28,7 +28,7 @@
     "build:linux:x64": "npm run build && electron-builder --linux --x64"
   },
   "dependencies": {
-    "@electron-toolkit/preload": "^3.0.1",
+    "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "@ffprobe-installer/ffprobe": "2.1.2",
     "@nut-tree-fork/nut-js": "^4.2.6",
@@ -72,22 +72,23 @@
   "devDependencies": {
     "@arco-design/web-vue": "^2.57.0",
     "@electron-toolkit/eslint-config-prettier": "3.0.0",
-    "@electron-toolkit/eslint-config-ts": "^3.0.0",
-    "@electron-toolkit/tsconfig": "^1.0.1",
+    "@electron-toolkit/eslint-config-ts": "^3.1.0",
+    "@electron-toolkit/tsconfig": "^2.0.0",
+    "@types/node": "^22.19.1",
+    "@vitejs/plugin-vue": "^6.0.2",
+    "electron": "^39.2.7",
+    "electron-builder": "^26.0.12",
+    "electron-vite": "^5.0.0",
+    "eslint": "^9.39.1",
+    "eslint-plugin-vue": "^10.6.2",
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.6",
+    "vue": "^3.5.25",
+    "vue-eslint-parser": "^10.2.0",
+    "vue-tsc": "^3.1.6",
     "@types/express": "^5.0.1",
-    "@types/node": "^22.13.13",
     "@types/node-schedule": "^2.1.7",
-    "@types/socket.io-client": "^1.4.36",
-    "@vitejs/plugin-vue": "^5.2.3",
-    "electron": "^35.0.3",
-    "electron-builder": "^25.1.8",
-    "electron-vite": "^3.1.0",
-    "eslint": "^9.23.0",
-    "eslint-plugin-vue": "^9.33.0",
-    "prettier": "^3.5.3",
-    "typescript": "^5.8.2",
-    "vite": "^6.2.3",
-    "vue": "^3.5.13",
-    "vue-tsc": "^2.2.8"
+    "@types/socket.io-client": "^1.4.36"
   }
 }
