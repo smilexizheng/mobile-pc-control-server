@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, ref, h } from 'vue'
 import { Setting, ThemeType } from '../env'
 import { useStorage } from '@vueuse/core'
 import { useSocketStore } from '@renderer/store/socket'
-import { Message, Modal } from '@arco-design/web-vue'
+import { Message, Modal, Notification } from '@arco-design/web-vue'
+import dayjs from 'dayjs'
 
 export const useAppStore = defineStore('app', () => {
   const ipcRenderer = window.electron.ipcRenderer
@@ -15,7 +16,17 @@ export const useAppStore = defineStore('app', () => {
     Message.error('检查更新失败，稍后重试...')
   })
   ipcRenderer.on('updateAvailable', (_, info) => {
-    Message.success('发现新版本 v' + info.version)
+    Notification.success({
+      title: `新版本 v${info.version}`,
+      content: () =>
+        h(
+          'div',
+          { style: { whiteSpace: 'pre-line' } },
+          `${info.releaseNotes} 发布时间： ${dayjs(info.releaseDate).format('YYYY-MM-DD HH:mm:ss')}`
+        ),
+      closable: true,
+      duration: 10000
+    })
   })
   ipcRenderer.on('downloadProgress', (_, info) => {
     // 1. 文件大小换算
@@ -44,7 +55,7 @@ export const useAppStore = defineStore('app', () => {
   })
   ipcRenderer.on('updateDownloaded', (_, info) => {
     Modal.success({
-      title: '更新提示',
+      title: '安装',
       content: `v${info.version}准备就绪，点击确认开始安装`,
       onOk: () => {
         window.api.quitAndInstall()

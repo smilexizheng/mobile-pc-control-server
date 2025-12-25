@@ -20,7 +20,7 @@ const handleSubmit = (): void => {
 }
 
 const checkUpdate = async () => {
-  Message.info('更新中')
+  Message.info('检查更新...')
   await window.api.checkForUpdate()
 }
 </script>

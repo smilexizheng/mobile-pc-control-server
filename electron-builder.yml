@@ -66,18 +66,14 @@ publish:
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/
 releaseInfo:
-  releaseNotes: |
-    <!--NOTES:en-->
-    update v2
+  releaseNotes:
+    zh-CN: |
+      v2更新
+      修复bug:
+        - ocr文字识别以及消息发送的异常
+    en: |
+      update v2
+      Bug Fixes:
+        - Fixed ocr and chat
 
-    Bug Fixes:
-    - Fixed ocr and chat
-
-    <!--NOTES:zh-CN-->
-    v2更新
-
-    修复bug:
-    - ocr文字识别以及消息发送的异常
-
-    <!--NOTES:END-->
 

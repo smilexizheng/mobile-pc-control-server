@@ -6,12 +6,6 @@ import path from 'path'
 import { systemConfig } from './SystemConfig'
 import { generateUserAgent } from './systemInfo'
 
-// Language markers constants for multi-language release notes
-const LANG_MARKERS = {
-  EN_START: '<!--NOTES:en-->',
-  ZH_CN_START: '<!--NOTES:zh-CN-->',
-  END: '<!--NOTES:END-->'
-} as const
 export default class Updater {
   autoUpdater: AppUpdater = autoUpdater
   private updateCheckResult: UpdateCheckResult | null = null
@@ -106,79 +100,12 @@ export default class Updater {
     setImmediate(() => autoUpdater.quitAndInstall())
   }
 
-  /**
-   * Process release info to handle multi-language release notes
-   * @param releaseInfo - Original release info from updater
-   * @returns Processed release info with localized release notes
-   */
   private processReleaseInfo(releaseInfo: UpdateInfo): UpdateInfo {
     const processedInfo = { ...releaseInfo }
-
-    // Handle multi-language release notes in string format
-    if (releaseInfo.releaseNotes && typeof releaseInfo.releaseNotes === 'string') {
-      // Check if it contains multi-language markers
-      if (this.hasMultiLanguageMarkers(releaseInfo.releaseNotes)) {
-        processedInfo.releaseNotes = this.parseMultiLangReleaseNotes(releaseInfo.releaseNotes)
-      }
+    if (releaseInfo.releaseNotes && typeof releaseInfo.releaseNotes === 'object') {
+      const lang = 'zh-CN'
+      processedInfo.releaseNotes = releaseInfo.releaseNotes[lang]
     }
-
     return processedInfo
-  }
-
-  /**
-   * Check if release notes contain multi-language markers
-   */
-  private hasMultiLanguageMarkers(releaseNotes: string): boolean {
-    return releaseNotes.includes(LANG_MARKERS.EN_START)
-  }
-
-  /**
-   * Parse multi-language release notes and return the appropriate language version
-   * @param releaseNotes - Release notes string with language markers
-   * @returns Parsed release notes for the user's language
-   *
-   * Expected format:
-   * <!--LANG:en-->English content<!--LANG:zh-CN-->Chinese content<!--LANG:END-->
-   */
-  private parseMultiLangReleaseNotes(releaseNotes: string): string {
-    try {
-      const language = 'zh-CN'
-      const isChineseUser = language === 'zh-CN' || language === 'zh-TW'
-
-      // Create regex patterns using constants
-      const enPattern = new RegExp(
-        `${LANG_MARKERS.EN_START.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([\\s\\S]*?)${LANG_MARKERS.ZH_CN_START.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`
-      )
-      const zhPattern = new RegExp(
-        `${LANG_MARKERS.ZH_CN_START.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([\\s\\S]*?)${LANG_MARKERS.END.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`
-      )
-
-      // Extract language sections
-      const enMatch = releaseNotes.match(enPattern)
-      const zhMatch = releaseNotes.match(zhPattern)
-
-      // Return appropriate language version with proper fallback
-      if (isChineseUser && zhMatch) {
-        return zhMatch[1].trim()
-      } else if (enMatch) {
-        return enMatch[1].trim()
-      } else {
-        // Clean fallback: remove all language markers
-        log.warn('Failed to extract language-specific release notes, using cleaned fallback')
-        return releaseNotes
-          .replace(
-            new RegExp(
-              `${LANG_MARKERS.EN_START}|${LANG_MARKERS.ZH_CN_START}|${LANG_MARKERS.END}`,
-              'g'
-            ),
-            ''
-          )
-          .trim()
-      }
-    } catch (error) {
-      log.error('Failed to parse multi-language release notes', error as Error)
-      // Return original notes as safe fallback
-      return releaseNotes
-    }
   }
 }
