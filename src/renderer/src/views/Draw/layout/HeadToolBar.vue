@@ -123,8 +123,8 @@ const operation = ref([
       >
         <template #icon>
           <Circle v-if="item.shape === 'circle'" />
-          <MoveUpRight v-else-if="item.shape === 'arrow' && item.type === 'straight'" />
-          <Redo v-else-if="item.shape === 'arrow' && item.type === 'curved'" />
+          <MoveUpRight v-else-if="item.shape === 'arrow' && item.shapeParam === 'straight'" />
+          <Redo v-else-if="item.shape === 'arrow' && item.shapeParam === 'curved'" />
           <RectangleHorizontal v-else /> </template
       ></a-button>
 
