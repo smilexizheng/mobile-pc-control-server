@@ -4,7 +4,7 @@ import { Setting } from '../env'
 import { useAppStore } from '../store/app'
 import Versions from '@renderer/components/Versions.vue'
 import { CircleArrowUp } from 'lucide-vue-next'
-import { Message } from '@arco-design/web-vue'
+import { Notification } from '@arco-design/web-vue'
 const appStore = useAppStore()
 const settingForm = ref<Setting>({
   token: '',
@@ -20,7 +20,11 @@ const handleSubmit = (): void => {
 }
 
 const checkUpdate = async () => {
-  Message.info('检查更新...')
+  Notification.info({
+    id: 'updateNotion',
+    content: '检查更新中',
+    duration: 0
+  })
   await window.api.checkForUpdate()
 }
 </script>

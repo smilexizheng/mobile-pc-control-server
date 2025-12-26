@@ -10,13 +10,22 @@ export const useAppStore = defineStore('app', () => {
   const ipcRenderer = window.electron.ipcRenderer
   const isMaximize = ref(false)
   ipcRenderer.on('updateNotAvailable', () => {
-    Message.success('当前为最新版本')
+    Notification.success({
+      id: 'updateNotion',
+      content: '当前为最新版本',
+      duration: 2000
+    })
   })
   ipcRenderer.on('updateError', () => {
-    Message.error('检查更新失败，稍后重试...')
+    Notification.error({
+      id: 'updateNotion',
+      content: '检查更新失败，稍后重试...',
+      duration: 2000
+    })
   })
   ipcRenderer.on('updateAvailable', (_, info) => {
     Notification.success({
+      id: 'updateNotion',
       title: `新版本 v${info.version}`,
       content: () =>
         h(
@@ -49,14 +58,14 @@ export const useAppStore = defineStore('app', () => {
     const calculatedPercent = ((info.transferred / info.total) * 100).toFixed(2) // 11.35%
     Message.info({
       id: 'updateDownloadProgress',
-      content: `下载进度 ${calculatedPercent}%-${speedMBps.toFixed(2)}MB/s`,
+      content: `下载更新 ${calculatedPercent}%   ${speedMBps.toFixed(2)}MB/s`,
       duration: 2000
     })
   })
   ipcRenderer.on('updateDownloaded', (_, info) => {
     Modal.success({
       title: '安装',
-      content: `v${info.version}准备就绪，点击确认开始安装`,
+      content: `新版本 v${info.version}准备就绪，点击确认开始安装`,
       onOk: () => {
         window.api.quitAndInstall()
       }
