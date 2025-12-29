@@ -12,6 +12,15 @@ export const useDrawArrowStore = defineStore('draw-arrow', () => {
   const shapes = ref<ArrowConfig[]>([])
   const currentShape = ref<ArrowConfig | null>(null)
 
+  const defaultShapeConfig = ref({
+    draggable: true,
+    pointerLength: 5,
+    pointerWidth: 5,
+    fill: '#0da7fa',
+    stroke: '#0da7fa',
+    strokeWidth: 1.5
+  })
+
   const error = ref<string | null>(null)
 
   const setShapeParams = (type: ArrowType): void => {
@@ -68,7 +77,7 @@ export const useDrawArrowStore = defineStore('draw-arrow', () => {
             break
         }
 
-        shapes.value.push({ ...currentShape.value })
+        shapes.value.push({ ...defaultShapeConfig.value, ...currentShape.value })
       }
       resetDrawing()
     } catch (err) {
@@ -105,6 +114,15 @@ export const useDrawArrowStore = defineStore('draw-arrow', () => {
   const handleDragEnd = (e) => {
     console.log(e)
   }
+  function updateConfig(index: number, config): void {
+    if (index >= shapes.value.length) return
+    shapes.value[index] = { ...shapes.value[index], ...config }
+  }
+
+  function getShapeConfig(index: number): Konva.ShapeConfig {
+    if (index >= shapes.value.length) return {}
+    return shapes.value[index]
+  }
   return {
     TYPE,
     shapes,
@@ -116,6 +134,8 @@ export const useDrawArrowStore = defineStore('draw-arrow', () => {
     endDrawing,
     resetDrawing,
     handleError,
+    getShapeConfig,
+    updateConfig,
     remove,
     removeAll,
     handleDragStart,

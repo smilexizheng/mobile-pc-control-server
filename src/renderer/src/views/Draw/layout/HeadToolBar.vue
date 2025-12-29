@@ -128,7 +128,11 @@ const operation = ref([
           <RectangleHorizontal v-else /> </template
       ></a-button>
 
-      <a-trigger trigger="click" :unmount-on-close="false">
+      <a-trigger
+        v-if="drawStore.selectShapeId.length === 1"
+        trigger="click"
+        :unmount-on-close="false"
+      >
         <a-button :size="size">配置</a-button>
         <template #content>
           <div class="base-shape-div"><ShapeConfig /></div

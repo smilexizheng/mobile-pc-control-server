@@ -21,6 +21,10 @@ export interface IChildDrawStore {
   removeAll(): void
   // 使同个store实现不同的绘制特性， 例如 箭头  直线箭头  曲线箭头，矩形  正方形  长方形
   setShapeParams(type: string | object): void
+  //获取当前参数设置
+  getShapeConfig(id: number): Konva.ShapeConfig
+  // 参数设置图形样式
+  updateConfig(id: number, config): void
 }
 
 // 矩形框参数

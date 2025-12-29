@@ -9,13 +9,7 @@ const drawStore = useDrawArrowStore()
     v-for="(config, index) in drawStore.shapes"
     :key="`${drawStore.TYPE}_` + index"
     :config="{
-      draggable: true,
       id: `${drawStore.TYPE}_` + index,
-      pointerLength: 5,
-      pointerWidth: 5,
-      fill: '#0da7fa',
-      stroke: '#0da7fa',
-      strokeWidth: 1.5,
       ...config
     }"
   />

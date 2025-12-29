@@ -12,7 +12,6 @@ const chatContent = ref<HTMLDivElement>()
 
 // Auto-scroll to bottom when messages
 watch(socketStore.userMessage, () => {
-  // console.log('更新了')
   nextTick(() => {
     chatContent.value?.scrollIntoView({ block: 'end', behavior: 'instant' })
   })

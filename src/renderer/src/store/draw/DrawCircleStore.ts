@@ -10,7 +10,12 @@ export const useDrawCircleStore = defineStore('draw-circle', () => {
   const shapes = ref<CircleConfig[]>([])
   const currentShape = ref<CircleConfig | null>(null)
   const error = ref<string | null>(null)
-
+  const defaultShapeConfig = ref({
+    draggable: true,
+    fill: '#00D2FF40',
+    stroke: '#0da7fa',
+    strokeWidth: 1.5
+  })
   const setShapeParams = (_): void => {}
 
   function startDrawing(e: Konva.KonvaPointerEvent): void {
@@ -54,7 +59,7 @@ export const useDrawCircleStore = defineStore('draw-circle', () => {
         return
       }
       if (currentShape.value.radius! > 10) {
-        shapes.value.push({ ...currentShape.value })
+        shapes.value.push({ ...defaultShapeConfig.value, ...currentShape.value })
       }
       resetDrawing()
     } catch (err) {
@@ -74,6 +79,16 @@ export const useDrawCircleStore = defineStore('draw-circle', () => {
   function removeAll(): void {
     resetDrawing()
     shapes.value = []
+  }
+
+  function updateConfig(index: number, config): void {
+    if (index >= shapes.value.length) return
+    shapes.value[index] = { ...shapes.value[index], ...config }
+  }
+
+  function getShapeConfig(index: number): Konva.ShapeConfig {
+    if (index >= shapes.value.length) return {}
+    return shapes.value[index]
   }
 
   function handleError(err: unknown): void {
@@ -101,6 +116,8 @@ export const useDrawCircleStore = defineStore('draw-circle', () => {
     updateDrawing,
     endDrawing,
     resetDrawing,
+    getShapeConfig,
+    updateConfig,
     handleError,
     remove,
     removeAll,

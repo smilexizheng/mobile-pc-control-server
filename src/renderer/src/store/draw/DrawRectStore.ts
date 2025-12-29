@@ -11,7 +11,12 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
 
   const error = ref<string | null>(null)
   const setShapeParams = (_): void => {}
-
+  const defaultShapeConfig = ref({
+    draggable: true,
+    fill: '#00D2FF40',
+    stroke: '#0da7fa',
+    strokeWidth: 1.5
+  })
   function startDrawing(e: Konva.KonvaPointerEvent): void {
     const pos = getPos(e)
     try {
@@ -55,7 +60,7 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
         return
       }
       if (currentRect.value.width! > 10 && currentRect.value.height! > 10) {
-        rectangles.value.push({ ...currentRect.value })
+        rectangles.value.push({ ...defaultShapeConfig.value, ...currentRect.value })
       }
       resetDrawing()
     } catch (err) {
@@ -92,6 +97,16 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
   const handleDragEnd = (e) => {
     console.log(e)
   }
+
+  function updateConfig(index: number, config): void {
+    if (index >= rectangles.value.length) return
+    rectangles.value[index] = { ...rectangles.value[index], ...config }
+  }
+
+  function getShapeConfig(index: number): Konva.ShapeConfig {
+    if (index >= rectangles.value.length) return {}
+    return rectangles.value[index]
+  }
   return {
     TYPE,
     rectangles,
@@ -103,6 +118,8 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
     endDrawing,
     resetDrawing,
     handleError,
+    getShapeConfig,
+    updateConfig,
     remove,
     removeAll,
     handleDragStart,

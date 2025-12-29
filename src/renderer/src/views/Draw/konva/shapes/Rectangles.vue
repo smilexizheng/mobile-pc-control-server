@@ -9,12 +9,8 @@ const rectStore = useDrawRectStore()
     v-for="(rect, index) in rectStore.rectangles"
     :key="`${rectStore.TYPE}_` + index"
     :config="{
-      ...rect,
-      draggable: true,
       id: `${rectStore.TYPE}_` + index,
-      fill: '#00D2FF40',
-      stroke: '#0da7fa',
-      strokeWidth: 1.5
+      ...rect
     }"
     @onDragStart="rectStore.handleDragStart"
     @onDragEnd="rectStore.handleDragEnd"

@@ -14,6 +14,14 @@ const getDrawInfo = (id: string) => {
   return { isDraw: false, id }
 }
 
+const getChildrenById = (layer: Konva.Layer | null | undefined, ids: number[]) => {
+  if (layer && ids) {
+    const children = layer.getChildren()
+    return children?.filter((child) => ids.includes(child._id))
+  }
+  return []
+}
+
 /**
  * 获取指针在 图像中的绝对坐标位置
  * @param e
@@ -48,4 +56,4 @@ const dynamicFontSize = (boxHeight: number): number => {
   )
 }
 
-export { getPos, getDrawInfo, dynamicFontSize }
+export { getPos, getChildrenById, getDrawInfo, dynamicFontSize }

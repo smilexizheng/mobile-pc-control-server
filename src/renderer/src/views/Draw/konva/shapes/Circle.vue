@@ -9,11 +9,7 @@ const drawStore = useDrawCircleStore()
     v-for="(config, index) in drawStore.shapes"
     :key="`${drawStore.TYPE}_` + index"
     :config="{
-      draggable: true,
-      fill: '#00D2FF40',
       id: `${drawStore.TYPE}_` + index,
-      stroke: '#0da7fa',
-      strokeWidth: 1.5,
       ...config
     }"
   />

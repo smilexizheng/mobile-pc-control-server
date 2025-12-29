@@ -13,7 +13,7 @@ import { KonvaExportUtil } from './konva/KonvaExportUtil'
 import { DrawMode, WH, IChildDrawStore, ShapeType } from '@renderer/store/draw/type'
 import { useDrawCircleStore } from '@renderer/store/draw/DrawCircleStore'
 import { useDrawArrowStore } from '@renderer/store/draw/DrawArrowStore'
-import { getDrawInfo } from '@renderer/store/draw/utils'
+import { getChildrenById, getDrawInfo } from '@renderer/store/draw/utils'
 
 type ChildStoreGetter = () => IChildDrawStore
 
@@ -27,6 +27,36 @@ export const useDrawStore = defineStore('draw', () => {
   const { x: divScrollX, y: divScrollY } = useScroll(scrollRef)
 
   const selectShapeId = ref<Array<number>>([])
+
+  const shapeConfig = ref({
+    x: 0,
+    y: 0,
+    fill: '#ffffff',
+    stroke: '#000000',
+    strokeWidth: 1,
+    opacity: 1,
+    draggable: true,
+    visible: true
+    // width: 0,
+    // height: 0,
+    // strokeScaleEnabled: true
+    // rotation: 0,
+    // scaleX: 1,
+    // scaleY: 1,
+    // lineJoin: 'miter',
+    // lineCap: 'butt',
+    // shadowColor: '#000000',
+    // shadowBlur: 0,
+    // shadowOffsetX: 0,
+    // shadowOffsetY: 0,
+    // shadowOpacity: 1,
+    // dash: '',
+    // dashOffset: 0,
+    // cornerRadius: 0,
+    // fillPatternRepeat: 'repeat',
+    // shadowEnabled: true
+  })
+
   const layerRef = ref<Konva.Layer | null>()
 
   const modeType: Array<DrawMode> = [
@@ -112,6 +142,22 @@ export const useDrawStore = defineStore('draw', () => {
   useResizeObserver(mainLayerRef, (): void => {
     calcScale()
   })
+
+  watch(
+    shapeConfig,
+    (v) => {
+      const nodes = getChildrenById(layerRef.value, selectShapeId.value)
+
+      nodes.forEach((node) => {
+        const info = getDrawInfo(node.attrs.id)
+
+        if (info.isDraw) {
+          storeMap[info.type!]()?.updateConfig(info.index, v)
+        }
+      })
+    },
+    { deep: true }
+  )
 
   const calcScale = (): void => {
     if (mainLayerRef.value) {
@@ -355,7 +401,7 @@ export const useDrawStore = defineStore('draw', () => {
   // 鼠标点击
   const stageClick = (e: Konva.KonvaPointerEvent): void => {
     const layer = e.target.getLayer()
-    console.log(e.target.attrs.id)
+    // console.log(e.target.attrs.id)
     // if clicked  on  rectangles
     if (e.target.attrs.id && e.target.attrs.id.indexOf('draw') > -1) {
       layerRef.value = layer
@@ -394,6 +440,16 @@ export const useDrawStore = defineStore('draw', () => {
     // console.log('选中节点', nodes, nodes[0].className)
     if (nodes) {
       tf.nodes(nodes)
+    }
+
+    // 目前仅支持 单独配置图形
+    if (nodes?.length === 1) {
+      const drawInfo = getDrawInfo(nodes[0].attrs.id)
+      if (drawInfo.isDraw) {
+        shapeConfig.value = {
+          ...storeMap[drawInfo.type!]()?.getShapeConfig(drawInfo.index)
+        }
+      }
     }
   })
 
@@ -465,9 +521,9 @@ export const useDrawStore = defineStore('draw', () => {
     const layer = stage.getLayers()
     if (!layer) return
     let dataUrl: Blob
-    ;(options.bgWidth = image.value?.width || mainLayerWH.value.width),
+    ;((options.bgWidth = image.value?.width || mainLayerWH.value.width),
       (options.bgHeight = image.value?.height || mainLayerWH.value.height),
-      (options.realScale = realScale.value)
+      (options.realScale = realScale.value))
     options.layerConfig = layerConfig.value
     if (options.exportType === 'full') {
       dataUrl = await KonvaExportUtil.exportFullContent(stage, layer, options)
@@ -481,6 +537,7 @@ export const useDrawStore = defineStore('draw', () => {
   }
 
   return {
+    shapeConfig,
     setRefs,
     scale,
     realScale,
@@ -492,6 +549,7 @@ export const useDrawStore = defineStore('draw', () => {
     showOcr,
     isLoading,
     layerConfig,
+    selectShapeId,
     copyText,
     ocrScreenshots,
     copyAllText,
