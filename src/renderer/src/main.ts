@@ -8,6 +8,7 @@ import router from './router'
 import { createPinia } from 'pinia'
 import VueKonva from 'vue-konva'
 import '@arco-design/web-vue/dist/arco.css'
+import 'animate.css'
 
 createApp(App)
   .use(ArcoVue)

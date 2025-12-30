@@ -60,7 +60,7 @@ watch(
       </a-tooltip>
 
       <a-input-group>
-        <a-typography-text> 远程设备： </a-typography-text>
+        <a-typography-text> 本地查看/远程设备： </a-typography-text>
         <a-input
           v-model="remoteStore.deviceCode"
           :style="{ width: '150px' }"

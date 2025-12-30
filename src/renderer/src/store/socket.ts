@@ -6,7 +6,9 @@ import { Message } from '@arco-design/web-vue'
 import Socket = SocketIOClient.Socket
 import { Notification } from '@arco-design/web-vue'
 import { UserMessage } from '../env'
+import { useRouter } from 'vue-router'
 export const useSocketStore = defineStore('socket-io', () => {
+  const router = useRouter()
   const socket = ref<Socket | null>(null)
   const isConnected = ref(false)
   // 在线的socket用户对象
@@ -48,6 +50,8 @@ export const useSocketStore = defineStore('socket-io', () => {
 
           socket.value?.on('chat-message', (data) => {
             const { form } = data
+            activeClient.value = onlineSocketUser.value[form]
+            router.push('/chat')
             Notification.info({
               content: `收到消息 ${data.content || data.fileName}`
             })

@@ -64,7 +64,7 @@ const showItemInFolder = (fileId) => {
         <template v-for="id in socketStore.onlineSocketIds" :key="id">
           <a-list-item
             v-if="id !== socketStore.socket?.id"
-            :class="{ 'active-item': id === socketStore.activeClient?.id }"
+            :class="{ 'active-item ': id === socketStore.activeClient?.id }"
             @click="selectChat(id)"
           >
             <template #extra>
@@ -216,6 +216,9 @@ const showItemInFolder = (fileId) => {
 
 .active-item {
   background-color: var(--color-fill-2);
+
+  animation: headShake; /* referring directly to the animation's @keyframe declaration */
+  animation-duration: 1s; /* don't forget to set a duration! */
 }
 
 .message-time {

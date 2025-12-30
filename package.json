@@ -33,6 +33,7 @@
     "@ffprobe-installer/ffprobe": "2.1.2",
     "@nut-tree-fork/nut-js": "^4.2.6",
     "@vueuse/core": "^13.1.0",
+    "animate.css": "^4.1.1",
     "dayjs": "^1.11.13",
     "electron-log": "^5.3.2",
     "electron-screenshots": "^0.5.27",
@@ -74,7 +75,10 @@
     "@electron-toolkit/eslint-config-prettier": "3.0.0",
     "@electron-toolkit/eslint-config-ts": "^3.1.0",
     "@electron-toolkit/tsconfig": "^2.0.0",
+    "@types/express": "^5.0.1",
     "@types/node": "^22.19.1",
+    "@types/node-schedule": "^2.1.7",
+    "@types/socket.io-client": "^1.4.36",
     "@vitejs/plugin-vue": "^6.0.2",
     "electron": "^39.2.7",
     "electron-builder": "^26.0.12",
@@ -86,9 +90,6 @@
     "vite": "^7.2.6",
     "vue": "^3.5.25",
     "vue-eslint-parser": "^10.2.0",
-    "vue-tsc": "^3.1.6",
-    "@types/express": "^5.0.1",
-    "@types/node-schedule": "^2.1.7",
-    "@types/socket.io-client": "^1.4.36"
+    "vue-tsc": "^3.1.6"
   }
 }
