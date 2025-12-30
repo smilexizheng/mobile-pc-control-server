@@ -12,8 +12,8 @@ export const useDrawCircleStore = defineStore('draw-circle', () => {
   const error = ref<string | null>(null)
   const defaultShapeConfig = ref({
     draggable: true,
-    fill: '#00D2FF40',
-    stroke: '#0da7fa',
+    fill: '#00D2FFB5',
+    stroke: '#0D44FAFF',
     strokeWidth: 1.5
   })
   const setShapeParams = (_): void => {}

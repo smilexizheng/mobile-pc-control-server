@@ -193,19 +193,29 @@ export const useDrawStore = defineStore('draw', () => {
       ocrImage(path)
     },
     delete: () => {
-      if (layerRef.value && selectShapeId.value) {
-        const children = layerRef.value.getChildren()
-        const nodes = children?.filter((child) => selectShapeId.value.includes(child._id))
+      const nodes = getChildrenById(layerRef.value, selectShapeId.value)
+      const delMap = new Map()
 
-        nodes.forEach((node) => {
-          const info = getDrawInfo(node.attrs.id)
-          if (info.isDraw) {
-            storeMap[info.type!]()?.remove(info.index)
+      nodes.forEach((node) => {
+        const info = getDrawInfo(node.attrs.id)
+        if (info?.isDraw) {
+          // Optional chaining for safety
+          const type = info.type
+          if (type) {
+            // Explicit check to avoid undefined keys
+            if (!delMap.has(type)) {
+              delMap.set(type, [])
+            }
+            delMap.get(type).push(info.index)
           }
-        })
-        selectShapeId.value = []
-        layerRef.value.draw()
+        }
+      })
+
+      for (const [key, indices] of delMap) {
+        indices.sort((a, b) => b - a)
+        indices.forEach((i) => storeMap[key]()?.remove(i))
       }
+      selectShapeId.value = []
     }
   })
 

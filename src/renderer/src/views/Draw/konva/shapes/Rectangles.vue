@@ -6,7 +6,7 @@ const rectStore = useDrawRectStore()
 <template>
   <!-- 已完成的矩形 -->
   <k-rect
-    v-for="(rect, index) in rectStore.rectangles"
+    v-for="(rect, index) in rectStore.shapes"
     :key="`${rectStore.TYPE}_` + index"
     :config="{
       id: `${rectStore.TYPE}_` + index,

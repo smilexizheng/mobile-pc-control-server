@@ -6,15 +6,15 @@ import Konva from 'konva'
 
 export const useDrawRectStore = defineStore('draw-rect', () => {
   const TYPE = 'draw_rect'
-  const rectangles = ref<RectangleConfig[]>([])
+  const shapes = ref<RectangleConfig[]>([])
   const currentRect = ref<RectangleConfig | null>(null)
 
   const error = ref<string | null>(null)
   const setShapeParams = (_): void => {}
   const defaultShapeConfig = ref({
     draggable: true,
-    fill: '#00D2FF40',
-    stroke: '#0da7fa',
+    fill: '#00D2FFB5',
+    stroke: '#0D44FAFF',
     strokeWidth: 1.5
   })
   function startDrawing(e: Konva.KonvaPointerEvent): void {
@@ -60,7 +60,7 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
         return
       }
       if (currentRect.value.width! > 10 && currentRect.value.height! > 10) {
-        rectangles.value.push({ ...defaultShapeConfig.value, ...currentRect.value })
+        shapes.value.push({ ...defaultShapeConfig.value, ...currentRect.value })
       }
       resetDrawing()
     } catch (err) {
@@ -74,12 +74,12 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
 
   function remove(index: number): void {
     resetDrawing()
-    rectangles.value.splice(index, 1)
+    shapes.value.splice(index, 1)
   }
 
   function removeAll(): void {
     resetDrawing()
-    rectangles.value = []
+    shapes.value = []
   }
 
   function handleError(err: unknown): void {
@@ -99,17 +99,17 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
   }
 
   function updateConfig(index: number, config): void {
-    if (index >= rectangles.value.length) return
-    rectangles.value[index] = { ...rectangles.value[index], ...config }
+    if (index >= shapes.value.length) return
+    shapes.value[index] = { ...shapes.value[index], ...config }
   }
 
   function getShapeConfig(index: number): Konva.ShapeConfig {
-    if (index >= rectangles.value.length) return {}
-    return rectangles.value[index]
+    if (index >= shapes.value.length) return {}
+    return shapes.value[index]
   }
   return {
     TYPE,
-    rectangles,
+    shapes,
     currentRect,
     error,
     setShapeParams,
