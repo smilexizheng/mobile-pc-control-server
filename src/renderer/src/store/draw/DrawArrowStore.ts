@@ -18,7 +18,7 @@ export const useDrawArrowStore = defineStore('draw-arrow', () => {
     pointerWidth: 5,
     fill: '#0da7fa',
     stroke: '#0da7fa',
-    strokeWidth: 1.5
+    strokeWidth: 3
   })
 
   const error = ref<string | null>(null)
@@ -27,11 +27,10 @@ export const useDrawArrowStore = defineStore('draw-arrow', () => {
     arrowType.value = type
   }
 
-  function startDrawing(e: Konva.KonvaPointerEvent): void {
-    const pos = getPos(e)
+  function startDrawing(): void {
     try {
       currentShape.value = {
-        points: [pos.x, pos.y]
+        points: []
       }
       error.value = null
     } catch (err) {

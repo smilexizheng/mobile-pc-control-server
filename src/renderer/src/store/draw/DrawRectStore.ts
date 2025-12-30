@@ -13,9 +13,9 @@ export const useDrawRectStore = defineStore('draw-rect', () => {
   const setShapeParams = (_): void => {}
   const defaultShapeConfig = ref({
     draggable: true,
-    fill: '#00D2FFB5',
-    stroke: '#0D44FAFF',
-    strokeWidth: 1.5
+    fill: 'rgba(255,255,255,0.25)',
+    stroke: '#ED4034',
+    strokeWidth: 2
   })
   function startDrawing(e: Konva.KonvaPointerEvent): void {
     const pos = getPos(e)

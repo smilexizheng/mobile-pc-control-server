@@ -50,6 +50,17 @@ const fillPatternRepeatOptions = [
   { label: 'Repeat-Y', value: 'repeat-y' },
   { label: 'No-Repeat', value: 'no-repeat' }
 ]
+
+const history = ref(['#FFFFFF00'])
+const addHistory = (visible, color) => {
+  if (!visible) {
+    const index = history.value.indexOf(color)
+    if (index !== -1) {
+      history.value.splice(index, 1)
+    }
+    history.value.unshift(color)
+  }
+}
 </script>
 
 <template>
@@ -60,26 +71,29 @@ const fillPatternRepeatOptions = [
     size="mini"
     :style="{ width: '200px' }"
   >
-    <a-form-item label="X 位置" field="x">
-      <a-input-number v-model="drawStore.shapeConfig.x" :step="1" />
-    </a-form-item>
-    <a-form-item label="Y 位置" field="y">
-      <a-input-number v-model="drawStore.shapeConfig.y" :step="1" />
-    </a-form-item>
-    <!--    <a-form-item label="宽度" field="width">-->
-    <!--      <a-input-number v-model="drawStore.shapeConfig.width" :step="1" :min="0" />-->
-    <!--    </a-form-item>-->
-    <!--    <a-form-item label="高度" field="height">-->
-    <!--      <a-input-number v-model="drawStore.shapeConfig.height" :step="1" :min="0" />-->
-    <!--    </a-form-item>-->
-    <a-form-item label="填充颜色" field="fill">
-      <a-color-picker v-model="drawStore.shapeConfig.fill" />
-    </a-form-item>
-    <a-form-item label="描边颜色" field="stroke">
-      <a-color-picker v-model="drawStore.shapeConfig.stroke" />
+    <a-form-item label="背景/边框">
+      <a-color-picker
+        v-model="drawStore.shapeConfig.fill"
+        :historyColors="history"
+        showHistory
+        showPreset
+        @popup-visible-change="addHistory"
+      />
+      <a-color-picker
+        v-model="drawStore.shapeConfig.stroke"
+        :historyColors="history"
+        showHistory
+        showPreset
+        @popup-visible-change="addHistory"
+      />
     </a-form-item>
     <a-form-item label="描边宽度" field="strokeWidth">
-      <a-input-number v-model="drawStore.shapeConfig.strokeWidth" :step="0.1" :min="0" />
+      <a-input-number
+        v-model="drawStore.shapeConfig.strokeWidth"
+        :step="1"
+        :min="0"
+        mode="button"
+      />
     </a-form-item>
     <a-form-item label="不透明度" field="opacity">
       <a-slider v-model="drawStore.shapeConfig.opacity" :min="0" :max="1" :step="0.01" />
@@ -90,6 +104,18 @@ const fillPatternRepeatOptions = [
     <a-form-item label="可见性" field="visible">
       <a-switch v-model="drawStore.shapeConfig.visible" disabled />
     </a-form-item>
+    <a-form-item label="X 位置" field="x">
+      <a-input-number v-model="drawStore.shapeConfig.x" :step="1" mode="button" />
+    </a-form-item>
+    <a-form-item label="Y 位置" field="y">
+      <a-input-number v-model="drawStore.shapeConfig.y" :step="1" mode="button" />
+    </a-form-item>
+    <!--    <a-form-item label="宽度" field="width">-->
+    <!--      <a-input-number v-model="drawStore.shapeConfig.width" :step="1" :min="0" />-->
+    <!--    </a-form-item>-->
+    <!--    <a-form-item label="高度" field="height">-->
+    <!--      <a-input-number v-model="drawStore.shapeConfig.height" :step="1" :min="0" />-->
+    <!--    </a-form-item>-->
     <!--    <a-form-item label="旋转角度 (度)" field="rotation">-->
     <!--      <a-input-number v-model="drawStore.shapeConfig.rotation" :step="1" />-->
     <!--    </a-form-item>-->
@@ -145,4 +171,9 @@ const fillPatternRepeatOptions = [
   </a-form>
 </template>
 
-<style></style>
+<style scoped>
+:deep(.arco-form-item) {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+</style>

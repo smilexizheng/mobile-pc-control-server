@@ -411,6 +411,7 @@ export const useDrawStore = defineStore('draw', () => {
   // 鼠标点击
   const stageClick = (e: Konva.KonvaPointerEvent): void => {
     const layer = e.target.getLayer()
+
     // console.log(e.target.attrs.id)
     // if clicked  on  rectangles
     if (e.target.attrs.id && e.target.attrs.id.indexOf('draw') > -1) {

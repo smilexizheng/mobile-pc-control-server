@@ -145,7 +145,7 @@ const operation = ref([
 <style scoped>
 .base-shape-div {
   width: 240px;
-  height: 450px;
+  height: 260px;
   background: var(--color-bg-1);
   overflow-y: auto;
 }
