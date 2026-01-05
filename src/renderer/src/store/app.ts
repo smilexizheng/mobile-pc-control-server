@@ -31,7 +31,7 @@ export const useAppStore = defineStore('app', () => {
         h(
           'div',
           { style: { whiteSpace: 'pre-line' } },
-          `${info.releaseNotes} 发布时间： ${dayjs(info.releaseDate).format('YYYY-MM-DD HH:mm:ss')}`
+          `${info.releaseNotes} \n发布时间： ${dayjs(info.releaseDate).format('YYYY-MM-DD HH:mm')}`
         ),
       closable: true,
       duration: 10000

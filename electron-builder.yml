@@ -5,9 +5,6 @@ directories:
 electronLanguages:
   - zh-CN
   - en-US
-  - zh_CN
-  - zh_TW
-  - en
 files:
   - "**/*"
   - "!**/{.vscode,.yarn,.yarn-lock,.github,.cursorrules,.prettierrc}"
@@ -66,14 +63,13 @@ publish:
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/
 releaseInfo:
-  releaseNotes:
-    zh-CN: |
-      v2更新
-      修复bug:
-        - ocr文字识别以及消息发送的异常
-    en: |
-      update v2
-      Bug Fixes:
-        - Fixed ocr and chat
-
-
+  releaseNotes: |
+    v2更新
+    ......
+#    https://www.electron.build/configuration#releaseinfo null | string
+#    zh-CN: |
+#      v2更新
+#    en: |
+#      update v2
+#
+#
