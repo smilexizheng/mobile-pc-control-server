@@ -117,10 +117,10 @@ const grabRegion = async (mouseX, mouseY, captureWidth, captureHeight): Promise<
     throw new Error('鼠标不在任何已知显示器区域内')
   }
   // 解析显示器参数（根据实际数据结构调整属性名）
-  const displayX = monitor.x
-  const displayY = monitor.y
-  const displayWidth = monitor.width
-  const displayHeight = monitor.height
+  const displayX = monitor.x()
+  const displayY = monitor.y()
+  const displayWidth = monitor.width()
+  const displayHeight = monitor.height()
 
   // 检查显示器是否足够大
   if (displayWidth < captureWidth || displayHeight < captureHeight) {
@@ -159,10 +159,20 @@ const grabRegion = async (mouseX, mouseY, captureWidth, captureHeight): Promise<
     }
   }
 
+  console.log(
+    left,
+    mouseX,
+    mouseX - captureWidth / 2,
+    startX,
+    captureWidth,
+    mouseX,
+    startX + captureWidth / 2 - mouseX
+  )
+
   // return {left,right,top,bottom
   //     ,buffer: (await img.crop(startX < 0 ? monitor.width - (Math.abs(startX)) : startX, startY, captureWidth, captureHeight)).toJpegSync()};
 
-  startX = Math.round(startX < 0 ? monitor.width - Math.abs(startX) : startX)
+  startX = Math.round(startX < 0 ? displayWidth - Math.abs(startX) : startX)
   startY = Math.round(startY)
   return {
     left,

@@ -3,28 +3,23 @@ import upath from 'upath'
 import { getAppIcon } from '../utils/common'
 import { is } from '@electron-toolkit/utils'
 
-ipcMain.on('openWindow', (_, { id, url, title, option }) => {
+ipcMain.on('openWindow', (event, { id, url, title, option }) => {
   console.log(`openWindow ${id} ${url}`)
-  createWindow(id, url, title, option)
+  createWindow(event, id, url, title, option)
 })
 
 ipcMain.on('openRemoteWindow', (event, { id, url, title, option }) => {
   console.log(`openRemoteWindow ${id} ${url}`)
-
-  if (global.childWindow[id]) {
-    global.childWindow[id].show()
-    return
-  }
+  console.error(`openRemoteWindow ${id} ${url}`)
 
   fetch(`${url}/getInfo`)
     .then((res) => res.json())
     .then((data) => {
       console.log(data)
-      event.reply('openWindow-resp', true)
       if (is.dev && id === 'self') {
         url = 'http://localhost:3002/'
       }
-      createWindow(id, url, title, option)
+      createWindow(event, id, url, title, option)
     })
     .catch((err) => {
       console.error(err)
@@ -33,6 +28,7 @@ ipcMain.on('openRemoteWindow', (event, { id, url, title, option }) => {
 })
 
 const createWindow = (
+  event: Electron.IpcMainEvent,
   id: string,
   url: string,
   title: string,
@@ -40,16 +36,17 @@ const createWindow = (
 ): void => {
   if (global.childWindow[id]) {
     global.childWindow[id].show()
+    event.reply('openWindow-resp', true)
     return
   }
   const childWindow = new BrowserWindow({
-    title: id,
     width: 430,
     height: 830,
     minWidth: 200,
     minHeight: 300,
     // maxWidth: 430,
     // maxHeight: 830,
+    ...option,
     show: false,
     icon: getAppIcon(),
     autoHideMenuBar: true,
@@ -57,8 +54,7 @@ const createWindow = (
       webSecurity: false,
       preload: upath.join(__dirname, '../preload/index.js'),
       sandbox: false
-    },
-    ...option
+    }
   })
   childWindow.setMenu(null)
   childWindow.setAlwaysOnTop(true, 'status')
@@ -75,16 +71,19 @@ const createWindow = (
   })
 
   childWindow.once('closed', () => {
-    global.childWindow[id] = undefined
+    delete global.childWindow[id]
   })
 
   childWindow.webContents.on('did-fail-load', (_, errorCode, errorDescription, validatedURL) => {
     console.error('无法加载窗口', url, errorCode, errorDescription, validatedURL)
+    event.reply('openWindow-resp', false)
     childWindow.close()
   })
 
   console.log('openWindow', url)
-  childWindow.loadURL(url).then()
+  childWindow.loadURL(url).then(() => {
+    event.reply('openWindow-resp', true)
+  })
 
   global.childWindow[id] = childWindow
 }

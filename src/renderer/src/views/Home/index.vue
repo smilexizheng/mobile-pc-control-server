@@ -1,19 +1,17 @@
 <script setup lang="ts">
-import { useRemoteStore } from '@renderer/store/remote'
 import { onMounted, ref, watch } from 'vue'
 import QRCodeStyling from 'qr-code-styling'
 import { Message, Notification } from '@arco-design/web-vue'
 import { useAppStore } from '@renderer/store/app'
 import { motion } from 'motion-v'
 const appStore = useAppStore()
-const remoteStore = useRemoteStore()
 const qrContainer = ref<HTMLDivElement>()
-const qrCode = ref(new QRCodeStyling(remoteStore.qrOptions))
+const qrCode = ref(new QRCodeStyling(appStore.qrOptions))
 onMounted(async () => {
   qrCode.value.append(qrContainer.value as HTMLDivElement)
   await appStore.initSetting()
   if (appStore.ips && appStore.ips.length) {
-    qrCode.value.update({ data: `http://${appStore.ips![0]}:${remoteStore.devicePort}` })
+    qrCode.value.update({ data: `http://${appStore.realHost}:${appStore.devicePort}` })
   } else {
     Message.error('获取本机的网卡信息识别！')
   }
@@ -62,25 +60,25 @@ watch(
       <a-input-group>
         <a-typography-text> 本地查看/远程设备： </a-typography-text>
         <a-input
-          v-model="remoteStore.deviceCode"
+          v-model="appStore.deviceIp"
           :style="{ width: '150px' }"
           placeholder="请输入IP地址"
           allow-clear
         />
         <a-input-number
-          v-model="remoteStore.devicePort"
+          v-model="appStore.devicePort"
           :style="{ width: '90px' }"
           placeholder="端口"
           allow-clear
         />
         <a-button
           type="primary"
-          :loading="remoteStore.isLoading"
+          :loading="appStore.isLoading"
           @click="
-            remoteStore.openRemoteWindow({
-              id: `remote_${remoteStore.deviceCode}`,
-              title: `远程设备_${remoteStore.deviceCode}`,
-              url: `http://${remoteStore.deviceCode}:${remoteStore.devicePort}`
+            appStore.openRemoteWindow({
+              id: `remote_${appStore.deviceIp}`,
+              title: `远程设备_${appStore.deviceIp}`,
+              url: `http://${appStore.deviceIp}:${appStore.devicePort}`
             })
           "
           >连接

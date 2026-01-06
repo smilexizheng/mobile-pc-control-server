@@ -193,15 +193,15 @@ const registerSocketHandlers = (io: Server): void => {
       const windowList: WindowInfo[] = []
       window.forEach((item) => {
         windowList.push({
-          id: item.id,
-          title: item.title,
-          appName: item.appName,
-          x: item.x,
-          y: item.y,
-          width: item.width,
-          height: item.height,
-          isMaximized: item.isMaximized,
-          isMinimized: item.isMinimized
+          id: item.id(),
+          title: item.title(),
+          appName: item.appName(),
+          x: item.x(),
+          y: item.y(),
+          width: item.width(),
+          height: item.height(),
+          isMaximized: item.isMaximized(),
+          isMinimized: item.isMinimized()
         })
 
         // let image = item.captureImageSync();
@@ -219,7 +219,7 @@ const registerSocketHandlers = (io: Server): void => {
     socket.on(CE.WINDOW_IMG, (windowId: number): void => {
       const window = Window.all()
       const buffer = window
-        .find((s) => s.id === windowId)
+        .find((s) => s.id() === windowId)
         ?.captureImageSync()
         .toPngSync()
       socket.emit(CE.WINDOW_IMG, buffer)

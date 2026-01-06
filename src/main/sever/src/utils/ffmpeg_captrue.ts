@@ -1,6 +1,6 @@
 import { ChildProcess, spawn } from 'child_process'
 import ffmpegPath from 'ffmpeg-static'
-import ffprobePath from '@ffprobe-installer/ffprobe'
+// import ffprobePath from '@ffprobe-installer/ffprobe'
 import upath from 'upath'
 
 // import {createWriteStream} from "fs";
@@ -22,7 +22,7 @@ const sendHeader = (io, socket): void => {
 
 const startScreenLive = (io): void => {
   if (childProcess || !ffmpegPath) return
-  console.log(ffmpegPath, ffprobePath, ffprobePath.path)
+  console.log(ffmpegPath)
   childProcess = spawn(
     upath.join(ffmpegPath).replace('app.asar', 'app.asar.unpacked'),
     [

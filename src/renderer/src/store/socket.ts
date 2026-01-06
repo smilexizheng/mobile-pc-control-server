@@ -20,9 +20,9 @@ export const useSocketStore = defineStore('socket-io', () => {
   const activeClient = ref()
 
   const connect = (): void => {
-    const { settings, realUrl } = useAppStore()
+    const { settings, realHost, serverPort } = useAppStore()
     if (!socket.value) {
-      socket.value = io(realUrl, {
+      socket.value = io(`http://${realHost}:${serverPort}`, {
         autoConnect: true,
         path: '/win-control.io',
         transports: ['websocket'],

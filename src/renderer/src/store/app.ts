@@ -5,8 +5,14 @@ import { useStorage } from '@vueuse/core'
 import { useSocketStore } from '@renderer/store/socket'
 import { Message, Modal, Notification } from '@arco-design/web-vue'
 import dayjs from 'dayjs'
+import { Options } from 'qr-code-styling'
+import logo from '@renderer/assets/logo.svg'
 
 export const useAppStore = defineStore('app', () => {
+  const deviceIp = ref<string>('127.0.0.1')
+  const devicePort = ref<number>(3000)
+  const isLoading = ref<boolean>(false)
+
   const ipcRenderer = window.electron.ipcRenderer
   const isMaximize = ref(false)
   ipcRenderer.on('updateNotAvailable', () => {
@@ -98,6 +104,9 @@ export const useAppStore = defineStore('app', () => {
     settings.value = await window.electron.ipcRenderer.invoke('get-settings')
     serverPort.value = await window.api.getControlServerPort()
     ips.value = await window.api.getLocalIPs()
+
+    devicePort.value = serverPort.value
+    deviceIp.value = realHost.value || '127.0.0.1'
     const socketStore = useSocketStore()
     socketStore.connect()
   }
@@ -131,8 +140,8 @@ export const useAppStore = defineStore('app', () => {
   }
 
   const isDark = computed(() => theme.value === 'dark')
-  const realUrl = computed(() => {
-    return `http://${settings.value?.hostname !== '0.0.0.0' ? settings.value?.hostname : ips.value[0]}:${serverPort.value}`
+  const realHost = computed(() => {
+    return settings.value?.hostname !== '0.0.0.0' ? settings.value?.hostname : ips.value[0]
   })
 
   const contentWH = computed(() => {
@@ -145,11 +154,41 @@ export const useAppStore = defineStore('app', () => {
     isMaximize.value = await window.api.handleMaximize()
   }
 
+  window.electron.ipcRenderer.on('openWindow-resp', (_, success: boolean) => {
+    isLoading.value = false
+    if (!success) Message.error('打开窗口失败')
+  })
+
+  const openRemoteWindow = (data): void => {
+    isLoading.value = true
+    window.electron.ipcRenderer.send('openRemoteWindow', data)
+  }
+  const openCustomWindow = (data): void => {
+    window.electron.ipcRenderer.send('openWindow', data)
+  }
+
+  // 配置二维码参数
+  const qrOptions: Partial<Options> = {
+    type: 'svg',
+    shape: 'square',
+    width: 200,
+    height: 200,
+    data: 'loading...',
+    image: logo,
+    margin: 10,
+    qrOptions: { mode: 'Byte', errorCorrectionLevel: 'Q' },
+    imageOptions: { saveAsBlob: true, hideBackgroundDots: true, imageSize: 0.5, margin: 5 },
+    dotsOptions: { type: 'square', color: '#f5aa29', roundSize: true },
+    backgroundOptions: { round: 0, color: 'rgba(255,255,255,0.9)' },
+    cornersSquareOptions: { type: 'dot', color: '#f08928' },
+    cornersDotOptions: { type: 'dot', color: '#f75802' }
+  }
+
   return {
     mainLayoutWH,
     contentWH,
     settings,
-    realUrl,
+    realHost,
     serverPort,
     ips,
     settingsVisible,
@@ -163,6 +202,12 @@ export const useAppStore = defineStore('app', () => {
     initSetting,
     updateSettings,
     toggleTheme,
-    initTheme
+    initTheme,
+    deviceIp,
+    devicePort,
+    isLoading,
+    openRemoteWindow,
+    openCustomWindow,
+    qrOptions
   }
 })

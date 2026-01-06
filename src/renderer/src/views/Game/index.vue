@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useRemoteStore } from '../../store/remote'
 import { computed, ref } from 'vue'
+import { useAppStore } from '@renderer/store/app'
 
-const remoteStore = useRemoteStore()
+const appStore = useAppStore()
 
 const showAddModal = ref(false)
 // 游戏数据
@@ -77,10 +77,10 @@ const filteredGames = computed(() => {
 })
 
 const startGame = (game) => {
-  remoteStore.openCustomWindow({
+  appStore.openCustomWindow({
     id: `EmulatorJS`,
     title: `EmulatorJS`,
-    url: `http://${remoteStore.deviceCode}:${remoteStore.devicePort}/game`
+    url: `http://${appStore.realHost}:${appStore.devicePort}/game`
   })
 }
 const handleSearch = (value) => {
