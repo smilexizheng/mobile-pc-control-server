@@ -53,10 +53,8 @@ async function createWindow(): Promise<void> {
   // 注册协议
   initProtocol()
   // 开机自启
-  if (app.isPackaged) {
-    app.setLoginItemSettings({
-      openAtLogin: global.setting.autoStart
-    })
+  if (!is.dev && global.setting.autoStart) {
+    electronApp.setAutoLaunch(global.setting.autoStart)
   }
   // todo win11 bugs titleBarOverlay冲突  https://github.com/electron/electron/issues/42409  createWindow setTimeout 100ms  正常
   mainWindow.on('ready-to-show', () => {

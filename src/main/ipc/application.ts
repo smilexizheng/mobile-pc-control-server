@@ -3,6 +3,7 @@ import { getLocalIPs } from '../utils/common'
 import { db } from '../sever/src/database'
 import { disconnectSockets } from '../sever/main'
 import Update from '../utils/Update'
+import { electronApp, is } from '@electron-toolkit/utils'
 
 ipcMain.on('ping', () => console.log('pong'))
 ipcMain.on('window-minimize', () => global.mainWindow.minimize())
@@ -28,10 +29,8 @@ ipcMain.on('update-settings', (_, { settings }) => {
     if (global.setting.token !== settings.token) {
       disconnectSockets()
     }
-    if (global.setting.autoStart !== settings.autoStart) {
-      app.setLoginItemSettings({
-        openAtLogin: settings.autoStart
-      })
+    if (global.setting.autoStart !== settings.autoStart && !is.dev) {
+      electronApp.setAutoLaunch(global.setting.autoStart)
     }
 
     global.setting = settings

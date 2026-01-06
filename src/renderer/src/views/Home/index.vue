@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import QRCodeStyling from 'qr-code-styling'
 import { Message, Notification } from '@arco-design/web-vue'
 import { useAppStore } from '@renderer/store/app'
@@ -18,22 +18,12 @@ onMounted(async () => {
 })
 
 const copyQrImg = async (): Promise<void> => {
-  qrCode.value.update({ backgroundOptions: { round: 0, color: '#fff' } })
   const rawData = await qrCode.value.getRawData('png')
   window.api.copyImage(rawData as Blob)
   Notification.info({
     content: '二维码 已复制到剪切板'
   })
 }
-
-watch(
-  () => appStore.isDark,
-  (v) => {
-    qrCode.value.update({
-      backgroundOptions: { round: 0, color: v ? 'rgba(253,252,252,0.2)' : 'none' }
-    })
-  }
-)
 </script>
 
 <template>
