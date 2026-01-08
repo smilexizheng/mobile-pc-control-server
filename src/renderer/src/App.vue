@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
 import { onMounted, useTemplateRef } from 'vue'
 import { useAppStore } from '@renderer/store/app'
 
@@ -7,7 +6,6 @@ import TitleBar from '@renderer/layout/TitleBar.vue'
 import LeftMenu from '@renderer/layout/LeftMenu.vue'
 import { useResizeObserver } from '@vueuse/core'
 const appStore = useAppStore()
-const router = useRouter()
 
 const mainLayout = useTemplateRef<HTMLDivElement>('mainLayout')
 useResizeObserver(mainLayout, (entries) => {
@@ -17,7 +15,6 @@ useResizeObserver(mainLayout, (entries) => {
 })
 
 onMounted(async () => {
-  router.replace('/')
   appStore.initTheme()
 })
 </script>

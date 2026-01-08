@@ -1,7 +1,7 @@
 import { app, BrowserWindow, net, protocol, shell } from 'electron'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import upath, { join } from 'upath'
+import { join } from 'upath'
 import { InitWinControlServer } from './sever/main'
 import { getAppIcon } from './utils/common'
 import { InitTray } from './menu/tray'
@@ -79,6 +79,7 @@ async function createWindow(): Promise<void> {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL']).then()
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html')).then()
+    // mainWindow.loadURL('app-cse://./index.html/#/draw')
   }
 }
 app.commandLine.appendSwitch('lang', 'zh-CN')
@@ -122,17 +123,7 @@ if (!gotTheLock) {
     protocol.handle('app-cse', (request) => {
       let pathName = new URL(request.url).pathname
       pathName = decodeURI(pathName)
-      return net.fetch(
-        pathToFileURL(
-          upath.join(
-            !app.isPackaged
-              ? process.cwd()
-              : upath.join(process.resourcesPath, __dirname.includes('.asar') ? 'app.asar' : 'app'),
-            'out/renderer',
-            pathName
-          )
-        ).toString()
-      )
+      return net.fetch(pathToFileURL(join(__dirname, '../renderer', pathName)).toString())
     })
 
     await createWindow()

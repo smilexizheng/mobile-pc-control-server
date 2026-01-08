@@ -4,7 +4,6 @@ import { getAppIcon } from '../utils/common'
 import { is } from '@electron-toolkit/utils'
 
 ipcMain.on('openWindow', (event, { id, url, title, option }) => {
-  console.log(`openWindow ${id} ${url}`)
   createWindow(event, id, url, title, option)
 })
 
@@ -51,7 +50,6 @@ const createWindow = (
     icon: getAppIcon(),
     autoHideMenuBar: true,
     webPreferences: {
-      webSecurity: false,
       preload: upath.join(__dirname, '../preload/index.js'),
       sandbox: false
     }
@@ -79,7 +77,6 @@ const createWindow = (
     event.reply('openWindow-resp', false)
     childWindow.close()
   })
-
   console.log('openWindow', url)
   childWindow.loadURL(url).then(() => {
     event.reply('openWindow-resp', true)

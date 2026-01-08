@@ -6,7 +6,7 @@
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self';  connect-src 'self' ws: http:; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: disk:"
+      content="default-src 'self' app-cse:;  connect-src 'self' ws: http: app-cse:; script-src 'self' app-cse:; style-src 'self' 'unsafe-inline' app-cse:; img-src 'self' data: disk: app-cse:"
     />
   </head>
 
