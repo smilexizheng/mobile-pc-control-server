@@ -31,7 +31,7 @@ const createWindow = (
   id: string,
   url: string,
   title: string,
-  option?: Electron.BrowserWindow
+  option?: Electron.BaseWindowConstructorOptions
 ): void => {
   if (global.childWindow[id]) {
     global.childWindow[id].show()
@@ -55,7 +55,8 @@ const createWindow = (
     }
   })
   childWindow.setMenu(null)
-  childWindow.setAlwaysOnTop(true, 'status')
+  // 窗口始终 在最上层级
+  // childWindow.setAlwaysOnTop(true, 'status')
   childWindow.on('ready-to-show', () => {
     childWindow.setTitle(title)
     childWindow?.show()
