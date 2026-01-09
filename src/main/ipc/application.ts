@@ -6,35 +6,52 @@ import Update from '../utils/Update'
 import { electronApp, is } from '@electron-toolkit/utils'
 
 ipcMain.on('ping', () => console.log('pong'))
-ipcMain.on('window-minimize', () => global.mainWindow.minimize())
-ipcMain.handle('window-maximize', () => {
-  if (global.mainWindow.isMaximized()) {
-    global.mainWindow.restore() // 或 unmaximize()，恢复窗口
+ipcMain.on('window-minimize', (_, windowId) => {
+  getWindow(windowId).minimize()
+})
+ipcMain.handle('window-maximize', (_, windowId) => {
+  const window = getWindow(windowId)
+
+  if (window.isMaximized()) {
+    window.restore() // 或 unmaximize()，恢复窗口
   } else {
-    global.mainWindow.maximize() // 最大化
+    window.maximize() // 最大化
   }
-  return global.mainWindow.isMaximized()
+  return window.isMaximized()
 })
 
-ipcMain.on('window-close', () => global.mainWindow.close())
-ipcMain.on('update-settings', (_, { settings }) => {
-  db.app.put('app:settings', settings).then(() => {
+ipcMain.on('window-close', (_, windowId) => {
+  getWindow(windowId).close()
+})
+
+ipcMain.on('appRelaunch', () => {
+  app.relaunch()
+  app.exit(0)
+})
+
+function getWindow(windowId) {
+  return windowId ? global.childWindow[windowId] : global.mainWindow
+}
+
+ipcMain.handle('update-settings', (_, { settings }) => {
+  return db.app.put('app:settings', settings).then(() => {
+    let restart = false
     if (
       global.controlServerPort !== settings.port ||
       global.setting.hostname !== settings.hostname
     ) {
-      app.relaunch()
-      app.exit(0)
+      restart = true
     }
     if (global.setting.token !== settings.token) {
       disconnectSockets()
     }
     if (global.setting.autoStart !== settings.autoStart && !is.dev) {
-      electronApp.setAutoLaunch(global.setting.autoStart)
+      electronApp.setAutoLaunch(settings.autoStart)
     }
 
     global.setting = settings
     console.log(global.setting)
+    return { restart }
   })
 })
 ipcMain.handle('get-settings', async () => {

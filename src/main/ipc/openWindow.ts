@@ -1,43 +1,58 @@
 import { ipcMain, BrowserWindow } from 'electron'
-import upath from 'upath'
+import upath, { join } from 'upath'
 import { getAppIcon } from '../utils/common'
 import { is } from '@electron-toolkit/utils'
+import { APP_WINDOW_SIZE } from '../config'
 
-ipcMain.on('openWindow', (event, { id, url, title, option }) => {
-  createWindow(event, id, url, title, option)
+/**
+ * 应用样式的窗口
+ */
+ipcMain.on('openAppWindow', (event, { id, hash, title, option }) => {
+  if (global.childWindow[id]) {
+    global.childWindow[id].show()
+  } else {
+    const window = createWindow(event, id, {
+      ...APP_WINDOW_SIZE,
+      ...option,
+      frame: false,
+      show: false,
+      transparent: true,
+      backgroundColor: 'rgba(0,0,0,0)',
+      titleBarStyle: 'hidden'
+    })
+
+    if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+      window
+        .loadURL(`${process.env['ELECTRON_RENDERER_URL']}#/${hash}?id=${id}&title=${title}`)
+        .then(() => {})
+    } else {
+      window
+        .loadFile(join(__dirname, '../renderer/index.html'), {
+          hash: `${hash}?id=${id}&title=${title}`
+        })
+        .then(() => {})
+    }
+  }
 })
 
-ipcMain.on('openRemoteWindow', (event, { id, url, title, option }) => {
-  console.log(`openRemoteWindow ${id} ${url}`)
-  console.error(`openRemoteWindow ${id} ${url}`)
-
-  fetch(`${url}/getInfo`)
-    .then((res) => res.json())
-    .then((data) => {
-      console.log(data)
-      if (is.dev && id === 'self') {
-        url = 'http://localhost:3002/'
-      }
-      createWindow(event, id, url, title, option)
-    })
-    .catch((err) => {
-      console.error(err)
-      event.reply('openWindow-resp', false)
-    })
+/**
+ * 系统原生窗口
+ */
+ipcMain.on('openUrlWindow', (event, { id, url, title, option }) => {
+  if (global.childWindow[id]) {
+    global.childWindow[id].show()
+  } else {
+    const window = createWindow(event, id, option)
+    window.setTitle(title)
+    window.loadURL(url).then()
+  }
 })
 
 const createWindow = (
   event: Electron.IpcMainEvent,
   id: string,
-  url: string,
-  title: string,
   option?: Electron.BaseWindowConstructorOptions
-): void => {
-  if (global.childWindow[id]) {
-    global.childWindow[id].show()
-    event.reply('openWindow-resp', true)
-    return
-  }
+): BrowserWindow => {
   const childWindow = new BrowserWindow({
     width: 430,
     height: 830,
@@ -57,10 +72,6 @@ const createWindow = (
   childWindow.setMenu(null)
   // 窗口始终 在最上层级
   // childWindow.setAlwaysOnTop(true, 'status')
-  childWindow.on('ready-to-show', () => {
-    childWindow.setTitle(title)
-    childWindow?.show()
-  })
 
   childWindow.once('closed', () => {
     global.childWindow[id] = undefined
@@ -69,19 +80,23 @@ const createWindow = (
     console.log('childWindow unresponsive')
   })
 
+  childWindow.on('ready-to-show', () => {
+    event.reply('openWindow-resp', true)
+    childWindow?.show()
+  })
+
   childWindow.once('closed', () => {
+    console.log('childWindow closed')
     delete global.childWindow[id]
   })
 
   childWindow.webContents.on('did-fail-load', (_, errorCode, errorDescription, validatedURL) => {
-    console.error('无法加载窗口', url, errorCode, errorDescription, validatedURL)
+    console.error('无法加载窗口', errorCode, errorDescription, validatedURL)
     event.reply('openWindow-resp', false)
     childWindow.close()
   })
-  console.log('openWindow', url)
-  childWindow.loadURL(url).then(() => {
-    event.reply('openWindow-resp', true)
-  })
 
   global.childWindow[id] = childWindow
+
+  return childWindow
 }

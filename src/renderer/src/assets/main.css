@@ -6,7 +6,7 @@ body {
   justify-content: center;
   overflow: hidden;
   color: var(--color-text-1);
-  background: var(--color-bg-1);
+  /*background-color: rgba(0,0,0,0);*/
   /*background-image: url('./wavy-lines.svg');*/
   background-size: cover;
   user-select: none;
@@ -17,6 +17,27 @@ body {
   width: 100vw;
   height: 100vh;
   display: flex;
+}
+
+/*顶部小按钮*/
+.control-btn {
+  color: var(--color-text-2);
+  font-size: 16px;
+  width: 32px;
+  height: 30px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.control-btn:hover {
+  cursor: pointer;
+  color: #fff;
+  background: var(--color-border-3);
 }
 
 

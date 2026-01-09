@@ -2,11 +2,8 @@
 import { onMounted, useTemplateRef } from 'vue'
 import { useAppStore } from '@renderer/store/app'
 
-import TitleBar from '@renderer/layout/TitleBar.vue'
-import LeftMenu from '@renderer/layout/LeftMenu.vue'
 import { useResizeObserver } from '@vueuse/core'
 const appStore = useAppStore()
-
 const mainLayout = useTemplateRef<HTMLDivElement>('mainLayout')
 useResizeObserver(mainLayout, (entries) => {
   const entry = entries[0]
@@ -14,27 +11,23 @@ useResizeObserver(mainLayout, (entries) => {
   appStore.setMainLayoutWH(width, height)
 })
 
-onMounted(async () => {
-  appStore.initTheme()
-})
+onMounted(() => {})
 </script>
 
 <template>
-  <a-layout>
-    <a-layout-header><TitleBar /> </a-layout-header>
-    <a-layout>
-      <LeftMenu />
-      <a-layout-content ref="mainLayout">
-        <RouterView />
-      </a-layout-content>
-    </a-layout>
-    <a-layout-footer></a-layout-footer>
-  </a-layout>
+  <div class="app" :style="{ borderRadius: appStore.isMaximize ? '0px' : '10px' }">
+    <RouterView />
+  </div>
 </template>
 
 <style scoped>
-.logo {
-  height: 32px;
-  margin: 0 auto;
+.app {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  background: var(--color-bg-1);
+  border: 1px solid var(--color-border-1);
+  -electron-corner-smoothing: system-ui;
+  padding: 0 10px 10px 10px;
 }
 </style>

@@ -4,7 +4,6 @@ import { ref, computed } from 'vue'
 import { useAppStore } from './app'
 import { Message } from '@arco-design/web-vue'
 import Socket = SocketIOClient.Socket
-import { Notification } from '@arco-design/web-vue'
 import { UserMessage } from '../env'
 import { useRouter } from 'vue-router'
 export const useSocketStore = defineStore('socket-io', () => {
@@ -52,9 +51,6 @@ export const useSocketStore = defineStore('socket-io', () => {
             const { form } = data
             activeClient.value = onlineSocketUser.value[form]
             router.push('/chat')
-            Notification.info({
-              content: `收到消息 ${data.content || data.fileName}`
-            })
             const ip = onlineSocketUser.value[form].clientIp
             if (!userMessage.value[ip]) {
               userMessage.value[ip] = []

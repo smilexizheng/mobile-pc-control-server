@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineExpose } from 'vue'
+import { ref } from 'vue'
 import { useDrawStore } from '@renderer/store/draw'
 const drawStore = useDrawStore()
 //

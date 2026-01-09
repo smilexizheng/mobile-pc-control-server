@@ -77,7 +77,7 @@ const filteredGames = computed(() => {
 })
 
 const startGame = (game) => {
-  appStore.openCustomWindow({
+  appStore.openUrlWindow({
     id: `EmulatorJS`,
     title: `EmulatorJS`,
     url: `http://${appStore.realHost}:${appStore.devicePort}/game`

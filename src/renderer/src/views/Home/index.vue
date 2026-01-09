@@ -4,9 +4,12 @@ import QRCodeStyling from 'qr-code-styling'
 import { Message, Notification } from '@arco-design/web-vue'
 import { useAppStore } from '@renderer/store/app'
 import { motion } from 'motion-v'
+import { useSocketStore } from '@renderer/store/socket'
 const appStore = useAppStore()
 const qrContainer = ref<HTMLDivElement>()
 const qrCode = ref(new QRCodeStyling(appStore.qrOptions))
+const socketStore = useSocketStore()
+
 onMounted(async () => {
   qrCode.value.append(qrContainer.value as HTMLDivElement)
   await appStore.initSetting()
@@ -15,6 +18,7 @@ onMounted(async () => {
   } else {
     Message.error('获取本机的网卡信息识别！')
   }
+  socketStore.connect()
 })
 
 const copyQrImg = async (): Promise<void> => {
@@ -65,7 +69,7 @@ const copyQrImg = async (): Promise<void> => {
           type="primary"
           :loading="appStore.isLoading"
           @click="
-            appStore.openRemoteWindow({
+            appStore.openUrlWindow({
               id: `remote_${appStore.deviceIp}`,
               title: `远程设备_${appStore.deviceIp}`,
               url: `http://${appStore.deviceIp}:${appStore.devicePort}`

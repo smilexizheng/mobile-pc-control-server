@@ -1,29 +1,23 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
-import { Message } from '@arco-design/web-vue'
-import { useAppStore } from '../store/app'
+import { useRouter, useRoute } from 'vue-router'
+import { useAppStore } from '@renderer/store/app'
+
 const router = useRouter()
+const route = useRoute()
 const appStore = useAppStore()
 
 const onClickMenuItem = (key): void => {
+  if (key.includes('/')) {
+    router.push(key)
+    return
+  }
   switch (key) {
-    case 'home':
-      router.push('/')
-      break
-    case 'draw':
-      router.push('/draw')
-      break
-    case 'chat':
-      router.push('/chat')
-      break
-    case 'game':
-      router.push('/game')
-      break
     case 'sys-setting':
-      appStore.settingsVisible = true
-      break
-    default:
-      Message.info('功能测试中')
+      appStore.openAppWindow({
+        id: `sys-setting`,
+        title: `设置`,
+        hash: `setting`
+      })
       break
   }
 }
@@ -44,18 +38,18 @@ const onClickMenuItem = (key): void => {
     </template>
     <a-menu
       :defaultOpenKeys="['more']"
-      :defaultSelectedKeys="['home']"
+      :selected-keys="[route.path]"
       @menuItemClick="onClickMenuItem"
     >
-      <a-menu-item key="home">
+      <a-menu-item key="/home">
         <IconHome />
         远程连接
       </a-menu-item>
-      <a-menu-item key="chat">
+      <a-menu-item key="/chat">
         <icon-message />
         消息互传
       </a-menu-item>
-      <a-menu-item key="draw">
+      <a-menu-item key="/draw">
         <icon-image />
         绘画涂鸦/OCR
       </a-menu-item>
@@ -68,9 +62,12 @@ const onClickMenuItem = (key): void => {
         <template #title>
           <span><icon-more />更多</span>
         </template>
-        <!--        <a-menu-item key="game"><icon-send />EmulatorJS</a-menu-item>-->
+        <!--        <a-menu-item key="/game"><icon-send />EmulatorJS</a-menu-item>-->
         <!--        <a-sub-menu key="config" title="配置">-->
-        <a-menu-item key="sys-setting"><icon-settings />系统设置</a-menu-item>
+        <a-menu-item key="sys-setting">
+          <icon-settings />
+          系统设置
+        </a-menu-item>
         <!--        </a-sub-menu>-->
       </a-sub-menu>
     </a-menu>

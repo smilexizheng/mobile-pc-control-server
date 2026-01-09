@@ -1,4 +1,4 @@
-import { app, BrowserWindow, net, protocol, shell } from 'electron'
+import { app, BrowserWindow, shell } from 'electron'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { join } from 'upath'
@@ -7,20 +7,18 @@ import { getAppIcon } from './utils/common'
 import { InitTray } from './menu/tray'
 import './utils/log'
 import { initProtocol, handleArgv } from './utils/protocol'
-import { pathToFileURL, URL } from 'url'
 import { db } from './sever/src/database'
+import { APP_WINDOW_SIZE } from './config'
 // import { InitAsrTts } from './asr-tts-ocr'
 
 async function createWindow(): Promise<void> {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
-    minWidth: 800,
-    minHeight: 600,
+    ...APP_WINDOW_SIZE,
     frame: false,
     show: false,
-    backgroundColor: 'rgb(32, 32, 32)',
+    transparent: true,
+    backgroundColor: '#00000000',
     titleBarStyle: 'hidden',
     // titleBarOverlay: {
     //   color: '#fcfcfc',
@@ -79,10 +77,12 @@ async function createWindow(): Promise<void> {
     mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL']).then()
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html')).then()
-    // mainWindow.loadURL('app-cse://./index.html/#/draw')
   }
 }
 app.commandLine.appendSwitch('lang', 'zh-CN')
+// 禁用动画效果 ，透明的窗口 切换时动画导致闪烁
+app.commandLine.appendSwitch('wm-window-animations-disabled')
+
 const gotTheLock = app.requestSingleInstanceLock()
 if (!gotTheLock) {
   app.quit()
@@ -118,12 +118,6 @@ if (!gotTheLock) {
       if (process.platform === 'win32') {
         handleArgv(commandLine)
       }
-    })
-
-    protocol.handle('app-cse', (request) => {
-      let pathName = new URL(request.url).pathname
-      pathName = decodeURI(pathName)
-      return net.fetch(pathToFileURL(join(__dirname, '../renderer', pathName)).toString())
     })
 
     await createWindow()

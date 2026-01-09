@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia'
-import { computed, ref, h } from 'vue'
+import { computed, h, onMounted, ref, watch } from 'vue'
 import { Setting, ThemeType } from '../env'
 import { useStorage } from '@vueuse/core'
-import { useSocketStore } from '@renderer/store/socket'
 import { Message, Modal, Notification } from '@arco-design/web-vue'
 import dayjs from 'dayjs'
 import { Options } from 'qr-code-styling'
@@ -89,14 +88,11 @@ export const useAppStore = defineStore('app', () => {
   }
 
   // 系统设置参数
-  const settingsVisible = ref(false)
   const settings = ref<Setting>()
 
   const serverPort = ref<number>()
   const ips = ref<string[]>([])
 
-  // 关于显隐
-  const aboutVisible = ref(false)
   // 主题
   const theme = useStorage<ThemeType>('arco-theme', 'light')
 
@@ -107,15 +103,35 @@ export const useAppStore = defineStore('app', () => {
 
     devicePort.value = serverPort.value
     deviceIp.value = realHost.value || '127.0.0.1'
-    const socketStore = useSocketStore()
-    socketStore.connect()
   }
+
+  onMounted(() => {
+    setTheme(theme.value)
+    initSetting().then()
+  })
 
   const updateSettings = (value: Setting): void => {
     settings.value = value
-    window.electron.ipcRenderer.send('update-settings', {
-      settings: { ...value }
-    })
+    window.electron.ipcRenderer
+      .invoke('update-settings', {
+        settings: { ...value }
+      })
+      .then((r) => {
+        if (r.restart) {
+          Modal.success({
+            title: '设置成功',
+            content: `此项修改需要重启生效！`,
+            okText: '立即重启',
+            onOk: () => {
+              window.api.appRelaunch()
+            }
+          })
+        } else {
+          Notification.success({
+            content: '配置已更新'
+          })
+        }
+      })
   }
 
   /**
@@ -127,17 +143,16 @@ export const useAppStore = defineStore('app', () => {
    * @param t 主题类型 ('light' 或 'dark')，如果不传则自动切换当前主题
    */
   const toggleTheme = (t?: ThemeType): void => {
-    const newTheme: ThemeType = t ? t : theme.value === 'dark' ? 'light' : 'dark'
-    theme.value = newTheme
-    document.body.setAttribute('arco-theme', newTheme)
+    theme.value = t ? t : theme.value === 'dark' ? 'light' : 'dark'
   }
 
-  /**
-   * 初始化主题（从本地存储中读取用户偏好）
-   */
-  const initTheme = (): void => {
-    toggleTheme(theme.value)
+  const setTheme = (v) => {
+    document.body.setAttribute('arco-theme', v)
   }
+
+  watch(theme, (v) => {
+    setTheme(v)
+  })
 
   const isDark = computed(() => theme.value === 'dark')
   const realHost = computed(() => {
@@ -159,12 +174,12 @@ export const useAppStore = defineStore('app', () => {
     if (!success) Message.error('打开窗口失败')
   })
 
-  const openRemoteWindow = (data): void => {
+  const openUrlWindow = (data): void => {
     isLoading.value = true
-    window.electron.ipcRenderer.send('openRemoteWindow', data)
+    window.electron.ipcRenderer.send('openUrlWindow', data)
   }
-  const openCustomWindow = (data): void => {
-    window.electron.ipcRenderer.send('openWindow', data)
+  const openAppWindow = (data): void => {
+    window.electron.ipcRenderer.send('openAppWindow', data)
   }
 
   // 配置二维码参数
@@ -191,8 +206,6 @@ export const useAppStore = defineStore('app', () => {
     realHost,
     serverPort,
     ips,
-    settingsVisible,
-    aboutVisible,
     isDark,
     isMaximize,
     setMainLayoutWH,
@@ -202,12 +215,11 @@ export const useAppStore = defineStore('app', () => {
     initSetting,
     updateSettings,
     toggleTheme,
-    initTheme,
     deviceIp,
     devicePort,
     isLoading,
-    openRemoteWindow,
-    openCustomWindow,
+    openUrlWindow,
+    openAppWindow,
     qrOptions
   }
 })

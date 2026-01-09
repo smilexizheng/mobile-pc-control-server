@@ -38,9 +38,9 @@ const api = {
     return null
   },
 
-  handleMinimize: () => ipcRenderer.send('window-minimize'),
-  handleMaximize: () => ipcRenderer.invoke('window-maximize'),
-  handleClose: () => ipcRenderer.send('window-close'),
+  handleMinimize: (id?) => ipcRenderer.send('window-minimize', id),
+  handleMaximize: (id?) => ipcRenderer.invoke('window-maximize', id),
+  handleClose: (id?) => ipcRenderer.send('window-close', id),
 
   getControlServerPort: (): Promise<number> => ipcRenderer.invoke('get-control-server-port'),
   getLocalIPs: (): Promise<string[]> => ipcRenderer.invoke('get-local-ips'),
@@ -85,6 +85,7 @@ const api = {
   readImage: (): Buffer => clipboard.readImage().toPNG(),
   checkForUpdate: () => ipcRenderer.invoke('checkForUpdate'),
   quitAndInstall: () => ipcRenderer.invoke('quitAndInstall'),
+  appRelaunch: () => ipcRenderer.send('appRelaunch'),
   cancelDownload: () => ipcRenderer.invoke('cancelDownload')
 }
 export type WindowApi = typeof api
