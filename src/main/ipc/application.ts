@@ -1,6 +1,6 @@
 import { ipcMain, app } from 'electron'
 import { getLocalIPs } from '../utils/common'
-import { db } from '../sever/src/database'
+import { db } from '../utils/database'
 import { disconnectSockets } from '../sever/main'
 import Update from '../utils/Update'
 import { electronApp, is } from '@electron-toolkit/utils'
@@ -34,25 +34,24 @@ function getWindow(windowId) {
 }
 
 ipcMain.handle('update-settings', (_, { settings }) => {
-  return db.app.put('app:settings', settings).then(() => {
-    let restart = false
-    if (
-      global.controlServerPort !== settings.port ||
-      global.setting.hostname !== settings.hostname
-    ) {
-      restart = true
-    }
-    if (global.setting.token !== settings.token) {
-      disconnectSockets()
-    }
-    if (global.setting.autoStart !== settings.autoStart && !is.dev) {
-      electronApp.setAutoLaunch(settings.autoStart)
-    }
+  db.app.put('app:settings', settings)
+  let restart = false
+  // 改变端口和ip需要重启
+  if (global.controlServerPort !== settings.port || global.setting.hostname !== settings.hostname) {
+    restart = true
+  }
+  // 断开socket
+  if (global.setting.token !== settings.token) {
+    disconnectSockets()
+  }
+  //应用自启动
+  if (global.setting.autoStart !== settings.autoStart && !is.dev) {
+    electronApp.setAutoLaunch(settings.autoStart)
+  }
 
-    global.setting = settings
-    console.log(global.setting)
-    return { restart }
-  })
+  global.setting = settings
+  console.log(global.setting)
+  return { restart }
 })
 ipcMain.handle('get-settings', async () => {
   return db.getSettings()

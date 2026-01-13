@@ -1,13 +1,18 @@
 import { ipcMain, BrowserWindow } from 'electron'
 import upath, { join } from 'upath'
-import { getAppIcon } from '../utils/common'
+import { createHexDigest, getAppIcon, objectToParam } from '../utils/common'
 import { is } from '@electron-toolkit/utils'
 import { APP_WINDOW_SIZE } from '../config'
 
 /**
  * 应用样式的窗口
+ * hash  路由
+ * title 标题
+ * option 窗口参数 Electron.BaseWindowConstructorOptions
+ * query 连接调整附带参数  route.query
  */
-ipcMain.on('openAppWindow', (event, { id, hash, title, option }) => {
+ipcMain.on('openAppWindow', (event, { hash, title, option, query }) => {
+  const id = createHexDigest(title + hash)
   if (global.childWindow[id]) {
     global.childWindow[id].show()
   } else {
@@ -16,19 +21,23 @@ ipcMain.on('openAppWindow', (event, { id, hash, title, option }) => {
       ...option,
       frame: false,
       show: false,
-      transparent: true,
+      transparent: false,
       backgroundColor: 'rgba(0,0,0,0)',
       titleBarStyle: 'hidden'
     })
 
+    query = { id, title, ...query }
+
+    const queryParams = objectToParam(query)
+
     if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
       window
-        .loadURL(`${process.env['ELECTRON_RENDERER_URL']}#/${hash}?id=${id}&title=${title}`)
+        .loadURL(`${process.env['ELECTRON_RENDERER_URL']}#/${hash}?${queryParams}`)
         .then(() => {})
     } else {
       window
         .loadFile(join(__dirname, '../renderer/index.html'), {
-          hash: `${hash}?id=${id}&title=${title}`
+          hash: `${hash}?${queryParams}`
         })
         .then(() => {})
     }
@@ -38,7 +47,8 @@ ipcMain.on('openAppWindow', (event, { id, hash, title, option }) => {
 /**
  * 系统原生窗口
  */
-ipcMain.on('openUrlWindow', (event, { id, url, title, option }) => {
+ipcMain.on('openUrlWindow', (event, { url, title, option }) => {
+  const id = createHexDigest(title + url)
   if (global.childWindow[id]) {
     global.childWindow[id].show()
   } else {
@@ -81,8 +91,11 @@ const createWindow = (
   })
 
   childWindow.on('ready-to-show', () => {
-    event.reply('openWindow-resp', true)
     childWindow?.show()
+  })
+
+  childWindow.on('show', () => {
+    event.reply('openWindow-resp', true)
   })
 
   childWindow.once('closed', () => {

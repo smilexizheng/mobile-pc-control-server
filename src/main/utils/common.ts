@@ -2,6 +2,7 @@ import { app, nativeImage } from 'electron'
 import upath from 'upath'
 import os from 'os'
 import NativeImage = Electron.NativeImage
+import * as crypto from 'crypto'
 
 // 获取所有IPv4地址
 const getLocalIPs = (): string[] => {
@@ -58,4 +59,28 @@ const getAppIcon = (): NativeImage => {
   return icon
 }
 
-export { getLocalIPs, getAppIcon }
+/**
+ * 信息摘要
+ * @param algorithm 'md5' | ''
+ * @param input
+ */
+const createHexDigest = (input: string, algorithm?: 'md5' | 'sha1' | 'sha256' | 'sha512') => {
+  // 创建哈希对象
+  return crypto
+    .createHash(algorithm || 'md5')
+    .update(input)
+    .digest('hex')
+}
+
+/**
+ * object转为 url param
+ * @param query
+ */
+const objectToParam = (query) => {
+  return Object.keys(query || {})
+    .sort()
+    .map((key) => `${key}=${encodeURIComponent(query[key])}`)
+    .join('&')
+}
+
+export { getLocalIPs, getAppIcon, createHexDigest, objectToParam }

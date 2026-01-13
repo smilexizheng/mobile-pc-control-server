@@ -33,7 +33,6 @@ const checkUpdate = async () => {
       <a-doption
         @click="
           appStore.openAppWindow({
-            id: `sys-setting`,
             title: `设置`,
             hash: `setting`
           })
@@ -44,9 +43,10 @@ const checkUpdate = async () => {
         :value="{ value: 'about' }"
         @click="
           appStore.openAppWindow({
-            id: `sys-about`,
             title: `关于`,
-            hash: `about`
+            hash: `about`,
+            option: { width: 520, height: 200 },
+            query: { open: true }
           })
         "
         >关于

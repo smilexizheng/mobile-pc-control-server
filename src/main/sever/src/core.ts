@@ -200,6 +200,7 @@ const grabRegion = async (mouseX, mouseY, captureWidth, captureHeight): Promise<
 const eventHandler = (e: SocketEvent): void => {
   const data: EventData | undefined = e.eventData
   if (!data) return
+  console.log(e.event, data)
   switch (e.event) {
     case CE.KEYPRESS:
       keyPressHandle(data).then()

@@ -18,7 +18,7 @@ import {
 import { mouse, Point } from '@nut-tree-fork/nut-js'
 import { TransferFile } from './TransferFile'
 import { createJob, deleteJob, getJobList, toggleJob } from './eventSchedule'
-import { db } from './database'
+import { db } from '../../utils/database'
 import { Server } from 'socket.io'
 
 import { initChat } from './Chat'
@@ -51,38 +51,38 @@ const registerSocketHandlers = (io: Server): void => {
     TransferFile(io, socket)
 
     // 任务计划
-    socket.on(CE.SCHEDULE_ADD, async (data) => {
-      await createJob(data)
-      socket.emit(CE.SCHEDULE_GET, await getJobList())
+    socket.on(CE.SCHEDULE_ADD, (data) => {
+      createJob(data)
+      socket.emit(CE.SCHEDULE_GET, getJobList())
     })
 
     // 查询保存定时任务
-    socket.on(CE.SCHEDULE_GET, async () => {
-      socket.emit(CE.SCHEDULE_GET, await getJobList())
+    socket.on(CE.SCHEDULE_GET, () => {
+      socket.emit(CE.SCHEDULE_GET, getJobList())
     })
-    socket.on(CE.SCHEDULE_DELETE, async (id) => {
-      await deleteJob(id)
-      socket.emit(CE.SCHEDULE_GET, await getJobList())
+    socket.on(CE.SCHEDULE_DELETE, (id) => {
+      deleteJob(id)
+      socket.emit(CE.SCHEDULE_GET, getJobList())
     })
-    socket.on(CE.SCHEDULE_TOGGLE_JOB, async (id) => {
-      await toggleJob(id)
-      socket.emit(CE.SCHEDULE_GET, await getJobList())
+    socket.on(CE.SCHEDULE_TOGGLE_JOB, (id) => {
+      toggleJob(id)
+      socket.emit(CE.SCHEDULE_GET, getJobList())
     })
 
-    const sendEventList = (): void => {
-      db.getAll(db.events).then((data) => io.emit(CE.EVENTS_GET, data))
+    const sendEventList = () => {
+      io.emit(CE.EVENTS_GET, db.events.values())
     }
     sendEventList()
     socket.on(CE.EVENTS_GET, () => {
       sendEventList()
     })
-    socket.on(CE.EVENTS_DELETE, async (id) => {
-      await db.events.del(id)
+    socket.on(CE.EVENTS_DELETE, (id) => {
+      db.events.del(id)
       sendEventList()
     })
-    socket.on(CE.EVENTS_PUT, async (data) => {
+    socket.on(CE.EVENTS_PUT, (data) => {
       const id = data.id || crypto.randomUUID()
-      await db.events.put(id, { ...data, id })
+      db.events.put(id, { ...data, id })
       sendEventList()
       socket.emit(CE.RESPONSE, {
         success: true,

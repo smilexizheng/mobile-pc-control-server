@@ -1,6 +1,6 @@
-import Store from 'electron-store'
-
+import { db } from './database'
 import { v4 as uuidv4 } from 'uuid'
+import JsonStore from './JsonStore/JsonStore'
 
 export enum ConfigKeys {
   AutoUpdate = 'autoUpdate',
@@ -8,14 +8,14 @@ export enum ConfigKeys {
 }
 
 export class SystemConfig {
-  private store: Store
+  private store: JsonStore<any, any>
 
   constructor() {
-    this.store = new Store()
+    this.store = db.app
   }
 
   getAutoUpdate(): boolean {
-    return this.get<boolean>(ConfigKeys.AutoUpdate, true)
+    return this.get(ConfigKeys.AutoUpdate, true)
   }
 
   setAutoUpdate(value: boolean): void {
@@ -33,7 +33,7 @@ export class SystemConfig {
     return clientId
   }
 
-  set(key: string, value: unknown): void {
+  set(key: string, value: any): void {
     this.store.set(key, value)
   }
 

@@ -7,7 +7,7 @@ import { getAppIcon } from './utils/common'
 import { InitTray } from './menu/tray'
 import './utils/log'
 import { initProtocol, handleArgv } from './utils/protocol'
-import { db } from './sever/src/database'
+import { db } from './utils/database'
 import { APP_WINDOW_SIZE } from './config'
 // import { InitAsrTts } from './asr-tts-ocr'
 
@@ -15,10 +15,12 @@ async function createWindow(): Promise<void> {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     ...APP_WINDOW_SIZE,
+    minWidth: 520,
+    minHeight: 200,
     frame: false,
     show: false,
-    transparent: true,
-    backgroundColor: '#00000000',
+    transparent: false,
+    backgroundColor: 'rgba(0,0,0,0)',
     titleBarStyle: 'hidden',
     // titleBarOverlay: {
     //   color: '#fcfcfc',
@@ -36,7 +38,8 @@ async function createWindow(): Promise<void> {
   })
 
   console.log('启动control-server')
-  global.setting = await db.getSettings()
+  global.setting = db.getSettings()
+
   global.mainWindow = mainWindow
   global.controlServerPort = await InitWinControlServer(
     global.setting.port,
@@ -80,8 +83,8 @@ async function createWindow(): Promise<void> {
   }
 }
 app.commandLine.appendSwitch('lang', 'zh-CN')
-// 禁用动画效果 ，透明的窗口 切换时动画导致闪烁
-app.commandLine.appendSwitch('wm-window-animations-disabled')
+// transparent启用时，透明的窗口 切换时动画导致闪烁，禁用动画效果
+// app.commandLine.appendSwitch('wm-window-animations-disabled')
 
 const gotTheLock = app.requestSingleInstanceLock()
 if (!gotTheLock) {

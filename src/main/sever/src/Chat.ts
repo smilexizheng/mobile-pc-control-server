@@ -2,6 +2,7 @@ import { getClientInfo } from './utils/socketUtil'
 
 // 记录在线的用户
 const onlineSocket = {}
+let serverSocketId = ''
 let hostSocket: ClientInfo | null = null
 const initChat = (io, socket): void => {
   // 记录连接信息
@@ -10,12 +11,16 @@ const initChat = (io, socket): void => {
     hostSocket = socketInfo
     console.log(hostSocket)
     socketInfo.name = '服务主机'
+    serverSocketId = socket.id
   }
   onlineSocket[socketInfo.id] = socketInfo
 
   // 收到socket消息
   socket.on('chat-message', async (message: ChatMessage) => {
     console.log('收到消息', message)
+    if (message.to === serverSocketId) {
+      global.mainWindow.show()
+    }
     io.to(message.to).emit('chat-message', {
       ...message,
       form: socket.id,

@@ -15,7 +15,8 @@ onMounted(() => {})
 </script>
 
 <template>
-  <div class="app" :style="{ borderRadius: appStore.isMaximize ? '0px' : '10px' }">
+  <div class="app">
+    <!--       :style="{ borderRadius: appStore.isMaximize ? '0px' : '10px' }"-->
     <RouterView />
   </div>
 </template>
@@ -28,6 +29,6 @@ onMounted(() => {})
   background: var(--color-bg-1);
   border: 1px solid var(--color-border-1);
   -electron-corner-smoothing: system-ui;
-  padding: 0 10px 10px 10px;
+  padding: 0 6px 6px 6px;
 }
 </style>

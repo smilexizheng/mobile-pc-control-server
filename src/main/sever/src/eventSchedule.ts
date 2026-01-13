@@ -1,18 +1,18 @@
 import schedule, { Job } from 'node-schedule'
-import {db} from './database'
+import { db } from '../../utils/database'
 import { eventHandler } from './core'
 
 /**
  * 创建定时任务
  * @param data
  */
-const createJob = async (data: ScheduleJob): Promise<void> => {
+const createJob = (data: ScheduleJob) => {
   if (data.id) {
-    await deleteJob(data.id)
+    deleteJob(data.id)
   }
   const id = data.id || crypto.randomUUID()
   data = { ...data, id }
-  await db.schedule.put(id, data)
+  db.schedule.put(id, data)
   if (data.runOnCreate) {
     runJob(data)
   }
@@ -23,6 +23,7 @@ const runJob = (data): void => {
   schedule.scheduleJob(data.id, data.cron, function () {
     // todo save  job log
     console.log(`${data.id}>>>>>${data.name} has run at ${new Date()}`)
+    console.log(data)
     if (data.events) {
       data.events.forEach((event) => {
         setTimeout(() => {
@@ -46,8 +47,8 @@ const cancelJob = (id): void => {
  * 删除job
  * @param id
  */
-const deleteJob = async (id): Promise<void> => {
-  await db.schedule.del(id)
+const deleteJob = (id) => {
+  db.schedule.del(id)
   if (!hasJob(id)) return
   schedule.scheduledJobs[id].deleteFromSchedule()
 }
@@ -56,11 +57,11 @@ const deleteJob = async (id): Promise<void> => {
  * 切换运行状态
  * @param id
  */
-const toggleJob = async (id): Promise<void> => {
+const toggleJob = (id) => {
   if (hasJob(id)) {
     schedule.scheduledJobs[id].cancel()
   } else {
-    await createJob(await db.schedule.get(id))
+    createJob(db.schedule.get(id)!)
   }
 }
 
@@ -86,11 +87,12 @@ const getScheduleJobs = (): { [jobName: string]: Job } => {
   return schedule.scheduledJobs
 }
 
-const getJobList = async (): Promise<ScheduleJob[]> => {
+const getJobList = (): ScheduleJob[] => {
   const result: ScheduleJob[] = []
-  for await (const value of db.schedule.values()) {
+  const data = db.schedule.values()
+  data.forEach((value) => {
     result.push({ ...value, hasJob: !!schedule.scheduledJobs[value.id] })
-  }
+  })
   return result
 }
 
