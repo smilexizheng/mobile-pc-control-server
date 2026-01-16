@@ -15,7 +15,7 @@ export default tseslint.config(
     }
   },
   {
-    files: ['**/*.{ts,mts,tsx,vue}'],
+    files: ['**/*.{js,ts,mts,tsx,vue}'],
     rules: {
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-explicit-any': 'off',

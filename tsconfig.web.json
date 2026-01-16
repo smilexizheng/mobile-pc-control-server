@@ -4,6 +4,9 @@
     "src/renderer/src/env.d.ts",
     "src/renderer/src/**/*",
     "src/renderer/src/**/*.vue",
+    "src/renderer/mobile/env.d.ts",
+    "src/renderer/mobile/**/*",
+    "src/renderer/mobile/**/*.vue",
     "src/preload/*.d.ts"
   ],
   "compilerOptions": {
@@ -12,6 +15,9 @@
     "paths": {
       "@renderer/*": [
         "src/renderer/src/*"
+      ],
+      "@mobile/*": [
+        "src/renderer/mobile/*"
       ]
     }
   }

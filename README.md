@@ -1,8 +1,7 @@
 # Mobile Remote PC Control
-
-欢迎大家提出issues或者其他想法，哪怕本身和这个软件毫无关联。
-
 基于Node.js Electron 的助手应用，核心远程控制电脑\其他辅助性功能，移动端H5界面简洁，适用于常见的手机电脑互通的场景。
+
+欢迎提出issues或者其他想法，哪怕功能本身和这个软件毫无关联。
 
 ![PC 界面预览](docs/img/1.png)
 快速了解项目，查看AI分析 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/smilexizheng/mobile-pc-control-server)
@@ -10,32 +9,24 @@
 
 ### PC 端功能
 
-- **远程控制**：设备扫码 打开网址 即可 远程控制电脑
-- **消息互传**：扫码连接后 聊天和发送文件
-- **自定义指令分享**：分享自定义指令和定时任务
+- **消息互传**：设备之间聊天和文件传输
 - **OCR 图文识别**：支持图片文字识别和涂鸦标注
 - **语音识别与合成**：基于 sherpa-onnx 的 ASR 语音识别和 TTS 文字转语音 [测试功能]
 
 
 ### 移动端功能
-
-- **远程控制**：扫码打开网址，可以文本输入、快捷键操作、鼠标移动/点击/拖拽
-- **自定义指令**：自定义一组，鼠标-键盘操作逻辑
-- **定时任务**：使用 cron 表达式设置定时触发的动作指令，实现自动化
+>首页打开为 远控PC操作的功能菜单，除了默认的选项外，可以自定义 （键鼠/快捷键/文本输入/打开网址）等功能菜单
+#### 应用解释
+- **鼠标键盘**：远程鼠标/键盘功能，支持预览桌面，可以文本输入、快捷键操作、鼠标移动/点击/拖拽
+- **消息互传**：聊天和文件传输
+- **我的指令**：自定义一组，（键鼠/快捷键/文本输入/打开网址）操作逻辑
+- **定时任务**：使用 cron 表达式设置定时触发的动作指令，实现自动化触发功能
 - **文件传输**：从移动设备上传文件到电脑
 - **窗口截图**：查看电脑运行应用的窗口截图
 
 ## 界面预览
 
-### OCR 图文识别
-
-![OCR 界面](docs/img/ocr.png)
-
-### 消息互传
-
-![img9.png](docs/img/chat.png)
-
-### 移动端控制界面
+### 移动端
 
 <table>
   <tr>
@@ -51,18 +42,21 @@
   </tr>
 </table>
 
+## PC端
+### OCR 图文识别
+
+![OCR 界面](docs/img/ocr.png)
+
+### 消息互传
+
+![img9.png](docs/img/chat.png)
+
+
 ## 平台支持
 
 - ✅ Windows
 - 🔄 macOS（暂无测试）
 - 🔄 Linux（暂无测试）
-
-## 开发进度
-
-- [√]重构为TypeScript
-- [√]PC端窗口化 自控/远控
-- [√]socket.io 连接鉴权配置
-
 
 ## 运行项目
 
@@ -91,12 +85,9 @@ $ npm run build:mac
 $ npm run build:linux
 ```
 
-### 移动端仓库
+### 修改移动端 首页菜单
 
-[ mobile-pc-control-web 仓库](https://github.com/smilexizheng/mobile-pc-control-web).
-
-- 将移动端web项目`build`后的静态资源放到此项目的`out/web`文件中,然后`build:win`, 即可替换移动端网页
-- 修改首页菜单方式
+-  src/renderer/mobile/views/Home
 
 ```javascript
 // 此处定义了客户端 发送和接收的event事件类型 https://github.com/smilexizheng/mobile-pc-control-server/tree/master/src/main/sever/src/constant
