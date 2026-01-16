@@ -20,7 +20,7 @@ async function createWindow(): Promise<void> {
     frame: false,
     show: false,
     transparent: false,
-    backgroundColor: 'rgba(0,0,0,0)',
+    // backgroundColor: 'rgba(0,0,0,0)',
     titleBarStyle: 'hidden',
     // titleBarOverlay: {
     //   color: '#fcfcfc',
@@ -36,27 +36,9 @@ async function createWindow(): Promise<void> {
       sandbox: false
     }
   })
-
-  console.log('启动control-server')
-  global.setting = db.getSettings()
-
-  global.mainWindow = mainWindow
-  global.controlServerPort = await InitWinControlServer(
-    global.setting.port,
-    global.setting.hostname
-  )
-  global.childWindow = {}
-  // InitAsrTts()
   // IPC
   import('./ipc')
-  // tray 系统托盘
-  InitTray()
-  // 注册协议
-  initProtocol()
-  // 开机自启
-  if (!is.dev && global.setting.autoStart) {
-    electronApp.setAutoLaunch(global.setting.autoStart)
-  }
+
   // todo win11 bugs titleBarOverlay冲突  https://github.com/electron/electron/issues/42409  createWindow setTimeout 100ms  正常
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -77,9 +59,29 @@ async function createWindow(): Promise<void> {
   // HMR for renderer base on electron-vite cli.
   // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL']).then()
+    mainWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/index.html`).then()
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html')).then()
+  }
+
+  console.log('启动control-server')
+  global.setting = db.getSettings()
+
+  global.mainWindow = mainWindow
+  global.controlServerPort = await InitWinControlServer(
+    global.setting.port,
+    global.setting.hostname
+  )
+  global.childWindow = {}
+  // InitAsrTts()
+
+  // tray 系统托盘
+  InitTray()
+  // 注册协议
+  initProtocol()
+  // 开机自启
+  if (!is.dev && global.setting.autoStart) {
+    electronApp.setAutoLaunch(global.setting.autoStart)
   }
 }
 app.commandLine.appendSwitch('lang', 'zh-CN')

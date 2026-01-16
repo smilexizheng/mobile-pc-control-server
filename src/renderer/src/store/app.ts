@@ -11,72 +11,78 @@ export const useAppStore = defineStore('app', () => {
   const deviceIp = ref<string>('127.0.0.1')
   const devicePort = ref<number>(3000)
   const isLoading = ref<boolean>(false)
-
-  const ipcRenderer = window.electron.ipcRenderer
   const isMaximize = ref(false)
-  ipcRenderer.on('updateNotAvailable', () => {
-    Notification.success({
-      id: 'updateNotion',
-      content: '当前为最新版本',
-      duration: 2000
+  const isDev = ref(import.meta.env.DEV)
+  const ipcRenderer = window.electron?.ipcRenderer
+  if (ipcRenderer) {
+    window.electron.ipcRenderer.on('openWindow-resp', (_, success: boolean) => {
+      isLoading.value = false
+      if (!success) Message.error('打开窗口失败')
     })
-  })
-  ipcRenderer.on('updateError', () => {
-    Notification.error({
-      id: 'updateNotion',
-      content: '检查更新失败，稍后重试...',
-      duration: 2000
+
+    ipcRenderer.on('updateNotAvailable', () => {
+      Notification.success({
+        id: 'updateNotion',
+        content: '当前为最新版本',
+        duration: 2000
+      })
     })
-  })
-  ipcRenderer.on('updateAvailable', (_, info) => {
-    Notification.success({
-      id: 'updateNotion',
-      title: `新版本 v${info.version}`,
-      content: () =>
-        h(
-          'div',
-          { style: { whiteSpace: 'pre-line' } },
-          `${info.releaseNotes} \n发布时间： ${dayjs(info.releaseDate).format('YYYY-MM-DD HH:mm')}`
-        ),
-      closable: true,
-      duration: 10000
+    ipcRenderer.on('updateError', () => {
+      Notification.error({
+        id: 'updateNotion',
+        content: '检查更新失败，稍后重试...',
+        duration: 2000
+      })
     })
-  })
-  ipcRenderer.on('downloadProgress', (_, info) => {
-    // 1. 文件大小换算
-    // const totalMB = info.total / (1024 * 1024) // ≈ 157.7 MB
-    // const transferredMB = info.transferred / (1024 * 1024) // ≈ 17.9 MB
-
-    // 2. 剩余下载量
-    // const remainingBytes = info.total - info.transferred // 146,602,321 字节
-    // const remainingMB = remainingBytes / (1024 * 1024) // ≈ 139.8 MB
-
-    // 3. 预计剩余时间
-    // const remainingSeconds = remainingBytes / info.bytesPerSecond // ≈ 640 秒
-    // const remainingMinutes = (remainingSeconds / 60).toFixed(2) // ≈ 10.7 分钟
-
-    // 4. 当前下载速度
-    // const speedKBps = info.bytesPerSecond / 1024 // ≈ 223.7 KB/s
-    const speedMBps = info.bytesPerSecond / (1024 * 1024) // ≈ 0.218 MB/s
-
-    // 5. 下载进度百分比（精确计算）
-    const calculatedPercent = ((info.transferred / info.total) * 100).toFixed(2) // 11.35%
-    Message.info({
-      id: 'updateDownloadProgress',
-      content: `下载更新 ${calculatedPercent}%   ${speedMBps.toFixed(2)}MB/s`,
-      duration: 2000
+    ipcRenderer.on('updateAvailable', (_, info) => {
+      Notification.success({
+        id: 'updateNotion',
+        title: `新版本 v${info.version}`,
+        content: () =>
+          h(
+            'div',
+            { style: { whiteSpace: 'pre-line' } },
+            `${info.releaseNotes} \n发布时间： ${dayjs(info.releaseDate).format('YYYY-MM-DD HH:mm')}`
+          ),
+        closable: true,
+        duration: 10000
+      })
     })
-  })
-  ipcRenderer.on('updateDownloaded', (_, info) => {
-    Modal.success({
-      title: '安装',
-      content: `新版本 v${info.version}准备就绪，点击确认开始安装`,
-      onOk: () => {
-        window.api.quitAndInstall()
-      }
-    })
-  })
+    ipcRenderer.on('downloadProgress', (_, info) => {
+      // 1. 文件大小换算
+      // const totalMB = info.total / (1024 * 1024) // ≈ 157.7 MB
+      // const transferredMB = info.transferred / (1024 * 1024) // ≈ 17.9 MB
 
+      // 2. 剩余下载量
+      // const remainingBytes = info.total - info.transferred // 146,602,321 字节
+      // const remainingMB = remainingBytes / (1024 * 1024) // ≈ 139.8 MB
+
+      // 3. 预计剩余时间
+      // const remainingSeconds = remainingBytes / info.bytesPerSecond // ≈ 640 秒
+      // const remainingMinutes = (remainingSeconds / 60).toFixed(2) // ≈ 10.7 分钟
+
+      // 4. 当前下载速度
+      // const speedKBps = info.bytesPerSecond / 1024 // ≈ 223.7 KB/s
+      const speedMBps = info.bytesPerSecond / (1024 * 1024) // ≈ 0.218 MB/s
+
+      // 5. 下载进度百分比（精确计算）
+      const calculatedPercent = ((info.transferred / info.total) * 100).toFixed(2) // 11.35%
+      Message.info({
+        id: 'updateDownloadProgress',
+        content: `下载更新 ${calculatedPercent}%   ${speedMBps.toFixed(2)}MB/s`,
+        duration: 2000
+      })
+    })
+    ipcRenderer.on('updateDownloaded', (_, info) => {
+      Modal.success({
+        title: '安装',
+        content: `新版本 v${info.version}准备就绪，点击确认开始安装`,
+        onOk: () => {
+          window.api.quitAndInstall()
+        }
+      })
+    })
+  }
   // 主区域大小
   const mainLayoutWH = ref<{ width: number; height: number }>({
     width: 0,
@@ -101,7 +107,7 @@ export const useAppStore = defineStore('app', () => {
     serverPort.value = await window.api.getControlServerPort()
     ips.value = await window.api.getLocalIPs()
 
-    devicePort.value = serverPort.value
+    devicePort.value = isDev.value ? Number.parseInt(location.port) : serverPort.value
     deviceIp.value = realHost.value || '127.0.0.1'
   }
 
@@ -163,16 +169,15 @@ export const useAppStore = defineStore('app', () => {
     return { width: mainLayoutWH.value.width, height: mainLayoutWH.value.height }
   })
 
+  const mobileHtml = computed(() => {
+    return `http://${realHost.value}:${isDev.value ? document.location.port : devicePort.value}/mobile.html#/`
+  })
+
   const handleMinimize = () => window.api.handleMinimize()
   const handleClose = () => window.api.handleClose()
   const handleMaximize = async () => {
     isMaximize.value = await window.api.handleMaximize()
   }
-
-  window.electron.ipcRenderer.on('openWindow-resp', (_, success: boolean) => {
-    isLoading.value = false
-    if (!success) Message.error('打开窗口失败')
-  })
 
   const openUrlWindow = (data): void => {
     isLoading.value = true
@@ -200,6 +205,8 @@ export const useAppStore = defineStore('app', () => {
   }
 
   return {
+    isDev,
+    mobileHtml,
     mainLayoutWH,
     contentWH,
     settings,

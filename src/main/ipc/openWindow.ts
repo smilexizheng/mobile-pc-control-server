@@ -6,24 +6,25 @@ import { APP_WINDOW_SIZE } from '../config'
 
 /**
  * 应用样式的窗口
+ * html 切换多页应用
  * hash  路由
  * title 标题
  * option 窗口参数 Electron.BaseWindowConstructorOptions
  * query 连接调整附带参数  route.query
+ * titleBar 使用原生窗口
  */
-ipcMain.on('openAppWindow', (event, { hash, title, option, query }) => {
+ipcMain.on('openAppWindow', (event, { html, hash, title, option, query, titleBar }) => {
   const id = createHexDigest(title + hash)
+  html = html ? html : 'index'
+  hash = hash ? hash : ''
   if (global.childWindow[id]) {
     global.childWindow[id].show()
   } else {
     const window = createWindow(event, id, {
       ...APP_WINDOW_SIZE,
       ...option,
-      frame: false,
-      show: false,
-      transparent: false,
-      backgroundColor: 'rgba(0,0,0,0)',
-      titleBarStyle: 'hidden'
+      frame: !!titleBar,
+      titleBarStyle: titleBar ? 'default' : 'hidden'
     })
 
     query = { id, title, ...query }
@@ -32,11 +33,11 @@ ipcMain.on('openAppWindow', (event, { hash, title, option, query }) => {
 
     if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
       window
-        .loadURL(`${process.env['ELECTRON_RENDERER_URL']}#/${hash}?${queryParams}`)
+        .loadURL(`${process.env['ELECTRON_RENDERER_URL']}/${html}.html#/${hash}?${queryParams}`)
         .then(() => {})
     } else {
       window
-        .loadFile(join(__dirname, '../renderer/index.html'), {
+        .loadFile(join(__dirname, `../renderer/${html}.html`), {
           hash: `${hash}?${queryParams}`
         })
         .then(() => {})

@@ -14,6 +14,11 @@ const InitWinControlServer = (port: number, hostname: string): Promise<number> =
     startWebServer(webExpress)
     io = new Server(httpServer, {
       path: '/win-control.io',
+      cors: {
+        origin: '*', // Allow all origins (for dev/testing; restrict in production, e.g., 'http://your-vue-app-origin')
+        methods: ['GET', 'POST'], // Required for polling
+        credentials: true // If using cookies/auth
+      },
       maxHttpBufferSize: 1024 * 1024 * 50
       // options
     })

@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import QRCodeStyling from 'qr-code-styling'
 import { Message, Notification } from '@arco-design/web-vue'
 import { useAppStore } from '@renderer/store/app'
+import { copyText } from '@renderer/utils/util'
 import { motion } from 'motion-v'
 import { useSocketStore } from '@renderer/store/socket'
 const appStore = useAppStore()
@@ -11,13 +12,9 @@ const qrCode = ref(new QRCodeStyling(appStore.qrOptions))
 const socketStore = useSocketStore()
 
 onMounted(async () => {
-  qrCode.value.append(qrContainer.value as HTMLDivElement)
   await appStore.initSetting()
-  if (appStore.ips && appStore.ips.length) {
-    qrCode.value.update({ data: `http://${appStore.realHost}:${appStore.devicePort}` })
-  } else {
-    Message.error('获取本机的网卡信息识别！')
-  }
+  qrCode.value.update({ data: appStore.mobileHtml })
+  qrCode.value.append(qrContainer.value as HTMLDivElement)
   socketStore.connect()
 })
 
@@ -44,15 +41,17 @@ const copyQrImg = async (): Promise<void> => {
         Control Server Electron
         <span class="vue">CSE</span>
       </div>
-      <p class="tip">浏览器\微信\支付宝 扫一扫 远程控制、任务自动化、定时任务等操作</p>
-      <a-tooltip content="点击将二维码复制到剪切板，分享给朋友">
+      <p class="tip" @click="copyText(appStore.mobileHtml)">
+        浏览器\微信\支付宝 扫一扫体验手机远控吧 （复制链接分享）
+      </p>
+      <a-tooltip content="复制二维码，分享给朋友">
         <motion.div :whileHover="{ scale: 1.1 }">
           <div ref="qrContainer" class="qr-container" @click="copyQrImg()"></div
         ></motion.div>
       </a-tooltip>
 
       <a-input-group>
-        <a-typography-text> 本地查看/远程设备： </a-typography-text>
+        <a-typography-text> 预览体验/远程设备： </a-typography-text>
         <a-input
           v-model="appStore.deviceIp"
           :style="{ width: '150px' }"
@@ -70,9 +69,8 @@ const copyQrImg = async (): Promise<void> => {
           :loading="appStore.isLoading"
           @click="
             appStore.openUrlWindow({
-              id: `remote_${appStore.deviceIp}`,
-              title: `远程设备_${appStore.deviceIp}`,
-              url: `http://${appStore.deviceIp}:${appStore.devicePort}`
+              title: `本地助手`,
+              url: `http://${appStore.deviceIp}:${appStore.devicePort}/mobile.html#/`
             })
           "
           >连接

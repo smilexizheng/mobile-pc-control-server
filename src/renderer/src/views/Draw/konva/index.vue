@@ -89,7 +89,7 @@ onUnmounted(() => {
                   x: data.box[0][0],
                   y: data.box[0][1]
                 }"
-                @click="!drawStore.graffitiMode && drawStore.copyText(data.text)"
+                @click="drawStore.copyText(data.text)"
               >
                 <k-rect
                   v-if="drawStore.showOcr"

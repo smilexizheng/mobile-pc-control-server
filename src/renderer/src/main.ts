@@ -10,10 +10,14 @@ import VueKonva from 'vue-konva'
 import '@arco-design/web-vue/dist/arco.css'
 import 'animate.css'
 
-createApp(App)
-  .use(ArcoVue)
-  .use(router)
-  .use(createPinia())
-  .use(VueKonva, { prefix: 'k' })
-  .use(ArcoVueIcon)
-  .mount('#app')
+if (!window.electron) {
+  window.location.href = '/mobile.html#/'
+} else {
+  createApp(App)
+    .use(ArcoVue)
+    .use(router)
+    .use(createPinia())
+    .use(VueKonva, { prefix: 'k' })
+    .use(ArcoVueIcon)
+    .mount('#app')
+}
