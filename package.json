@@ -1,6 +1,6 @@
 {
   "name": "control-server",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "ControlServer",
   "main": "./out/main/index.js",
   "author": "smilexizheng",
@@ -78,7 +78,7 @@
     "@types/socket.io-client": "^1.4.36",
     "@vitejs/plugin-vue": "^6.0.2",
     "electron": "^39.2.7",
-    "electron-builder": "^26.0.12",
+    "electron-builder": "^26.1.0",
     "electron-vite": "^5.0.0",
     "eslint": "^9.39.1",
     "eslint-plugin-vue": "^10.6.2",
@@ -91,6 +91,6 @@
     "less": "^4.2.2",
     "unplugin-vue-components": "^28.4.1",
     "@nutui/auto-import-resolver": "^1.0.0",
-    "vite-plugin-vue-devtools": "^7.7.2"
+    "vite-plugin-vue-devtools": "^8.0.5"
   }
 }
