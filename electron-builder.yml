@@ -13,7 +13,7 @@ files:
   - '!{.eslintignore,.eslintrc.cjs,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,.env.development,.env.production,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
-  - '!{.idea,.fastRequest,docs,db,logs,test,script}'
+  - '!{.idea,.github,docs,db,logs,test,script}'
   - '!*.md'
   - '!**/*.{map,ts,tsx,jsx,less,scss,sass,css.d.ts,d.cts,d.mts,md,markdown,yaml,yml}'
   - '!**/{test,tests,__tests__,coverage}/**'
