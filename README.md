@@ -1,64 +1,60 @@
 # Mobile Remote PC Control
-基于Node.js Electron 的助手应用，核心远程控制电脑\其他辅助性功能，移动端H5界面简洁，适用于常见的手机电脑互通的场景。
 
-欢迎提出issues或者其他想法，哪怕功能本身和这个软件毫无关联。
+这是一款基于 Electron 的桌面助手工具，能将你的电脑快速变成可被手机/浏览器远程控制的服务器。主要面向局域网内手机控制电脑的场景，无需互联网，连接方便。
 
+
+
+程序在电脑端运行后，会同时启动一个 Express + Socket.IO 服务，并显示二维码。手机扫描二维码即可打开优化过的 H5 网页控制端，实现以下功能
 ![PC 界面预览](docs/img/1.png)
+
 快速了解项目，查看AI分析 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/smilexizheng/mobile-pc-control-server)
-## 主要功能
+[![GitHub stars](https://img.shields.io/github/stars/smilexizheng/mobile-pc-control-server.svg)](https://github.com/smilexizheng/mobile-pc-control-server/stargazers)
+[![License](https://img.shields.io/github/license/smilexizheng/mobile-pc-control-server.svg)](LICENSE)
+<p align="center">中文 | <a href="./docs/README_EN.md">English</a><br></p>
 
-### PC 端功能
+## 核心功能
 
-- **消息互传**：设备之间聊天和文件传输
-- **OCR 图文识别**：支持图片文字识别和涂鸦标注
-- **语音识别与合成**：基于 sherpa-onnx 的 ASR 语音识别和 TTS 文字转语音 [测试功能]
+- 实时远程控制电脑（键盘输入、鼠标移动/点击/拖拽/滚轮,音量调节、关机重启、窗口管理等）
+- 屏幕实时流传输（基于 FFmpeg\flv.js ，ios浏览器不支持Meida Source Extensions无法使用，有可能改为hls ）
+- 实时聊天 + 在线用户列表+ 双向文件传输
+- 自定义快捷指令、组合宏、定时任务（支持 cron）
+- 屏幕 OCR 文字识别
+- 屏幕涂鸦/标注功能
+- 实验性语音功能（语音识别/合成，未启用）
 
+>适合这些场景：沙发上用手机操控客厅电脑、演示时快速切换、家庭自动化触发、手机与电脑间快速传文件、轻量级局域网远程协助等。
 
-### 移动端功能
->首页打开为 远控PC操作的功能菜单，除了默认的选项外，可以自定义 （键鼠/快捷键/文本输入/打开网址）等功能菜单
-#### 应用解释
-- **鼠标键盘**：远程鼠标/键盘功能，支持预览桌面，可以文本输入、快捷键操作、鼠标移动/点击/拖拽
-- **消息互传**：聊天和文件传输
-- **我的指令**：自定义一组，（键鼠/快捷键/文本输入/打开网址）操作逻辑
-- **定时任务**：使用 cron 表达式设置定时触发的动作指令，实现自动化触发功能
-- **文件传输**：从移动设备上传文件到电脑
-- **窗口截图**：查看电脑运行应用的窗口截图
+## 界面一览
 
-## 界面预览
-
-### 移动端
-
+### 移动端预览
 <table>
   <tr>
-    <td><img src="docs/img/2.png" alt="移动端主界面" width="250"/></td>
+    <td><img src="docs/img/2.png" alt="主界面" width="250"/></td>
     <td><img src="docs/img/3.png" alt="远程控制" width="250"/></td>
-    <td><img src="docs/img/5.png" alt="文件共享" width="250"/>
-      <img src="docs/img/6.png" alt="创建自动化操作" width="250"/></td>
+    <td><img src="docs/img/5.png" alt="文件共享" width="250"/><br><img src="docs/img/6.png" alt="自动化创建" width="250"/></td>
   </tr>
   <tr>
-    <td><img src="docs/img/8.png" alt="本地指令" width="250"/></td>
-    <td><img src="docs/img/4.png" alt="自动化操作详情" width="250"/></td>
-    <td><img src="docs/img/7.png" alt="窗口截屏" width="250"/></td>
+    <td><img src="docs/img/8.png" alt="自定义指令" width="250"/></td>
+    <td><img src="docs/img/4.png" alt="任务详情" width="250"/></td>
+    <td><img src="docs/img/7.png" alt="窗口截图" width="250"/></td>
   </tr>
 </table>
 
-## PC端
-### OCR 图文识别
-
+### PC 端预览
+#### OCR 识别界面
 ![OCR 界面](docs/img/ocr.png)
 
-### 消息互传
+#### 消息共享界面
+![消息界面](docs/img/chat.png)
 
-![img9.png](docs/img/chat.png)
+## 支持平台
+- ✅ Windows（全面测试，推荐首选）
+- 🔄 macOS（支持构建，未测试）
+- 🔄 Linux（支持构建，未测试）
 
 
-## 平台支持
 
-- ✅ Windows
-- 🔄 macOS（暂无测试）
-- 🔄 Linux（暂无测试）
-
-## 运行项目
+## 快速上手
 
 ### Install
 
@@ -85,7 +81,21 @@ $ npm run build:mac
 $ npm run build:linux
 ```
 
-### 修改移动端 首页菜单
+### 启动指南
+
+- 运行打包后的应用（exe/app）。
+- PC 启动服务器，扫描 二维码或复制链接。
+- 手机浏览器扫码/输入 URL，使用 设置的token连接。（默认token: ssss）
+- 安全：Token 认证确保连接安全，适合局域网。无内置加密，避免公网使用。
+
+### 常见问题
+
+- Q: 延迟太高？ A: 确认同网段，设置里调整 屏幕质量，或优化网络。
+- Q: 手机支持？ A: 主流浏览器（如 Chrome/Safari） 均可。
+- Q: 如何扩展？ A: 修改 Vue 组件或新增事件，参考常量文件的event。
+
+
+### 自定义菜单
 
 -  src/renderer/mobile/views/Home
 
