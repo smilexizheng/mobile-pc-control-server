@@ -1,5 +1,5 @@
 import { ChildProcess, spawn } from 'child_process'
-import ffmpegPath from 'ffmpeg-static'
+// import ffmpegPath from 'ffmpeg-static'
 // import ffprobePath from '@ffprobe-installer/ffprobe'
 import upath from 'upath'
 
@@ -16,12 +16,16 @@ const sendHeader = (io, socket): void => {
     socket.emit('flv_data', header)
   } else {
     console.log('服务启动中')
-    startScreenLive(io)
+    startScreenLive(io, socket)
   }
 }
 
-const startScreenLive = (io): void => {
-  if (childProcess || !ffmpegPath) return
+const startScreenLive = (io, socket): void => {
+  const ffmpegPath = global.setting.ffmpegPath
+  if (childProcess || !ffmpegPath) {
+    socket.emit('server_error', '请配置有效的ffmpeg.exe路径')
+    return
+  }
   console.log(ffmpegPath)
   childProcess = spawn(
     upath.join(ffmpegPath).replace('app.asar', 'app.asar.unpacked'),

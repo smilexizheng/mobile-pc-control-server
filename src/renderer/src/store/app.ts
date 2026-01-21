@@ -117,12 +117,12 @@ export const useAppStore = defineStore('app', () => {
   })
 
   const updateSettings = (value: Setting): void => {
-    settings.value = value
     window.electron.ipcRenderer
       .invoke('update-settings', {
         settings: { ...value }
       })
       .then((r) => {
+        settings.value = value
         if (r.restart) {
           Modal.success({
             title: '设置成功',

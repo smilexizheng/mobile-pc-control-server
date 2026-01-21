@@ -77,9 +77,9 @@ const apps = ref([
     modules: [
       { name: '鼠标键盘', color: '#9217e4', action: 'router', toLink: '/mouse' },
       {
-        name: '浏览器',
+        name: '百度',
         color: '#f16b3a',
-        events: [{ event: CE.OPEN_URL, eventData: { url: 'https://' } }]
+        events: [{ event: CE.OPEN_URL, eventData: { url: 'https://baidu.com/' } }]
       },
       { name: '文件上传', color: '#2196F3', action: 'router', toLink: '/transfer' },
       { name: '消息互传', color: '#28f321', action: 'router', toLink: '/chatList' },

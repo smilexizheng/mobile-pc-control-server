@@ -1,24 +1,21 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { Setting } from '@renderer/env'
 import { useAppStore } from '@renderer/store/app'
+import { chooseFile } from '@renderer/utils/util'
 const appStore = useAppStore()
-const settingForm = ref<Setting>({
-  token: '',
-  port: 0,
-  hostname: '',
-  quality: 50,
-  autoStart: true
-})
+const settingForm = ref<Setting>(appStore.settings!)
 
-const handleSubmit = (): void => {
-  appStore.updateSettings(settingForm.value)
-  appStore.settingsVisible = false
+const chooseFfmpegpath = async () => {
+  settingForm.value.ffmpegPath = await chooseFile('ffmpeg', ['exe'])
 }
 
-onMounted(() => {
-  settingForm.value = { ...appStore.settings } as Setting
-})
+const openDownPage = () => {
+  window.api.openExternal('https://ffmpeg.org/download.html')
+}
+const handleSubmit = (): void => {
+  appStore.updateSettings(settingForm.value!)
+}
 </script>
 
 <template>
@@ -46,6 +43,20 @@ onMounted(() => {
     </a-form-item>
     <a-form-item field="autoStart" tooltip="开机自启" label="开机自启">
       <a-switch v-model="settingForm.autoStart" />
+    </a-form-item>
+
+    <a-form-item field="ffmpegPath" tooltip="桌面视频流基于ffmpeg" label="ffmpeg路径">
+      <a-input-search
+        v-model="settingForm.ffmpegPath"
+        placeholder="选择ffmpeg路径"
+        allow-clear
+        button-text="选择文件"
+        search-button
+        @search="chooseFfmpegpath()"
+      ></a-input-search>
+    </a-form-item>
+    <a-form-item field="isRead">
+      <a-button type="text" @click="openDownPage()">ffmpeg 下载地址</a-button>
     </a-form-item>
 
     <a-form-item>

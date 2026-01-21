@@ -7,13 +7,16 @@ const api = {
   showItemInFolder: (fileId): void => {
     ipcRenderer.send('showItemInFolder', fileId)
   },
+  openExternal: (url): void => {
+    ipcRenderer.send('openExternal', url)
+  },
 
   shellOpen: (fileId): void => {
     ipcRenderer.send('shellOpen', fileId)
   },
   /**
    * 选择文件
-   * @param name 标题名曾
+   * @param name 标题名
    * @param extensions 文件后置
    */
   chooseFile: async (name: string, extensions: string[]): Promise<string | null> => {

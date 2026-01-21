@@ -13,6 +13,10 @@ ipcMain.handle('addAllowDownFile', async (_, { filePath, fileName }) => {
 ipcMain.on('showItemInFolder', async (_, fileId) => {
   shell.showItemInFolder(global.allowDownFiles[fileId].filePath)
 })
+
+ipcMain.on('openExternal', async (_, url) => {
+  shell.openExternal(url).then()
+})
 ipcMain.on('shellOpen', async (_, fileId) => {
   shell.openPath(global.allowDownFiles[fileId].filePath)
 })

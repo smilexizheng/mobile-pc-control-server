@@ -15,6 +15,7 @@ type Setting = {
   hostname: string
   quality: number
   autoStart: boolean
+  ffmpegPath: string
 }
 
 type UserMessage = {

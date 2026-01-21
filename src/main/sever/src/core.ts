@@ -2,8 +2,7 @@ import { Key, keyboard, mouse, Point } from '@nut-tree-fork/nut-js'
 
 import { Monitor } from 'node-screenshots'
 import sharp from 'sharp'
-import { clipboard } from 'electron'
-import { spawn } from 'child_process'
+import { clipboard, shell } from 'electron'
 import { CLIENT_EMIT_EVENTS as CE } from './constant/client-emit'
 import { shutdown } from './system'
 // import { WinApi } from './utils/win-api'
@@ -77,12 +76,13 @@ const typeString = async (data): Promise<void> => {
 }
 
 const openUrl = (url): void => {
-  const subprocess = spawn('cmd.exe', ['/c', 'start', '""', url], {
-    detached: true, // 让子进程独立
-    stdio: 'ignore', // 忽略 IO
-    windowsHide: true
-  })
-  subprocess.unref()
+  shell.openExternal(url).then()
+  // const subprocess = spawn('cmd.exe', ['/c', 'start', '""', url], {
+  //   detached: true, // 让子进程独立
+  //   stdio: 'ignore', // 忽略 IO
+  //   windowsHide: true
+  // })
+  // subprocess.unref()
 }
 
 const getMousePos = async (): Promise<Point> => {

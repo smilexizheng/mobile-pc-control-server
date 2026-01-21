@@ -8,4 +8,9 @@ const copyText = (text): void => {
   }
 }
 
-export { copyText }
+const chooseFile = async (name: string, extensions: string[]) => {
+  const path = await window.api.chooseFile(name, extensions)
+  return path || ''
+}
+
+export { copyText, chooseFile }

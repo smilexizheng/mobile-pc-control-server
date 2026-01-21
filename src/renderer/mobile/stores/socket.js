@@ -66,6 +66,10 @@ export const useSocketStore = defineStore('socket', () => {
         showNotify.danger('服务异常：' + error)
       })
 
+      socket.value.on('server_error', (error) => {
+        showNotify.danger(error)
+      })
+
       socket.value.on('connect_error', (err) => {
         showNotify.warn('连接异常：' + err.message)
         if (err?.data?.code === 401) {
