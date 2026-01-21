@@ -1,5 +1,6 @@
-# Mobile Remote PC Control
+<p align="center">中文 | <a href="./docs/README_EN.md">English</a><br></p>
 
+## Mobile Remote PC Control
 这是一款基于 Electron 的桌面助手工具，能将你的电脑快速变成可被手机/浏览器远程控制的服务器。主要面向局域网内手机控制电脑的场景，无需互联网，连接方便。
 
 
@@ -10,7 +11,6 @@
 快速了解项目，查看AI分析 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/smilexizheng/mobile-pc-control-server)
 [![GitHub stars](https://img.shields.io/github/stars/smilexizheng/mobile-pc-control-server.svg)](https://github.com/smilexizheng/mobile-pc-control-server/stargazers)
 [![License](https://img.shields.io/github/license/smilexizheng/mobile-pc-control-server.svg)](LICENSE)
-<p align="center">中文 | <a href="./docs/README_EN.md">English</a><br></p>
 
 ## 核心功能
 

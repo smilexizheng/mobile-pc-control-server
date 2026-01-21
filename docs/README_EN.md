@@ -1,3 +1,5 @@
+<p align="center">English | <a href="https://github.com/smilexizheng/mobile-pc-control-server">中文</a><br></p>
+
 **Mobile-PC-Control-Server** (also known as ControlServer) is an Electron-based desktop application that transforms your PC into a powerful remote control server. It allows users to control their computer seamlessly from mobile phones or web browsers over a local network — no internet required.
 
 By running on your PC, the app starts an embedded Express + Socket.IO server. Users simply scan a QR code displayed on the PC to connect via a mobile-optimized H5 web interface. Once connected,
@@ -8,7 +10,6 @@ Quick insights: View AI analysis [![Ask DeepWiki](https://deepwiki.com/badge.svg
 [![GitHub stars](https://img.shields.io/github/stars/smilexizheng/mobile-pc-control-server.svg)](https://github.com/smilexizheng/mobile-pc-control-server/stargazers)
 [![License](https://img.shields.io/github/license/smilexizheng/mobile-pc-control-server.svg)](LICENSE)
 
-<p align="center">English | <a href="https://github.com/smilexizheng/mobile-pc-control-server">中文</a><br></p>
 
 ### you can
 - Perform real-time remote desktop control (keyboard input, mouse movement, click, drag, scroll)
