@@ -50,7 +50,7 @@ interface OcrDetectedBox {
    * @minimum 0
    * @maximum 1
    */
-  score: number
+  mean: number
 
   /**
    * 识别出的文本内容

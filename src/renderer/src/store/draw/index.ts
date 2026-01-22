@@ -124,7 +124,7 @@ export const useDrawStore = defineStore('draw', () => {
     if (box.code === 100) {
       ocrResult.value = box.data
     } else if (showOcr.value) {
-      Message.error(box.data)
+      Message.error(box.data || result)
     }
   })
 

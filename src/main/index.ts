@@ -1,9 +1,8 @@
 import { app, BrowserWindow, shell } from 'electron'
 import { electronApp, is, optimizer } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
+import icon from '../../build/icon.png?asset'
 import { join } from 'upath'
 import { InitWinControlServer } from './sever/main'
-import { getAppIcon } from './utils/common'
 import { InitTray } from './menu/tray'
 import './utils/log'
 import { initProtocol, handleArgv } from './utils/protocol'
@@ -27,7 +26,7 @@ async function createWindow(): Promise<void> {
     //   symbolColor: '#e80ba3',
     //   height: 26
     // },
-    icon: getAppIcon(),
+    // icon: getAppIcon(),
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     // ...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),

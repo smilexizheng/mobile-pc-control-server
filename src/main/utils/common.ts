@@ -1,9 +1,8 @@
-import { app, nativeImage } from 'electron'
-import upath from 'upath'
+import { nativeImage } from 'electron'
 import os from 'os'
 import NativeImage = Electron.NativeImage
 import * as crypto from 'crypto'
-
+import appIcon from '../../../build/icon.png?asset'
 // 获取所有IPv4地址
 const getLocalIPs = (): string[] => {
   const interfaces = os.networkInterfaces()
@@ -51,11 +50,15 @@ const getAppIcon = (): NativeImage => {
   if (icon) {
     return icon
   }
-  const iconPath = app.isPackaged
-    ? upath.join(process.resourcesPath, 'app.asar.unpacked', 'resources', 'icon.png')
-    : upath.join(process.cwd(), 'resources', 'icon.png')
+  // const modelPath = upath
+  //   .join(__dirname, '../../resources/icon.png')
+  //   .replace('app.asar', 'app.asar.unpacked')
 
-  icon = nativeImage.createFromPath(iconPath)
+  // const iconPath = app.isPackaged
+  //   ? upath.join(process.resourcesPath, 'app.asar.unpacked', 'resources', 'icon.png')
+  //   : upath.join(process.cwd(), 'resources', 'icon.png')
+
+  icon = nativeImage.createFromPath(appIcon)
   return icon
 }
 

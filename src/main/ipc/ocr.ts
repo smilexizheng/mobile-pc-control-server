@@ -3,17 +3,24 @@ import OCRService from '../asr-tts-ocr/ocr'
 import * as fs from 'fs'
 import upath from 'upath'
 import Screenshots from 'electron-screenshots'
+import { platform } from '@electron-toolkit/utils'
 
 const ocrService = new OCRService({ lang: 'zhCN' })
 
 ipcMain.on('ocr-recognition', (_, imgPath) => {
-  ocrService.ocr(imgPath)
+  if (platform.isWindows) {
+    ocrService.ocr(imgPath)
+  } else {
+    global.mainWindow.webContents.send('ocr-result', '{ "data":"此平台暂不支持OCR" }')
+  }
 })
 
 ipcMain.on('ocr-screenshots', () => {
   isShortcut = false
   global.mainWindow.minimize()
-  screenshots.startCapture().then()
+  setTimeout(() => {
+    screenshots.startCapture().then()
+  }, 200)
 })
 
 ipcMain.handle('cor-clipboard-readImage', async () => {

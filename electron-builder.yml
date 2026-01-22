@@ -6,25 +6,35 @@ electronLanguages:
   - zh-CN
   - en-US
 files:
-  - "**/*"
-  - "!**/{.vscode,.yarn,.yarn-lock,.github,.cursorrules,.prettierrc}"
-  - '!src/*'
-  - '!electron.vite.config.{js,ts,mjs,cjs}'
-  - '!{.eslintignore,.eslintrc.cjs,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,.env.development,.env.production,CHANGELOG.md,README.md}'
-  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
-  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
-  - '!{.idea,.github,docs,db,logs,test,script}'
-  - '!*.md'
-  - '!**/*.{map,ts,tsx,jsx,less,scss,sass,css.d.ts,d.cts,d.mts,md,markdown,yaml,yml}'
+  - "out/**"
+  - "package.json"
+  - "resources/**"
+  - "node_modules/**"
+  - '!**/*.{map,ts,tsx,jsx,less,scss,sass,css.d.ts,d.cts,d.mts,md,txt,markdown,yaml,yml}'
+  - '!**/*{LICENSE,license,license.txt,LICENSE.txt,LICENSE-MIT.txt,*.LICENSE.txt,NOTICE.txt,README,README.md,CHANGELOG.md}'
+  - "!**/{.vscode,.yarn,.yarn-lock,.github,.cursorrules,.prettierrc,.prettierrc.json}"
   - '!**/{test,tests,__tests__,coverage}/**'
-  - '!**/*.{spec,test}.{js,jsx,ts,tsx}'
-  - '!**/{*.map,*.log,*.d.ts,*.LICENSE,*license,*.README,*example.js}'
-  - '!**/{.DS_Store,Thumbs.db}'
-  - '!**/{LICENSE,LICENSE.txt,LICENSE-MIT.txt,*.LICENSE.txt,NOTICE.txt,README.md,CHANGELOG.md}'
+  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  - '!**/{*.map,*.log,*.d.ts,*.LICENSE,*license,*.README,*example.js,example*,examples/*}'
+#  - "**/*"
+#  - '!src/*'
+#  - '!electron.vite.config.{js,ts,mjs,cjs}'
+#  - '!{.eslintignore,.eslintrc.cjs,eslint.config.mjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,.env.development,.env.production,CHANGELOG.md,README.md}'
+#  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+#  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+#  - '!{.idea,.github,docs,db,logs,test,script}'
+#  - '!*.md'
+#  - '!**/*.{spec,test}.{js,jsx,ts,tsx}'
+#  - '!**/{.DS_Store,Thumbs.db}'
+#  - '!**/{LICENSE,LICENSE.txt,LICENSE-MIT.txt,*.LICENSE.txt,NOTICE.txt,README.md,CHANGELOG.md}'
 
 # to look app.asar  npx asar extract app.asar ./unpacked
 asarUnpack:
   - resources/**
+# 将models 资源复制到外部
+#extraResources:
+#  - from: "models"
+#    to: "models"
 win:
   executableName: ControlServer
 #  requestedExecutionLevel: requireAdministrator
