@@ -12,13 +12,14 @@ export default defineConfig(({ mode }): UserConfig => {
     renderer: {
       server: { host: true },
       build: {
-        rollupOptions: {
+        rolldownOptions: {
           input: {
             browser: resolve(__dirname, 'src/renderer/index.html'),
             mobile: resolve(__dirname, 'src/renderer/mobile.html')
           }
-        },
-        isolatedEntries: true //启用隔离构建可以减少生成的 chunk 数量
+        }
+        // isolatedEntries: true, //启用隔离构建可以减少生成的 chunk 数量
+        // externalizeDeps: false
       },
 
       resolve: {
