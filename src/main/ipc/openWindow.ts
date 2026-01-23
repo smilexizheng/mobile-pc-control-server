@@ -1,9 +1,9 @@
 import { ipcMain, BrowserWindow } from 'electron'
 import upath, { join } from 'upath'
-import { createHexDigest, getAppIcon, objectToParam } from '../utils/common'
-import { is } from '@electron-toolkit/utils'
+import { createHexDigest, objectToParam } from '../utils/common'
+import { is, platform } from '@electron-toolkit/utils'
 import { APP_WINDOW_SIZE } from '../config'
-
+import icon from '../../../build/icon.png?asset'
 /**
  * 应用样式的窗口
  * html 切换多页应用
@@ -23,8 +23,8 @@ ipcMain.on('openAppWindow', (event, { html, hash, title, option, query, titleBar
     const window = createWindow(event, id, {
       ...APP_WINDOW_SIZE,
       ...option,
-      frame: !!titleBar,
-      titleBarStyle: titleBar ? 'default' : 'hidden'
+      ...(platform.isWindows ? { frame: !!titleBar } : {})
+      // titleBarStyle: titleBar ? 'default' : 'hidden'
     })
 
     query = { id, title, ...query }
@@ -73,8 +73,9 @@ const createWindow = (
     // maxHeight: 830,
     ...option,
     show: false,
-    icon: getAppIcon(),
     autoHideMenuBar: true,
+    ...(process.platform === 'linux' || platform.isWindows ? { icon } : {}),
+    ...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),
     webPreferences: {
       preload: upath.join(__dirname, '../preload/index.js'),
       sandbox: false

@@ -1,5 +1,5 @@
 import { app, BrowserWindow, shell } from 'electron'
-import { electronApp, is, optimizer } from '@electron-toolkit/utils'
+import { electronApp, is, optimizer, platform } from '@electron-toolkit/utils'
 import icon from '../../build/icon.png?asset'
 import { join } from 'upath'
 import { InitWinControlServer } from './sever/main'
@@ -16,20 +16,21 @@ async function createWindow(): Promise<void> {
     ...APP_WINDOW_SIZE,
     minWidth: 520,
     minHeight: 200,
-    frame: false,
     show: false,
     transparent: false,
+    ...(is.dev && platform.isWindows ? { icon } : {}),
+    //默认标题栏
+    ...(platform.isWindows ? { frame: false } : {}),
     // backgroundColor: 'rgba(0,0,0,0)',
-    titleBarStyle: 'hidden',
+    // titleBarStyle: 'hidden',
     // titleBarOverlay: {
     //   color: '#fcfcfc',
     //   symbolColor: '#e80ba3',
     //   height: 26
     // },
-    // icon: getAppIcon(),
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
-    // ...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),
+    ...(process.platform !== 'darwin' ? { titleBarOverlay: true } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false

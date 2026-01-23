@@ -16,7 +16,7 @@ const checkUpdate = async () => {
 </script>
 
 <template>
-  <button class="control-btn" @click="checkUpdate">
+  <button class="control-btn" @click="checkUpdate" v-if="appStore.platform?.isWindows">
     <CircleArrowUp :size="16" />
   </button>
 

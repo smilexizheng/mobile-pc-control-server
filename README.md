@@ -48,9 +48,9 @@
 ![消息界面](docs/img/chat.png)
 
 ## 支持平台
-- ✅ Windows（全面测试，推荐首选）
-- 🔄 macOS（支持构建，未测试）
-- 🔄 Linux（支持构建，未测试）
+- ✅ Windows
+- 🔄 macOS（未测试）
+- 🔄 Linux（未测试）
 
 
 

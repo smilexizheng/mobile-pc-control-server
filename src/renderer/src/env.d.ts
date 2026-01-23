@@ -1,5 +1,6 @@
 /// <reference types="vite/client" />
 import { ElectronAPI } from '@electron-toolkit/preload'
+import { platform } from '@electron-toolkit/utils'
 
 type ThemeType = 'light' | 'dark'
 
@@ -9,6 +10,13 @@ declare global {
   }
 }
 
+type Platform = {
+  isWindows: boolean
+  isMacOS: boolean
+  isLinux: boolean
+  isDev: boolean
+}
+
 type Setting = {
   token: string
   port: number
@@ -16,6 +24,11 @@ type Setting = {
   quality: number
   autoStart: boolean
   ffmpegPath: string
+}
+
+type AppSettings = {
+  settings: Setting
+  platform: Platform
 }
 
 type UserMessage = {

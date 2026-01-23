@@ -3,7 +3,7 @@ import { getLocalIPs } from '../utils/common'
 import { db } from '../utils/database'
 import { disconnectSockets } from '../sever/main'
 import Update from '../utils/Update'
-import { electronApp, is } from '@electron-toolkit/utils'
+import { electronApp, is, platform } from '@electron-toolkit/utils'
 
 ipcMain.on('ping', () => console.log('pong'))
 ipcMain.on('window-minimize', (_, windowId) => {
@@ -54,7 +54,7 @@ ipcMain.handle('update-settings', (_, { settings }) => {
   return { restart }
 })
 ipcMain.handle('get-settings', async () => {
-  return db.getSettings()
+  return { settings: { ...db.getSettings() }, platform: { ...platform, isDev: is.dev } }
 })
 
 ipcMain.handle('get-control-server-port', (): number => {

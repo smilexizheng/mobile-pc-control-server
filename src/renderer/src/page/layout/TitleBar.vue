@@ -12,16 +12,21 @@ const appStore = useAppStore()
   <div class="title-bar">
     <img alt="logo" class="min-logo" :src="logo" />
     {{ title }}
+
     <div class="window-controls">
       <Settings />
-      <button class="control-btn minimize" @click="appStore.handleMinimize">
-        <Minus :size="22" />
-      </button>
-      <button class="control-btn maximize" @click="appStore.handleMaximize">
-        <Copy v-if="appStore.isMaximize" :size="16" />
-        <Square v-else :size="16" />
-      </button>
-      <button class="control-btn close" @click="appStore.handleClose"><X :size="22" /></button>
+      <template v-if="appStore.platform?.isWindows">
+        <button class="control-btn minimize" @click="appStore.handleMinimize">
+          <Minus :size="22" />
+        </button>
+        <button class="control-btn maximize" @click="appStore.handleMaximize">
+          <Copy v-if="appStore.isMaximize" :size="16" />
+          <Square v-else :size="16" />
+        </button>
+        <button class="control-btn close" @click="appStore.handleClose">
+          <X :size="22" />
+        </button>
+      </template>
     </div>
   </div>
 </template>

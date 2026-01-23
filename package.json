@@ -61,7 +61,7 @@
     "flv.js": "^1.6.2",
     "less": "^4.2.2",
     "mic": "^2.1.2",
-    "naudiodon2": "^2.4.0",
+    "naudiodon2": "^2.5.0",
     "pinia": "^3.0.2",
     "prettier": "^3.7.4",
     "typescript": "^5.9.3",

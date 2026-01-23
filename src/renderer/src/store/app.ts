@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { computed, h, onMounted, ref, watch } from 'vue'
-import { Setting, ThemeType } from '../env'
+import { Setting, Platform, ThemeType } from '../env'
 import { useStorage } from '@vueuse/core'
 import { Message, Modal, Notification } from '@arco-design/web-vue'
 import dayjs from 'dayjs'
@@ -95,6 +95,8 @@ export const useAppStore = defineStore('app', () => {
 
   // 系统设置参数
   const settings = ref<Setting>()
+  // 平台参数
+  const platform = ref<Platform>()
 
   const serverPort = ref<number>()
   const ips = ref<string[]>([])
@@ -103,7 +105,9 @@ export const useAppStore = defineStore('app', () => {
   const theme = useStorage<ThemeType>('arco-theme', 'light')
 
   const initSetting = async (): Promise<void> => {
-    settings.value = await window.electron.ipcRenderer.invoke('get-settings')
+    const appSettings = await window.electron.ipcRenderer.invoke('get-settings')
+    settings.value = appSettings.settings
+    platform.value = appSettings.platform
     serverPort.value = await window.api.getControlServerPort()
     ips.value = await window.api.getLocalIPs()
 
@@ -206,6 +210,7 @@ export const useAppStore = defineStore('app', () => {
 
   return {
     isDev,
+    platform,
     mobileHtml,
     mainLayoutWH,
     contentWH,
