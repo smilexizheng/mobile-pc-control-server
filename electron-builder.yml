@@ -10,7 +10,7 @@ files:
   - "package.json"
   - "resources/**"
   - "node_modules/**"
-  - '!**/*.{map,ts,tsx,jsx,less,scss,sass,css.d.ts,d.cts,d.mts,md,txt,markdown,yaml,yml}'
+  - '!**/*.{map,ts,tsx,jsx,less,scss,sass,css.d.ts,d.cts,d.mts,md,markdown,yaml,yml}'
   - '!**/*{LICENSE,license,license.txt,LICENSE.txt,LICENSE-MIT.txt,*.LICENSE.txt,NOTICE.txt,README,README.md,CHANGELOG.md}'
   - "!**/{.vscode,.yarn,.yarn-lock,.github,.cursorrules,.prettierrc,.prettierrc.json}"
   - '!**/{test,tests,__tests__,coverage}/**'
