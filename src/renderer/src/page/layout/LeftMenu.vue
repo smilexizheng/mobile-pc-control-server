@@ -53,10 +53,10 @@ const onClickMenuItem = (key): void => {
         <icon-image />
         绘画涂鸦/OCR
       </a-menu-item>
-      <!--      <a-menu-item key="asr"> <iconVoice /> ASR语音识别 </a-menu-item>-->
+      <a-menu-item key="/asr"> <iconVoice /> ASR语音转文字 </a-menu-item>
       <!--      <a-menu-item key="tts">-->
       <!--        <icon-chinese-fill />-->
-      <!--        TTS文字转换-->
+      <!--        TTS文字转语音-->
       <!--      </a-menu-item>-->
       <a-sub-menu key="more">
         <template #title>

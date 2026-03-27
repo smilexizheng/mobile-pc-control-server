@@ -3,6 +3,7 @@ import Home from '@renderer/views/Home/index.vue'
 import Draw from '@renderer/views/Draw/index.vue'
 import Chat from '@renderer/views/Chat/index.vue'
 import Game from '@renderer/views/Game/index.vue'
+import Asr from '@renderer/views/Asr/index.vue'
 import Layout from '@renderer/page/layout/index.vue'
 import AppLayout from '@renderer/page/app/index.vue'
 
@@ -28,6 +29,11 @@ const router = createRouter({
           path: '/chat',
           name: 'chat',
           component: Chat
+        },
+        {
+          path: '/asr',
+          name: 'asr',
+          component: Asr
         }
       ]
     },

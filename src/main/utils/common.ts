@@ -3,6 +3,12 @@ import os from 'os'
 import NativeImage = Electron.NativeImage
 import * as crypto from 'crypto'
 import appIcon from '../../../build/icon.png?asset'
+import path from 'path'
+
+const getResourcePath = () => {
+  const enginePath = path.join(__dirname, '../../resources')
+  return enginePath.replace('app.asar', 'app.asar.unpacked')
+}
 // 获取所有IPv4地址
 const getLocalIPs = (): string[] => {
   const interfaces = os.networkInterfaces()
@@ -86,4 +92,4 @@ const objectToParam = (query) => {
     .join('&')
 }
 
-export { getLocalIPs, getAppIcon, createHexDigest, objectToParam }
+export { getResourcePath, getLocalIPs, getAppIcon, createHexDigest, objectToParam }

@@ -14,6 +14,12 @@ const api = {
   shellOpen: (fileId): void => {
     ipcRenderer.send('shellOpen', fileId)
   },
+  whisperConfig: async (config): void => {
+    return await ipcRenderer.invoke('whisper-config', config)
+  },
+  getWhisperConfig: async () => {
+    return await ipcRenderer.invoke('get-whisper-config')
+  },
   /**
    * 选择文件
    * @param name 标题名
@@ -29,7 +35,12 @@ const api = {
     }
     return null
   },
-
+  /**
+   * whisperAsync
+   */
+  whisperAsync: async (path): Promise<string | null> => {
+    return await ipcRenderer.invoke('whisper-async', path)
+  },
   /**
    * 选择文件夹
    */

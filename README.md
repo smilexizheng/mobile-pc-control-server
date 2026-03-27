@@ -8,7 +8,7 @@
 程序在电脑端运行后，会同时启动一个 Express + Socket.IO 服务，并显示二维码。手机扫描二维码即可打开优化过的 H5 网页控制端，实现以下功能
 ![PC 界面预览](docs/img/1.png)
 
-快速了解项目，查看AI分析 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/smilexizheng/mobile-pc-control-server)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/smilexizheng/mobile-pc-control-server)
 [![GitHub stars](https://img.shields.io/github/stars/smilexizheng/mobile-pc-control-server.svg)](https://github.com/smilexizheng/mobile-pc-control-server/stargazers)
 [![License](https://img.shields.io/github/license/smilexizheng/mobile-pc-control-server.svg)](LICENSE)
 
@@ -19,6 +19,7 @@
 - 实时聊天 + 在线用户列表+ 双向文件传输
 - 自定义快捷指令、组合宏、定时任务（支持 cron）
 - 屏幕 OCR 文字识别
+- 本地的语音转文字 基于whisper.cpp
 - 屏幕涂鸦/标注功能
 - 实验性语音功能（语音识别/合成，未启用）
 
