@@ -14,7 +14,7 @@ const api = {
   shellOpen: (fileId): void => {
     ipcRenderer.send('shellOpen', fileId)
   },
-  whisperConfig: async (config): void => {
+  whisperConfig: async (config) => {
     return await ipcRenderer.invoke('whisper-config', config)
   },
   getWhisperConfig: async () => {
