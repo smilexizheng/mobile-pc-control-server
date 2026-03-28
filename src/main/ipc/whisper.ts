@@ -3,13 +3,22 @@ import path from 'path'
 import whisper from '../../../resources/whisper/whisper.node'
 import { promisify } from 'util'
 import fs from 'fs'
-import { getResourcePath } from '../utils/common'
+import os from 'os'
+import crypto from 'crypto'
+import { spawnSync } from 'child_process'
 import { db } from '../utils/database'
+
 const whisperAsync = promisify(whisper.whisper)
-const vadParams = {
+
+type WhisperStore = {
+  model: string | null
+  vad_model: string | null
+  vad?: boolean
+}
+
+/** 与 whisper.node 约定一致的公共字段（每次调用拷贝，避免改写到共享模块状态） */
+const SHARED_WHISPER_FIELDS = {
   language: 'auto',
-  model: path.join(getResourcePath(), '../models/ggml-base.bin'),
-  fname_inp: path.join(__dirname, 'jfk.wav'),
   use_gpu: true,
   flash_attn: false,
   no_prints: false,
@@ -19,89 +28,174 @@ const vadParams = {
   detect_language: false,
   audio_ctx: 0,
   max_len: 0,
-  // VAD parameters
+  initial_prompt: '这是中文简体 普通话。'
+} as const
+
+const VAD_EXTRA_FIELDS = {
   vad: true,
-  vad_model: path.join(getResourcePath(), '../models/ggml-silero-v6.2.0.bin'), // You need to download this model
   vad_threshold: 0.5,
   vad_min_speech_duration_ms: 250,
   vad_min_silence_duration_ms: 100,
   vad_max_speech_duration_s: 30.0,
   vad_speech_pad_ms: 30,
-  vad_samples_overlap: 0.1,
-  initial_prompt: '这是中文简体 普通话。',
-  progress_callback: (progress) => {
-    console.log(`VAD Transcription progress: ${progress}%`)
-  }
-}
+  vad_samples_overlap: 0.1
+} as const
 
-// Example without VAD (traditional approach)
-const traditionalParams = {
-  language: 'auto',
-  model: path.join(getResourcePath(), '../models/ggml-base.bin'),
-  fname_inp: path.join(__dirname, 'jfk.wav'),
-  use_gpu: true,
-  flash_attn: false,
-  no_prints: false,
-  comma_in_time: true,
-  translate: false,
-  no_timestamps: false,
-  detect_language: false,
-  audio_ctx: 0,
-  initial_prompt: '这是中文简体 普通话。',
-  max_len: 0,
-  vad: false, // Explicitly disable VAD
-  progress_callback: (progress) => {
-    console.log(`Traditional transcription progress: ${progress}%`)
-  }
-}
-
-const transcribeAudio = async (fname_inp) => {
-  const modelsConfig = db.app.get('whisper', {
+function defaultWhisperStore(): WhisperStore {
+  return {
     model: null,
     vad_model: null,
     vad: true
-  })
-  if (!modelsConfig.model) {
-    return { err: '请先下载模型 Model not found,Please download the VAD model first' }
   }
-  vadParams.model = modelsConfig.model
-  vadParams.vad_model = modelsConfig.vad_model
-  traditionalParams.model = modelsConfig.model
-  vadParams.fname_inp = fname_inp
-  traditionalParams.fname_inp = fname_inp
-  if (!fs.existsSync(vadParams.vad_model)) {
-    console.log('⚠️  VAD model not found. Please download the VAD model first:')
-    console.log('   ./models/download-vad-model.sh silero-v6.2.0')
-    console.log('   Or run: python models/convert-silero-vad-to-ggml.py')
-    console.log('\n   Falling back to traditional transcription without VAD...\n')
+}
 
-    // Run without VAD
-    console.log('🎵 Running traditional transcription...')
-    const traditionalResult = await whisperAsync(traditionalParams)
-    console.log('\n📝 Traditional transcription result:')
-    console.log(traditionalResult)
-    return
+function attachMeta<T extends Record<string, unknown>>(
+  payload: T,
+  processMs: number
+): T & { meta: { processMs: number } } {
+  return {
+    ...payload,
+    meta: { processMs }
+  }
+}
+
+function runFfmpegMp3To16kWavMono(
+  ffmpegExe: string,
+  inputMp3: string,
+  outputWav: string
+): { ok: true } | { ok: false; detail: string } {
+  const r = spawnSync(
+    ffmpegExe,
+    ['-y', '-i', inputMp3, '-ar', '16000', '-ac', '1', '-c:a', 'pcm_s16le', outputWav],
+    {
+      encoding: 'utf-8',
+      windowsHide: true,
+      maxBuffer: 10 * 1024 * 1024,
+      env: { ...process.env, LC_ALL: 'C' }
+    }
+  )
+  if (r.status === 0) {
+    return { ok: true }
+  }
+  const errText = [r.stderr, r.stdout].filter(Boolean).join('\n').trim().slice(-2500)
+  return { ok: false, detail: errText || `ffmpeg 退出码 ${r.status ?? 'unknown'}` }
+}
+
+function whisperParamsForJob(fname_inp: string, modelPath: string, cfg: WhisperStore) {
+  const vadPath = cfg.vad_model?.trim() ?? ''
+  const vadAllowed = cfg.vad !== false && vadPath.length > 0 && fs.existsSync(vadPath)
+
+  const progress = (label: string) => (p: number) => console.log(`${label}: ${p}%`)
+
+  const base = {
+    ...SHARED_WHISPER_FIELDS,
+    model: modelPath.trim(),
+    fname_inp,
+    progress_callback: progress(vadAllowed ? 'VAD transcription' : 'Transcription')
   }
 
-  console.log('🎵 Running transcription with VAD enabled...')
-  // console.log('VAD Parameters:')
-  // console.log(`  - Threshold: ${vadParams.vad_threshold}`)
-  // console.log(`  - Min speech duration: ${vadParams.vad_min_speech_duration_ms}ms`)
-  // console.log(`  - Min silence duration: ${vadParams.vad_min_silence_duration_ms}ms`)
-  // console.log(`  - Max speech duration: ${vadParams.vad_max_speech_duration_s}s`)
-  // console.log(`  - Speech padding: ${vadParams.vad_speech_pad_ms}ms`)
-  // console.log(`  - Samples overlap: ${vadParams.vad_samples_overlap}\n`)
+  if (vadAllowed) {
+    return { ...base, ...VAD_EXTRA_FIELDS, vad_model: vadPath }
+  }
 
-  const startTime = Date.now()
-  const vadResult = await whisperAsync(vadParams)
-  const vadDuration = Date.now() - startTime
+  if (cfg.vad !== false && vadPath && !fs.existsSync(vadPath)) {
+    console.warn('[whisper] VAD 模型未找到，已回退为非 VAD 转写:', vadPath || '(empty)')
+  }
 
-  console.log('\n✅ VAD transcription completed!')
-  console.log(`⏱️  Processing time: ${vadDuration}ms`)
-  console.log('\n📝 VAD transcription result:')
-  console.log(vadResult)
+  return { ...base, vad: false }
+}
 
-  return vadResult
+const transcribeAudio = async (fname_inp: string) => {
+  if (typeof fname_inp !== 'string' || !fname_inp.trim()) {
+    return { err: '无效音频路径' }
+  }
+  const audioPath = fname_inp.trim()
+  if (!fs.existsSync(audioPath)) {
+    return { err: '音频文件不存在' }
+  }
+
+  const modelsConfig = db.app.get('whisper', defaultWhisperStore()) as WhisperStore
+  const modelPath = modelsConfig.model?.trim()
+
+  if (!modelPath) {
+    return {
+      err: '请先在 ASR 页面选择有效的 ggml 模型（.bin）'
+    }
+  }
+  if (!fs.existsSync(modelPath)) {
+    return { err: '模型文件不存在，请重新选择路径' }
+  }
+
+  const ext = path.extname(audioPath).toLowerCase()
+  let tempWav: string | null = null
+  let wavPathForWhisper = audioPath
+
+  if (ext === '.mp3') {
+    const ffmpegExe = global.setting?.ffmpegPath?.trim()
+    if (!ffmpegExe || !fs.existsSync(ffmpegExe)) {
+      return {
+        err: 'MP3 需要先转换：请在「设置」中配置有效的 ffmpeg 可执行文件路径'
+      }
+    }
+    tempWav = path.join(
+      os.tmpdir(),
+      `cse-asr-${Date.now()}-${crypto.randomBytes(4).toString('hex')}.wav`
+    )
+    console.log(tempWav)
+    const conv = runFfmpegMp3To16kWavMono(ffmpegExe, audioPath, tempWav)
+    if (!conv.ok) {
+      if (fs.existsSync(tempWav)) {
+        try {
+          fs.unlinkSync(tempWav)
+        } catch {
+          /* ignore */
+        }
+      }
+      return { err: `MP3 转 WAV 失败：${conv.detail}` }
+    }
+    wavPathForWhisper = tempWav
+  } else if (ext !== '.wav') {
+    return { err: '仅支持 WAV 或 MP3 文件' }
+  }
+
+  const params = whisperParamsForJob(wavPathForWhisper, modelPath, modelsConfig)
+  const mode = params.vad ? 'VAD' : 'non-VAD'
+  console.log(`[whisper] start (${mode})`, path.basename(audioPath))
+
+  const t0 = Date.now()
+
+  try {
+    const raw = await whisperAsync(params)
+    console.log(raw)
+    const processMs = Date.now() - t0
+    console.log(`[whisper] done in ${processMs}ms`)
+
+    if (raw === null || raw === undefined) {
+      return attachMeta({ err: '转写无返回' }, processMs)
+    }
+    if (typeof raw === 'string') {
+      return attachMeta({ transcription: raw }, processMs)
+    }
+    if (typeof raw === 'object' && !Array.isArray(raw)) {
+      return attachMeta({ ...(raw as Record<string, unknown>) }, processMs)
+    }
+
+    return attachMeta({ transcription: String(raw) }, processMs)
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e)
+    const processMs = Date.now() - t0
+    console.error('[whisper] failed:', msg)
+    return attachMeta({ err: msg }, processMs)
+  } finally {
+    if (tempWav && fs.existsSync(tempWav)) {
+      try {
+        fs.unlinkSync(tempWav)
+        console.log('[whisper] removed temp wav', path.basename(tempWav))
+      } catch (err) {
+        console.warn('[whisper] temp wav cleanup failed:', err)
+      }
+    }
+  }
 }
 
 ipcMain.handle('whisper-async', async (_, fname_inp) => {
