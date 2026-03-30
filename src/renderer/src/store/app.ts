@@ -15,11 +15,14 @@ export const useAppStore = defineStore('app', () => {
   const isDev = ref(import.meta.env.DEV)
   const ipcRenderer = window.electron?.ipcRenderer
   if (ipcRenderer) {
-    window.electron.ipcRenderer.on('openWindow-resp', (_, success: boolean) => {
+    ipcRenderer.on('openWindow-resp', (_, success: boolean) => {
       isLoading.value = false
       if (!success) Message.error('打开窗口失败')
     })
 
+    ipcRenderer.on('app-resize', (_, window) => {
+      isMaximize.value = window.isMaximized
+    })
     ipcRenderer.on('updateNotAvailable', () => {
       Notification.success({
         id: 'updateNotion',

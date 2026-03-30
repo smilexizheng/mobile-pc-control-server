@@ -44,6 +44,12 @@ async function createWindow(): Promise<void> {
     mainWindow.show()
   })
 
+  mainWindow.on('resize', () => {
+    const { width, height } = mainWindow.getBounds()
+    console.log('mianWindow resize ' + width, height)
+    mainWindow.webContents.send('app-resize', { isMaximized: mainWindow.isMaximized() })
+  })
+
   mainWindow.on('close', (e) => {
     if (!app.willQuitApp) {
       mainWindow.hide()

@@ -16,6 +16,10 @@ const handleMaximize = async () => {
 onMounted(() => {
   windowId.value = route.query.id as string
   title.value = route.query.title as string
+
+  window.electron?.ipcRenderer.on(`app-resize`, (_, window) => {
+    isMaximize.value = window.isMaximized
+  })
 })
 </script>
 

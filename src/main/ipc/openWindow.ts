@@ -88,6 +88,12 @@ const createWindow = (
   childWindow.once('closed', () => {
     global.childWindow[id] = undefined
   })
+
+  childWindow.on('resize', () => {
+    console.log('child resize')
+    console.log(id)
+    childWindow.webContents.send(`app-resize`, { isMaximized: childWindow.isMaximized() })
+  })
   childWindow.once('unresponsive', () => {
     console.log('childWindow unresponsive')
   })
