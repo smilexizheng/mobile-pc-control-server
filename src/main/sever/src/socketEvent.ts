@@ -231,7 +231,7 @@ const registerSocketHandlers = (io: Server): void => {
     scale: 1, // 分辨率缩放比例（从 100% 降至 50%）
     quality: global.setting.quality || 30 // JPEG质量降至可接受范围
   }
-  const captureInterval = 18 // 截图间隔（毫秒）
+  const captureInterval = 30 // 截图间隔（毫秒）
 
   let isCapture = false
   const captureScreen = async (cutSize = { width: 400, height: 800 }, force): Promise<void> => {

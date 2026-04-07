@@ -159,15 +159,15 @@ const grabRegion = async (mouseX, mouseY, captureWidth, captureHeight): Promise<
     }
   }
 
-  console.log(
-    left,
-    mouseX,
-    mouseX - captureWidth / 2,
-    startX,
-    captureWidth,
-    mouseX,
-    startX + captureWidth / 2 - mouseX
-  )
+  // console.log(
+  //   left,
+  //   mouseX,
+  //   mouseX - captureWidth / 2,
+  //   startX,
+  //   captureWidth,
+  //   mouseX,
+  //   startX + captureWidth / 2 - mouseX
+  // )
 
   // return {left,right,top,bottom
   //     ,buffer: (await img.crop(startX < 0 ? monitor.width - (Math.abs(startX)) : startX, startY, captureWidth, captureHeight)).toJpegSync()};

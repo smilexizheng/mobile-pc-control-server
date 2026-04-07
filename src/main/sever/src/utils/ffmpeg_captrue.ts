@@ -1,11 +1,6 @@
 import { ChildProcess, spawn } from 'child_process'
-// import ffmpegPath from 'ffmpeg-static'
-// import ffprobePath from '@ffprobe-installer/ffprobe'
 import upath from 'upath'
-
-// import {createWriteStream} from "fs";
-
-// const file = createWriteStream("capture.flv");
+import fs from 'fs'
 
 let childProcess: ChildProcess | null
 
@@ -22,7 +17,7 @@ const sendHeader = (io, socket): void => {
 
 const startScreenLive = (io, socket): void => {
   const ffmpegPath = global.setting.ffmpegPath
-  if (childProcess || !ffmpegPath) {
+  if (childProcess || !ffmpegPath || !fs.existsSync(ffmpegPath)) {
     socket.emit('server_error', '请配置有效的ffmpeg.exe路径')
     return
   }
@@ -32,6 +27,12 @@ const startScreenLive = (io, socket): void => {
     [
       '-f',
       'gdigrab',
+      // '-offset_x',
+      // '0',
+      // '-offset_y',
+      // '0',
+      // '-video_size',
+      // '1920*1080',
       '-i',
       'desktop',
       '-vcodec',

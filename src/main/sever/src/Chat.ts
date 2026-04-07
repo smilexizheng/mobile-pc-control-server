@@ -9,7 +9,7 @@ const initChat = (io, socket): void => {
   const socketInfo = getClientInfo(socket)
   if (socket.handshake.auth.isServer) {
     hostSocket = socketInfo
-    console.log(hostSocket)
+    console.log('hostSocket', hostSocket)
     socketInfo.name = '服务主机'
     serverSocketId = socket.id
   }

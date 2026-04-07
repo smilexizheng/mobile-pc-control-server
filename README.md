@@ -15,7 +15,7 @@
 ## 核心功能
 
 - 实时远程控制电脑（键盘输入、鼠标移动/点击/拖拽/滚轮,音量调节、关机重启、窗口管理等）
-- 屏幕实时流传输（基于 FFmpeg\flv.js ，ios浏览器不支持Meida Source Extensions无法使用，有可能改为hls ）
+- 屏幕实时流传输（基于 FFmpeg\mpegts.js,支持iOS Safari with iOS 17.1+）
 - 实时聊天 + 在线用户列表+ 双向文件传输
 - 自定义快捷指令、组合宏、定时任务（支持 cron）
 - 屏幕 OCR 文字识别

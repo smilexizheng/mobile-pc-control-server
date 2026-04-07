@@ -1,12 +1,14 @@
-import { BaseLoader, LoaderStatus, LoaderErrors } from 'flv.js'
+import Mpegts from 'mpegts.js'
 import { CLIENT_EMIT_EVENTS as CE } from '@mobile/constant/client-emit.js'
 
 /**
  * rewrite socket-io-loader  be based on FLV over WebSocket live stream
- * https://github.com/bilibili/flv.js/blob/master/src/io/websocket-loader.js
+ * https://github.com/xqq/mpegts.js/blob/master/src/io/websocket-loader.js
  */
 
-class SocketIoLoader extends BaseLoader {
+const LoaderStatus = Mpegts.LoaderStatus
+const LoaderErrors = Mpegts.LoaderErrors
+class SocketIoLoader extends Mpegts.BaseLoader {
   static isSupported() {
     try {
       return typeof self.WebSocket !== 'undefined'
