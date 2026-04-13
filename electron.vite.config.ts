@@ -12,13 +12,13 @@ export default defineConfig((): UserConfig => {
   return {
     main: {
       build: {
-        minify: isProd ? 'esbuild' : false,
+        minify: isProd ? 'oxc' : false,
         sourcemap: isDev
       }
     },
     preload: {
       build: {
-        minify: isProd ? 'esbuild' : false,
+        minify: isProd ? 'oxc' : false,
         sourcemap: isDev
       }
     },

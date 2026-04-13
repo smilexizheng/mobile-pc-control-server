@@ -1,4 +1,4 @@
-import sherpa_onnx from 'sherpa-onnx'
+const sherpa_onnx = require('sherpa-onnx')
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 const createOfflineTts = () => {
   const offlineTtsKokoroModelConfig = {

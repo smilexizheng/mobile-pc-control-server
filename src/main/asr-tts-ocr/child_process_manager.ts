@@ -1,6 +1,7 @@
 // https://github.com/l1veIn/lol-wom-electron/blob/main/src/utils/child_process_manager.js
-import { fork, ForkOptions, ChildProcess } from 'child_process'
+// import { fork, ForkOptions, ChildProcess } from 'child_process'
 import EventEmitter from 'events'
+import { utilityProcess, UtilityProcess, ForkOptions } from 'electron'
 
 interface ChildProcessManagerOptions {
   maxRestarts?: number
@@ -12,7 +13,7 @@ interface ChildProcessManagerOptions {
 class ChildProcessManager extends EventEmitter {
   private readonly scriptPath: string
   private options: Required<ChildProcessManagerOptions>
-  private childProcess: ChildProcess | null = null
+  private childProcess: UtilityProcess | null = null
   private restartCount: number = 0
   private isShuttingDown: boolean = false
 
@@ -33,7 +34,6 @@ class ChildProcessManager extends EventEmitter {
       this.emit('warning', 'Child process already running')
       return
     }
-
     this.createProcess()
   }
 
@@ -42,15 +42,20 @@ class ChildProcessManager extends EventEmitter {
   }
 
   private createProcess(): void {
-    this.childProcess = fork(this.scriptPath, this.options.args, this.options.forkOptions)
+    this.childProcess = utilityProcess.fork(
+      this.scriptPath,
+      this.options.args,
+      this.options.forkOptions
+    )
 
-    this.childProcess.on('error', (error: Error) => {
-      this.emit('error', error)
+    this.childProcess.on('error', (e) => {
+      // this.emit('error', error)
+      console.error(e)
       this.handleProcessFailure('error')
     })
 
-    this.childProcess.on('exit', (code: number | null, signal: NodeJS.Signals | null) => {
-      this.emit('exit', code, signal)
+    this.childProcess.on('exit', (code: number) => {
+      this.emit('exit', code)
       if (code !== 0 && !this.isShuttingDown) {
         this.handleProcessFailure('exit')
       }
@@ -66,6 +71,7 @@ class ChildProcessManager extends EventEmitter {
   private handleProcessFailure(reason: string): void {
     if (this.restartCount < this.options.maxRestarts) {
       this.restartCount++
+      console.error(this.restartCount, '尝试重启', this.scriptPath)
       this.emit('restarting', { reason, attempt: this.restartCount })
       setTimeout(() => this.createProcess(), this.options.restartDelay)
     } else {
@@ -75,7 +81,8 @@ class ChildProcessManager extends EventEmitter {
 
   send(message): void {
     if (this.childProcess) {
-      this.childProcess.send(message)
+      // this.childProcess.send(message)
+      process.parentPort.postMessage(message)
     } else {
       this.emit('warning', 'Attempted to send message to non-existent child process')
     }
