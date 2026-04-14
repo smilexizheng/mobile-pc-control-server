@@ -24,7 +24,7 @@ const InitAsrTts = (): void => {
   // 文字转语音
   const ttsProcess = new ChildProcessManager(TTSPath)
   // ttsProcess.start()
-  ttsProcess.send({ cmd: 'tts', text: '这是中文，this is a dog,中英切换，效果如何？' })
+  // ttsProcess.send({ cmd: 'tts', text: '这是中文，this is a dog,你觉得效果如何？' })
   global.ttsProcess = ttsProcess
 }
 

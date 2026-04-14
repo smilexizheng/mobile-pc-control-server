@@ -82,7 +82,7 @@ class ChildProcessManager extends EventEmitter {
   send(message): void {
     if (this.childProcess) {
       // this.childProcess.send(message)
-      process.parentPort.postMessage(message)
+      this.childProcess.postMessage(message)
     } else {
       this.emit('warning', 'Attempted to send message to non-existent child process')
     }
