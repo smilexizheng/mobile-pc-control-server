@@ -44,11 +44,12 @@ const appStore = useAppStore()
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 0 10px;
 }
 
 .min-logo {
-  height: 24px;
-  width: 24px;
+  height: 20px;
+  width: 20px;
 }
 
 .window-controls {

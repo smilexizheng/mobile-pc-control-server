@@ -8,7 +8,7 @@ import './utils/log'
 import { initProtocol, handleArgv } from './utils/protocol'
 import { db } from './utils/database'
 import { APP_WINDOW_SIZE } from './config'
-import { InitAsrTts } from './asr-tts-ocr'
+// import { InitAsrTts } from './asr-tts-ocr'
 
 async function createWindow(): Promise<void> {
   // Create the browser window.
@@ -79,7 +79,7 @@ async function createWindow(): Promise<void> {
     global.setting.hostname
   )
   global.childWindow = {}
-  InitAsrTts()
+  // InitAsrTts()
 
   // tray 系统托盘
   InitTray()

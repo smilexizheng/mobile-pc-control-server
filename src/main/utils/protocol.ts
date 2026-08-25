@@ -20,7 +20,7 @@ const initProtocol = (): void => {
   })
 
   /**
-   * 从本地磁盘读取文件
+   * 注册 disk 协议，从本地磁盘读取文件
    */
   protocol.handle('disk', (request) => {
     let pathName = new URL(request.url).pathname

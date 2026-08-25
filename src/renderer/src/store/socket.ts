@@ -36,12 +36,16 @@ export const useSocketStore = defineStore('socket-io', () => {
 
           socket.value?.on('client-list', (data) => {
             onlineSocketUser.value = data
-            if (data) {
-              activeClient.value = null
-            }
           })
-          socket.value?.on('client-leave', () => {
+          socket.value?.on('latest-online', (id) => {
+            activeClient.value = onlineSocketUser.value[id]
+          })
+          socket.value?.on('client-leave', (data) => {
             Message.info('客户端离线')
+            if (data == activeClient.value.id) {
+              activeClient.value = onlineSocketUser.value[onlineSocketIds.value[0]]
+            }
+
             // if (userMessage.value[data]) {
             // delete userMessage.value[data]
             // }

@@ -1,25 +1,38 @@
 import { BrowserWindow, dialog, shell, ipcMain } from 'electron'
 import upath from 'upath'
 import * as fs from 'fs'
+import { formatFileSize } from '../utils/common'
 
+/**
+ * 创建共享文件
+ *
+ */
 ipcMain.handle('addAllowDownFile', async (_, { filePath, fileName }) => {
   const fileId = crypto.randomUUID().toString()
   global.allowDownFiles[fileId] = {
     filePath,
-    fileName
+    fileName,
+    extName: upath.extname(fileName)
   }
   return fileId
 })
-ipcMain.on('showItemInFolder', async (_, fileId) => {
-  shell.showItemInFolder(global.allowDownFiles[fileId].filePath)
+
+ipcMain.handle('getAllowFileById', async (_, fileId) => {
+  const allowDownFile = global.allowDownFiles[fileId]
+  const fileStat = await fs.statSync(allowDownFile.filePath)
+  return { ...allowDownFile, size: formatFileSize(fileStat.size) }
 })
 
-ipcMain.on('openExternal', async (_, url) => {
-  shell.openExternal(url).then()
+ipcMain.on('showItemInFolder', async (_, fileId) => {
+  shell.showItemInFolder(global.allowDownFiles[fileId].filePath)
 })
 ipcMain.on('shellOpen', async (_, fileId) => {
   shell.openPath(global.allowDownFiles[fileId].filePath)
 })
+ipcMain.on('openExternal', async (_, url) => {
+  shell.openExternal(url).then()
+})
+
 ipcMain.handle('chooseFolder', async (event) => {
   // 获取当前窗口作为父窗口
   const parentWindow = BrowserWindow.fromWebContents(event.sender)!

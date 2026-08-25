@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { ref, reactive, watch, onMounted, nextTick } from 'vue'
-import { IconSend, IconFaceSmileFill, IconFolderAdd, IconImage } from '@arco-design/web-vue/es/icon'
+import { IconFaceSmileFill, IconFolderAdd, IconImage } from '@arco-design/web-vue/es/icon'
 import { useSocketStore } from '@renderer/store/socket'
 import dayjs from 'dayjs'
 import { copyText } from '@renderer/utils/util'
-import { Copy, FolderOpen, File } from 'lucide-vue-next'
+import { Copy, FolderOpen } from 'lucide-vue-next'
+import FileLoader from './FileLoader.vue'
+import { Message } from '@arco-design/web-vue'
 const socketStore = useSocketStore()
 
 const emojis = reactive(['😀', '😂', '😅', '😘', '🏸', '😎', '❤️', '👍', '🎉'])
 const chatContent = ref<HTMLDivElement>()
-
+const isDragover = ref(false)
 // Auto-scroll to bottom when messages
 watch(socketStore.userMessage, () => {
   nextTick(() => {
@@ -24,12 +26,20 @@ const inputMessage = ref('')
 const triggerFileInput = async (extensions: string[]): Promise<void> => {
   const filePath = await window.api.chooseFile('选择文件', extensions)
   if (filePath) {
-    const fileId = await window.electron.ipcRenderer.invoke('addAllowDownFile', {
-      filePath,
-      fileName: filePath.split('/').pop()
-    })
-    socketStore.sendMessage({ msgType: 'file', fileId, fileName: filePath.split('/').pop() })
+    await sharedFile(filePath)
   }
+}
+
+const sharedFile = async (filePath) => {
+  const fileId = await window.electron.ipcRenderer.invoke('addAllowDownFile', {
+    filePath,
+    fileName: filePath.split('/').pop()
+  })
+  socketStore.sendMessage({
+    msgType: 'file',
+    fileId,
+    fileName: filePath.split('/').pop()
+  })
 }
 
 const insertEmoji = (emoji): void => {
@@ -48,19 +58,49 @@ const sendMessage = (): void => {
   inputMessage.value = ''
 }
 
-const openFile = (fileId) => {
-  window.api.shellOpen(fileId)
+const handleKeyDown = (event) => {
+  // 监听 Enter 键（key 值为 'Enter'）
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault() // 阻止换行
+    sendMessage()
+  }
 }
+
 const showItemInFolder = (fileId) => {
   window.api.showItemInFolder(fileId)
 }
+
+const handleDrop = (event) => {
+  isDragover.value = false
+  if (!socketStore.activeClient) {
+    Message.error('请先扫描连接平台！')
+    return
+  }
+  // 获取拖拽的文件列表（DataTransfer）
+  const files = event.dataTransfer.files
+
+  if (files.length === 0) return
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i]
+    const absolutePath = window.api.getPathForFile(file)
+    sharedFile(absolutePath)
+  }
+}
 </script>
 <template>
-  <a-layout class="chat-container">
+  <a-layout
+    class="chat-container"
+    @dragover.prevent="isDragover = true"
+    @dragenter.prevent="isDragover = true"
+    @dragleave.prevent="isDragover = false"
+    @drop.prevent="handleDrop"
+  >
     <!-- 左侧消息列表 -->
     <a-layout-sider :width="221" class="left-sider">
-      <div class="message-header">消息列表</div>
+      <div class="message-header">在线设备</div>
       <a-list :bordered="false" class="message-list" :style="{ width: `220px` }">
+        <template #empty></template>
         <template v-for="id in socketStore.onlineSocketIds" :key="id">
           <a-list-item
             v-if="id !== socketStore.socket?.id"
@@ -72,6 +112,7 @@ const showItemInFolder = (fileId) => {
                 >{{ dayjs(socketStore.onlineSocketUser[id].connectTime).format('HH:mm') }}
               </span>
             </template>
+
             <a-list-item-meta>
               <template #avatar>
                 <a-avatar :size="40" :style="{ backgroundColor: '#14a9f8' }">
@@ -86,6 +127,7 @@ const showItemInFolder = (fileId) => {
                   socketStore.onlineSocketUser[id].userAgent.os.name
                 }}</span>
               </template>
+
               <template #description>
                 <div class="message-preview">
                   {{ socketStore.onlineSocketUser[id].clientIp }}
@@ -98,10 +140,10 @@ const showItemInFolder = (fileId) => {
     </a-layout-sider>
 
     <!-- 右侧聊天区域 -->
-    <a-layout class="right-layout">
-      <a-layout-content class="chat-content">
-        <a-scrollbar style="height: calc(100vh - 116px); overflow: auto">
-          <div v-if="socketStore.activeClient" ref="chatContent" class="chat-messages">
+    <a-layout v-if="socketStore.activeClient" style="background: var(--color-fill-1)">
+      <a-layout-content>
+        <a-scrollbar style="height: calc(100vh - 260px); overflow: auto">
+          <div ref="chatContent" class="chat-messages">
             <div
               v-for="(message, index) in socketStore.userMessage[socketStore.activeClient.clientIp]"
               :key="index"
@@ -114,26 +156,24 @@ const showItemInFolder = (fileId) => {
 
                 <a-space>
                   <a-link @click="copyText(message.content)">
-                    <template #icon> <Copy :size="16" /> </template>复制
+                    <template #icon> <Copy :size="12" /> </template>复制
                   </a-link>
                 </a-space>
               </div>
-
+              <!--文件类型-->
               <div v-if="message.msgType === 'file'" class="bubble-content">
                 <div class="message-time">{{ message.time }}</div>
-                <div class="message-text">{{ message.fileName }}</div>
+                <div>
+                  <FileLoader :fileId="message.fileId" />
+                </div>
                 <a-space>
-                  <a-link @click="openFile(message.fileId)">
-                    <template #icon> <File :size="16" /> </template>文件
-                  </a-link>
-                  <a-link @click="showItemInFolder(message.fileId)">
-                    <template #icon> <FolderOpen :size="16" /> </template>文件夹
+                  <a-link @click.stop="showItemInFolder(message.fileId)">
+                    <template #icon> <FolderOpen :size="12" /> </template>打开文件夹
                   </a-link>
                 </a-space>
               </div>
             </div>
           </div>
-          <div v-else class="empty-chat">请选择聊天</div>
         </a-scrollbar>
       </a-layout-content>
 
@@ -141,7 +181,7 @@ const showItemInFolder = (fileId) => {
       <a-layout-footer class="toolbar-footer">
         <div class="toolbar">
           <a-trigger position="top" auto-fit-position :unmount-on-close="false">
-            <a-button class="toolbar-btn">
+            <a-button type="text" class="toolbar-btn">
               <icon-face-smile-fill />
             </a-button>
             <template #content>
@@ -158,35 +198,50 @@ const showItemInFolder = (fileId) => {
             </template>
           </a-trigger>
 
-          <a-button class="toolbar-btn" @click="triggerFileInput(['*'])">
+          <a-button type="text" class="toolbar-btn" @click="triggerFileInput(['*'])">
             <icon-folder-add />
           </a-button>
-          <a-button class="toolbar-btn" @click="triggerFileInput(['png', 'jpg', 'jpeg'])">
+          <a-button
+            type="text"
+            class="toolbar-btn"
+            @click="triggerFileInput(['png', 'jpg', 'jpeg'])"
+          >
             <icon-image />
           </a-button>
         </div>
 
         <!-- 输入区域 -->
-        <div class="input-area">
+        <div>
           <a-textarea
             v-model="inputMessage"
-            placeholder="输入消息..."
-            :auto-size="{ minRows: 1, maxRows: 4 }"
-            @press-enter="sendMessage"
+            placeholder="支持文件拖拽，请输入消息..."
+            allow-clear
+            :auto-size="{
+              minRows: 6,
+              maxRows: 6
+            }"
+            @keydown="handleKeyDown"
           />
-          <a-button
-            type="primary"
-            class="send-btn"
-            @click="sendMessage"
-            :disabled="!socketStore.activeClient"
-          >
-            <template #icon>
-              <icon-send />
-            </template>
-          </a-button>
         </div>
+        <a-row justify="end">
+          <a-space>
+            <span style="color: var(--color-fill-4)">Enter发送，Shift+Enter 换行</span>
+            <a-button
+              type="primary"
+              class="send-btn"
+              @click="sendMessage"
+              :disabled="!socketStore.activeClient"
+            >
+              <!--            <template #icon>-->
+              <!--              <icon-send />-->
+              <!--            </template>-->
+              发送
+            </a-button>
+          </a-space>
+        </a-row>
       </a-layout-footer>
     </a-layout>
+    <div v-else class="empty-chat">暂无设备连接，请扫码/浏览器 连接助手</div>
   </a-layout>
 </template>
 
@@ -237,6 +292,7 @@ const showItemInFolder = (fileId) => {
 
 .chat-messages {
   display: flex;
+  overflow: hidden;
   flex-direction: column;
   gap: 12px;
   padding: 0 10px;
@@ -270,16 +326,9 @@ const showItemInFolder = (fileId) => {
   word-break: break-all;
 }
 
-.input-footer {
-  height: 80px;
-  padding: 16px;
-  border-top: 1px solid var(--color-border);
-}
-
-/* 新增工具栏样式 */
 .toolbar-footer {
-  height: auto;
-  padding: 2px 16px 8px 16px;
+  height: 260px;
+  padding: 2px 6px;
   border-top: 1px solid var(--color-border);
 }
 
@@ -316,18 +365,12 @@ const showItemInFolder = (fileId) => {
   transform: scale(1.2);
 }
 
-/* 调整输入区域布局 */
-.input-area {
-  display: flex;
-  gap: 8px;
-  align-items: flex-end;
-}
-
 .send-btn {
   margin-bottom: 4px;
 }
 
 .empty-chat {
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;

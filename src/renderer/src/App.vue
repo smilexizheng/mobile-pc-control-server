@@ -29,6 +29,5 @@ onMounted(() => {})
   background: var(--color-bg-1);
   border: 1px solid var(--color-border-1);
   -electron-corner-smoothing: system-ui;
-  padding: 0 6px 6px 6px;
 }
 </style>

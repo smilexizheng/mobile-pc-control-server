@@ -60,6 +60,8 @@ type WindowInfo = {
 type ClientInfo = {
   // socket.io id
   id: string
+  // 客户端ID
+  clientId: string
   // 自定义名称
   name?: string
   // 连接时间
@@ -68,6 +70,7 @@ type ClientInfo = {
   userAgent: UAParser.IResult
   // 客户端IP
   clientIp: string
+  isOnline?: boolean
 }
 
 // 消息互动

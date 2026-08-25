@@ -1,4 +1,5 @@
 import { UAParser } from 'ua-parser-js'
+import { createHexDigest } from '../../../utils/common'
 
 /**
  * 获取客户端基础信息
@@ -13,7 +14,13 @@ const getClientInfo = (socket): ClientInfo => {
   const userAgent = new UAParser(headers['user-agent']).getResult()
   // 获取连接时间
   const connectTime = new Date(socket.handshake.time)
-  return { id: socket.id, connectTime, userAgent, clientIp }
+  return {
+    id: socket.id,
+    clientId: createHexDigest(clientIp + userAgent.toString()),
+    connectTime,
+    userAgent,
+    clientIp
+  }
 }
 
 export { getClientInfo }

@@ -24,7 +24,7 @@ const onClickMenuItem = (key): void => {
 </script>
 
 <template>
-  <a-layout-sider collapsible>
+  <a-layout-sider>
     <!--        <div class="logo">-->
     <!--          <img alt="logo" class="min-logo" src="./assets/logo.svg" />-->
     <!--        </div>-->
@@ -43,11 +43,11 @@ const onClickMenuItem = (key): void => {
     >
       <a-menu-item key="/home">
         <IconHome />
-        远程连接
+        远程链接
       </a-menu-item>
       <a-menu-item key="/chat">
         <icon-message />
-        消息互传
+        互传
       </a-menu-item>
       <a-menu-item key="/draw">
         <icon-image />

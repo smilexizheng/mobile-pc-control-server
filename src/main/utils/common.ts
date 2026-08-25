@@ -92,4 +92,16 @@ const objectToParam = (query) => {
     .join('&')
 }
 
-export { getResourcePath, getLocalIPs, getAppIcon, createHexDigest, objectToParam }
+/**
+ * 字节大小转换
+ * @param bytes
+ */
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 B'
+  const units = ['B', 'KB', 'MB', 'GB', 'TB']
+  const k = 1024
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + units[i]
+}
+
+export { getResourcePath, getLocalIPs, getAppIcon, createHexDigest, objectToParam, formatFileSize }

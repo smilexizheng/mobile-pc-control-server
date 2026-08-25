@@ -30,6 +30,9 @@ const initChat = (io, socket): void => {
   // 通知客户端列表s
   const sendClientList = (): void => {
     io.sockets.emit('client-list', onlineSocket)
+    if (!socket.handshake.auth.isServer) {
+      io.sockets.emit('latest-online', socket.id)
+    }
   }
   // 处理客户端断开连接
   socket.on('disconnect', () => {

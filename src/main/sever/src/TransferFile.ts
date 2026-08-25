@@ -81,14 +81,17 @@ const TransferFile = (io, socket): void => {
     socket.emit(CE.FILE_COMPLETE, fileId)
     // 聊天文件传输
     if (upload.to) {
-      global.allowDownFiles[upload.id] = {
+      // copy by system.ts ipcMain.handle('addAllowDownFile'
+      const fileId = crypto.randomUUID().toString()
+      global.allowDownFiles[fileId] = {
         filePath,
-        fileName: upload.fileName
+        fileName: upload.fileName,
+        extName: upath.extname(upload.fileName)
       }
       io.to(upload.to).emit('chat-message', {
         form: socket.id,
         msgType: 'file',
-        fileId: upload.id,
+        fileId: fileId,
         fileName: upload.fileName
       })
     } else {

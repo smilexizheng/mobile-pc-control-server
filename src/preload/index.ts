@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer, clipboard } from 'electron'
+import { contextBridge, ipcRenderer, clipboard, webUtils } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { copyImage, toImage } from '../main/utils/img'
 
@@ -6,6 +6,11 @@ import { copyImage, toImage } from '../main/utils/img'
 const api = {
   showItemInFolder: (fileId): void => {
     ipcRenderer.send('showItemInFolder', fileId)
+  },
+  getAllowFileById: async (
+    fileId
+  ): Promise<{ filePath: string; fileName: string; extName: string; size: string }> => {
+    return ipcRenderer.invoke('getAllowFileById', fileId)
   },
   openExternal: (url): void => {
     ipcRenderer.send('openExternal', url)
@@ -100,7 +105,9 @@ const api = {
   checkForUpdate: () => ipcRenderer.invoke('checkForUpdate'),
   quitAndInstall: () => ipcRenderer.invoke('quitAndInstall'),
   appRelaunch: () => ipcRenderer.send('appRelaunch'),
-  cancelDownload: () => ipcRenderer.invoke('cancelDownload')
+  cancelDownload: () => ipcRenderer.invoke('cancelDownload'),
+  // 注意：这里传递的是 File 对象本身，webUtils 能安全处理它
+  getPathForFile: (file) => webUtils.getPathForFile(file)
 }
 export type WindowApi = typeof api
 

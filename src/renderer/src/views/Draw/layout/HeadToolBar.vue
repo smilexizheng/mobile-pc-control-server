@@ -50,7 +50,7 @@ const operation = ref([
 </script>
 
 <template>
-  <div style="height: 70px; padding: 5px 10px">
+  <div style="height: 70px; padding: 5px 0px">
     <ExportModal />
     <a-space :size="size">
       <a-dropdown trigger="hover" :popup-max-height="false">
