@@ -7,6 +7,7 @@ import { copyText } from '@renderer/utils/util'
 import { motion } from 'motion-v'
 import { useSocketStore } from '@renderer/store/socket'
 import { Copy } from 'lucide-vue-next'
+import MyFun from '@renderer/views/Home/MyFun.vue'
 const appStore = useAppStore()
 const qrContainer = ref<HTMLDivElement>()
 const qrCode = ref(new QRCodeStyling(appStore.qrOptions))
@@ -43,7 +44,7 @@ const copyQrImg = async (): Promise<void> => {
         <span class="vue">CSE</span>
       </div>
       <div class="tip" @click="copyText(appStore.mobileHtml)">
-        扫一扫/复制链接 开始远控PC、数据互传<br />
+        扫一扫/复制链接 远控PC、自定义指令、数据互传<br />
         {{ appStore.mobileHtml }}
         <span style="font-size: 14px"> <Copy :size="12" />复制</span>
       </div>
@@ -81,6 +82,7 @@ const copyQrImg = async (): Promise<void> => {
       </a-input-group>
     </div>
   </motion.div>
+  <MyFun />
 </template>
 
 <style scoped>

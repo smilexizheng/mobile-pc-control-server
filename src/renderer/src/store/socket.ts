@@ -6,6 +6,7 @@ import { Message } from '@arco-design/web-vue'
 import Socket = SocketIOClient.Socket
 import { UserMessage } from '../env'
 import { useRouter } from 'vue-router'
+import { useDebounceFn } from '@vueuse/core'
 export const useSocketStore = defineStore('socket-io', () => {
   const router = useRouter()
   const socket = ref<Socket | null>(null)
@@ -17,7 +18,8 @@ export const useSocketStore = defineStore('socket-io', () => {
     return Object.keys(onlineSocketUser.value)
   })
   const activeClient = ref()
-
+  // 自定义事件
+  const customEvents = ref<any>([])
   const connect = (): void => {
     const { settings, realHost, serverPort } = useAppStore()
     if (!socket.value) {
@@ -34,6 +36,10 @@ export const useSocketStore = defineStore('socket-io', () => {
         socket.value.on('connect', () => {
           isConnected.value = true
 
+          socket.value?.on('events:get', (data) => {
+            customEvents.value = data
+          })
+          // emit('events:get', '')
           socket.value?.on('client-list', (data) => {
             onlineSocketUser.value = data
           })
@@ -101,6 +107,18 @@ export const useSocketStore = defineStore('socket-io', () => {
     socket.value?.once(event, data)
   }
 
+  // 处理自定义指令事件
+  const eventHandler = useDebounceFn((item) => {
+    if (item.events) {
+      // socket事件
+      item.events.forEach((event) => {
+        setTimeout(() => {
+          emit(event.event, event.eventData)
+        }, event.delay || 0)
+      })
+    }
+  })
+
   const sendMessage = (data): void => {
     if (activeClient.value) {
       const ip = activeClient.value.clientIp
@@ -125,9 +143,11 @@ export const useSocketStore = defineStore('socket-io', () => {
     off,
     emit,
     once,
+    eventHandler,
     onlineSocketUser,
     onlineSocketIds,
     userMessage,
-    sendMessage
+    sendMessage,
+    customEvents
   }
 })
