@@ -44,9 +44,10 @@ class AsyncJsonStore<V> {
         this.enforceCacheSize()
       }
       this.loaded = true
+      console.log(`${this.filePath} AsyncJsonStore loaded successfully`)
     } catch (error: any) {
       if (error.code !== 'ENOENT') {
-        console.error(`Error loading ${this.filePath}:`, error)
+        console.error(`Error AsyncJsonStore loading ${this.filePath}:`, error)
       }
       await this.save()
     }

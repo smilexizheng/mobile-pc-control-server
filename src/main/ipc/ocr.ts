@@ -16,7 +16,6 @@ ipcMain.on('ocr-recognition', (_, imgPath) => {
 })
 
 ipcMain.on('ocr-screenshots', () => {
-  isShortcut = false
   global.mainWindow.minimize()
   setTimeout(() => {
     screenshots.startCapture().then()
@@ -31,12 +30,9 @@ ipcMain.handle('cor-clipboard-readImage', async () => {
   return null
 })
 
-// 实现截屏ocr
-let isShortcut = false
 const screenshots = new Screenshots({ singleWindow: true })
 // 快捷键使用
-globalShortcut.register('ctrl+shift+s', () => {
-  isShortcut = true
+globalShortcut.register('ctrl+i', () => {
   screenshots.startCapture()
 })
 
@@ -45,10 +41,9 @@ screenshots.on('ok', (_, buffer, bounds) => {
   console.log('screenshots', bounds.bounds)
   global.mainWindow.show()
   clipboard.writeImage(nativeImage.createFromBuffer(buffer))
-  if (!isShortcut) {
-    const path = saveLocalPng(buffer)
-    global.mainWindow.webContents.send('ocr-screenshots-success', path)
-  }
+
+  const path = saveLocalPng(buffer)
+  global.mainWindow.webContents.send('ocr-screenshots-success', path)
 })
 // 点击取消按钮回调事件
 screenshots.on('cancel', () => {

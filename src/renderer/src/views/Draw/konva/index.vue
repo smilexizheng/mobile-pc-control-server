@@ -6,6 +6,8 @@ import Rectangles from '@renderer/views/Draw/konva/shapes/Rectangles.vue'
 import Circle from '@renderer/views/Draw/konva/shapes/Circle.vue'
 import Arrow from '@renderer/views/Draw/konva/shapes/Arrow.vue'
 import Konva from 'konva'
+import { isImage } from '@renderer/utils/util'
+import { Message } from '@arco-design/web-vue'
 
 const drawStore = useDrawStore()
 const transformer = useTemplateRef<Konva.Transformer>('transformer')
@@ -21,6 +23,21 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('keydown', drawStore.shortcutKeyHandler)
 })
+
+const handleDrop = (event) => {
+  // 获取拖拽的文件列表（DataTransfer）
+  const files = event.dataTransfer.files
+
+  if (files.length === 0) return
+
+  const file = files[0]
+  const absolutePath = window.api.getPathForFile(file)
+  if (isImage(absolutePath)) {
+    drawStore.ocrImage(absolutePath)
+  } else {
+    Message.error('不支持的文件类型！')
+  }
+}
 </script>
 
 <template>
@@ -47,6 +64,8 @@ onUnmounted(() => {
             position: 'absolute',
             top: 0
           }"
+          @dragover="(e) => e.preventDefault()"
+          @drop.prevent="handleDrop"
           @wheel="drawStore.wheelHandler"
         >
           <k-stage
@@ -168,7 +187,7 @@ onUnmounted(() => {
 .layer-2 {
   width: calc(100%);
   height: calc(100%);
-  background-color: var(--color-fill-3);
+  background-color: var(--color-fill-4);
   position: absolute;
   overflow: hidden;
 }

@@ -14,10 +14,12 @@ import { DrawMode, WH, IChildDrawStore, ShapeType } from '@renderer/store/draw/t
 import { useDrawCircleStore } from '@renderer/store/draw/DrawCircleStore'
 import { useDrawArrowStore } from '@renderer/store/draw/DrawArrowStore'
 import { getChildrenById, getDrawInfo } from '@renderer/store/draw/utils'
+import { useRouter } from 'vue-router'
 
 type ChildStoreGetter = () => IChildDrawStore
 
 export const useDrawStore = defineStore('draw', () => {
+  const router = useRouter()
   const transformerRef = ref<Konva.Transformer | null>()
   const stageRef = ref<Konva.Stage | null>()
   const mainLayerRef = ref<HTMLDivElement | null>()
@@ -129,6 +131,7 @@ export const useDrawStore = defineStore('draw', () => {
   })
 
   ipcRenderer.on('ocr-screenshots-success', (_, path) => {
+    router.push('/draw')
     ocrImage(path)
   })
 
@@ -250,6 +253,8 @@ export const useDrawStore = defineStore('draw', () => {
 
   //ocr的处理的图片
   const image = ref()
+  // 当前图片的 路径
+  const imagePath = ref()
 
   // ocr结果
   const ocrResult = ref<OcrResult>([])
@@ -316,7 +321,10 @@ export const useDrawStore = defineStore('draw', () => {
   })
 
   // 发送ocr识别
-  const ocrRecognition = (img): void => window.electron.ipcRenderer.send('ocr-recognition', img)
+  const ocrRecognition = (img): void => {
+    toggleLoading()
+    window.electron.ipcRenderer.send('ocr-recognition', img)
+  }
   // 截取屏幕
   const ocrScreenshots = (): void => window.electron.ipcRenderer.send('ocr-screenshots')
 
@@ -329,24 +337,34 @@ export const useDrawStore = defineStore('draw', () => {
    * @param path
    */
   const ocrImage = (path: string): void => {
-    const imgSrc = `disk:///${path}`
-    if (imgSrc) {
+    if (path !== '') {
+      imagePath.value = path
+      const imgSrc = `disk:///${path}`
       loadImage(imgSrc)
-      ocrRecognition(path)
+      if (showOcr.value) {
+        ocrRecognition(path)
+      }
     }
   }
 
   const loadImage = (imgSrc): void => {
+    toggleLoading()
     const img = new Image()
     img.onload = (): void => {
-      toggleLoading()
       image.value = img
       calcScale()
       ocrResult.value = []
       removeAllDraw()
+      toggleLoading()
     }
     img.src = imgSrc
   }
+
+  watch(showOcr, (v) => {
+    if (v && ocrResult.value.length === 0) {
+      ocrRecognition(imagePath.value)
+    }
+  })
 
   /**
    * 选择ocr的图片
@@ -554,6 +572,7 @@ export const useDrawStore = defineStore('draw', () => {
     realScale,
     mainLayerWH,
     ocrImageWH,
+    ocrImage,
     stageConfig,
     image,
     ocrResult,

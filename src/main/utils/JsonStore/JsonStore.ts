@@ -16,7 +16,6 @@ class JsonStore<V> {
   private loaded: boolean
   private option: Options = { maxCacheSize: 0, safeStorage: true }
   constructor(storeName: string, option?: Options) {
-    console.log('加载', storeName)
     if (!storeName) {
       throw new Error('JsonStore storeName is required')
     }
@@ -42,7 +41,7 @@ class JsonStore<V> {
           this.cache.set(key, value)
         }
 
-        // console.log(`${this.filePath} loaded successfully`);
+        console.log(`${this.filePath} JsonStore loaded successfully`)
       } catch (error) {
         console.error(`JsonStore Error loading ${this.filePath}:`, error)
         this.save()

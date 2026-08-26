@@ -4,15 +4,17 @@ import { useDrawStore } from '@renderer/store/draw'
 import { ref } from 'vue'
 import ExportModal from '@renderer/views/Draw/konva/ExportModal.vue'
 import ShapeConfig from '@renderer/views/Draw/konva/ShapeConfig.vue'
-
+import Help from '@renderer/views/Draw/layout/Help.vue'
 const drawStore = useDrawStore()
 
 const size = ref<'mini' | 'medium' | 'large' | 'small'>('mini')
 
+const helpVisible = ref(false)
+
 const operation = ref([
   {
     value: 'open',
-    label: '打开图片',
+    label: '选择图片',
     event: () => {
       drawStore.chooseImgFile()
     }
@@ -33,7 +35,7 @@ const operation = ref([
   },
   {
     value: 'copyImg',
-    label: '复制可见图',
+    label: '复制可见区域',
     event: () => {
       drawStore.copyImg()
     }
@@ -81,7 +83,7 @@ const operation = ref([
         :size="size"
         :loading="drawStore.isLoading"
         @click="drawStore.chooseImgFile()"
-        >打开
+        >选择图片
       </a-button>
 
       <a-button
@@ -92,11 +94,16 @@ const operation = ref([
         >截屏
       </a-button>
 
+      <a-button type="primary" :size="size" @click="helpVisible = true">帮助 </a-button>
+      <Help :visible="helpVisible" @close="helpVisible = false" />
+
       <!--        <a-button :size="size" :disabled="drawStore.isLoading" @click="drawStore.toggle()"-->
       <!--          >{{ drawStore.showOcr ? '隐藏结果' : '显示结果' }}-->
       <!--        </a-button>-->
     </a-space>
+
     <a-divider margin="0" />
+
     <a-space :size="size" style="margin-top: 5px">
       <template #split>
         <a-divider margin="0" direction="vertical" />
