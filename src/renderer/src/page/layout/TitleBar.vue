@@ -39,8 +39,8 @@ const appStore = useAppStore()
   height: 40px;
   width: 100%;
   font-size: 12px;
-  color: var(--color-text-3);
-  /*background: #fcfcfc;*/
+  color: var(--color-text-1);
+  background: var(--color-neutral-2);
   display: flex;
   align-items: center;
   gap: 8px;
