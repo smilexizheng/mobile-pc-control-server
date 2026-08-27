@@ -1,5 +1,5 @@
 import { app, BrowserWindow, shell } from 'electron'
-import { electronApp, is, optimizer, platform } from '@electron-toolkit/utils'
+import { electronApp as electronUtils, is, optimizer, platform } from '@electron-toolkit/utils'
 import icon from '../../build/icon.png?asset'
 import { join } from 'upath'
 import { InitWinControlServer } from './sever/main'
@@ -41,7 +41,13 @@ async function createWindow(): Promise<void> {
 
   // todo win11 bugs titleBarOverlay冲突  https://github.com/electron/electron/issues/42409  createWindow setTimeout 100ms  正常
   mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+    const isAutoLaunch = app.getLoginItemSettings().wasOpenedAtLogin
+    if (isAutoLaunch) {
+      // 启动后最小化到任务栏
+      mainWindow.minimize()
+    } else {
+      mainWindow.show()
+    }
   })
 
   mainWindow.on('resize', () => {
@@ -58,6 +64,7 @@ async function createWindow(): Promise<void> {
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
+    // 拦截外部链接 → 用系统浏览器打开
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
@@ -87,7 +94,7 @@ async function createWindow(): Promise<void> {
   initProtocol()
   // 开机自启
   if (!is.dev && global.setting.autoStart) {
-    electronApp.setAutoLaunch(global.setting.autoStart)
+    electronUtils.setAutoLaunch(global.setting.autoStart)
   }
 }
 app.commandLine.appendSwitch('lang', 'zh-CN')
@@ -104,7 +111,7 @@ if (!gotTheLock) {
   // Some APIs can only be used after this event occurs.
   app.whenReady().then(async () => {
     // Set app user model id for windows
-    electronApp.setAppUserModelId('PC-CSE')
+    electronUtils.setAppUserModelId('PC-CSE')
 
     // Default open or close DevTools by F12 in development
     // and ignore CommandOrControl + R in production.

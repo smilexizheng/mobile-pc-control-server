@@ -1,7 +1,7 @@
 {
   "name": "control-server",
-  "version": "2.5.6",
-  "description": "ControlServer",
+  "version": "2.5.7",
+  "description": "本地助手-ControlServerElectron",
   "main": "./out/main/index.js",
   "author": "smilexizheng",
   "private": "true",

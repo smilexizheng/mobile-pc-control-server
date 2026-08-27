@@ -1,5 +1,5 @@
-appId: com.smile.cse
-productName: ControlServer
+appId: io.github.smilexizheng
+productName: 本地助手CSE
 directories:
   buildResources: build
 electronLanguages:
@@ -25,7 +25,7 @@ asarUnpack:
 #  - from: "models"
 #    to: "models"
 win:
-  executableName: ControlServer
+  executableName: 本地助手CSE
 #  requestedExecutionLevel: requireAdministrator
 nsis:
   #  allowElevation: false

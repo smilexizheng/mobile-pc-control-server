@@ -27,7 +27,7 @@ const InitTray = (): void => {
       }
     }
   ])
-  tray.setToolTip('Control Service')
+  tray.setToolTip('本地助手CSE')
   tray.setContextMenu(contextMenu)
   tray.on('click', () => {
     global.mainWindow.show()

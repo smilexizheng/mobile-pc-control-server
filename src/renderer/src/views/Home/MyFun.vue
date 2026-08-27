@@ -1,7 +1,22 @@
 <script setup lang="ts">
 import { useSocketStore } from '@renderer/store/socket'
+import { CLIENT_EMIT_EVENTS as CE } from '@mobile/constant/client-emit'
+import { ref } from 'vue'
 
 const socketStore = useSocketStore()
+
+const event = ref([
+  {
+    name: '关机',
+    color: '#ff2256',
+    events: [{ event: CE.SYS_SHUTDOWN, eventData: { type: 'now' } }]
+  },
+  {
+    name: '重启',
+    color: '#fd9b1b',
+    events: [{ event: CE.SYS_SHUTDOWN, eventData: { type: 'reboot' } }]
+  }
+])
 </script>
 
 <template>
@@ -15,6 +30,12 @@ const socketStore = useSocketStore()
         }}
       </div>
       <a-row class="fun-grid" :gutter="[10, 10]">
+        <a-col :lg="3" :xxl="2" v-for="module in event" @click="socketStore.eventHandler(module)">
+          <div class="text-icon" :style="{ backgroundColor: module.color }">
+            {{ module.name }}
+          </div>
+        </a-col>
+
         <!--自定义的功能-->
         <a-col
           :lg="3"

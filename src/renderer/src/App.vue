@@ -27,7 +27,7 @@ onMounted(() => {})
   height: 100vh;
   display: flex;
   background: var(--color-bg-1);
-  //border: 1px solid var(--color-border-1);
+  /*border: 1px solid var(--color-border-1);*/
   -electron-corner-smoothing: system-ui;
 }
 </style>
