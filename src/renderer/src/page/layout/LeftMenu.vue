@@ -5,7 +5,6 @@ import { useAppStore } from '@renderer/store/app'
 const router = useRouter()
 const route = useRoute()
 const appStore = useAppStore()
-
 const onClickMenuItem = (key): void => {
   if (key.includes('/')) {
     router.push(key)

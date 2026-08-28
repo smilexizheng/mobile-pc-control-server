@@ -3,6 +3,7 @@ import { onMounted, useTemplateRef } from 'vue'
 import { useAppStore } from '@renderer/store/app'
 
 import { useResizeObserver } from '@vueuse/core'
+import { useSocketStore } from '@renderer/store/socket'
 const appStore = useAppStore()
 const mainLayout = useTemplateRef<HTMLDivElement>('mainLayout')
 useResizeObserver(mainLayout, (entries) => {

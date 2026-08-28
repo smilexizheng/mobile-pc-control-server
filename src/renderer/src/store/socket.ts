@@ -11,6 +11,7 @@ export const useSocketStore = defineStore('socket-io', () => {
   const router = useRouter()
   const socket = ref<Socket | null>(null)
   const isConnected = ref(false)
+  const isReconnecting = ref(false)
   // 在线的socket用户对象
   const onlineSocketUser = ref({})
   const userMessage = ref<Record<string, Array<UserMessage>>>({})
@@ -22,7 +23,7 @@ export const useSocketStore = defineStore('socket-io', () => {
   const customEvents = ref<any>([])
   const connect = (): void => {
     const { settings, realHost, serverPort } = useAppStore()
-    if (!socket.value) {
+    if (!socket.value && realHost && serverPort) {
       socket.value = io(`http://${realHost}:${serverPort}`, {
         autoConnect: true,
         path: '/win-control.io',
@@ -32,62 +33,60 @@ export const useSocketStore = defineStore('socket-io', () => {
           isServer: true
         }
       })
-      if (socket.value) {
-        socket.value.on('connect', () => {
-          isConnected.value = true
+      socket.value.on('connect', () => {
+        isConnected.value = true
+        isReconnecting.value = false
 
-          socket.value?.on('events:get', (data) => {
-            customEvents.value = data
-          })
-          // emit('events:get', '')
-          socket.value?.on('client-list', (data) => {
-            onlineSocketUser.value = data
-          })
-          socket.value?.on('latest-online', (id) => {
-            activeClient.value = onlineSocketUser.value[id]
-          })
-          socket.value?.on('client-leave', (data) => {
-            Message.info('客户端离线')
-            if (data == activeClient.value.id) {
-              activeClient.value = onlineSocketUser.value[onlineSocketIds.value[0]]
-            }
+        socket.value?.on('events:get', (data) => {
+          customEvents.value = data
+        })
+        // emit('events:get', '')
+        socket.value?.on('client-list', (data) => {
+          onlineSocketUser.value = data
+        })
+        socket.value?.on('latest-online', (id) => {
+          activeClient.value = onlineSocketUser.value[id]
+        })
+        socket.value?.on('client-leave', (data) => {
+          Message.info('客户端离线')
+          if (data == activeClient.value.id) {
+            activeClient.value = onlineSocketUser.value[onlineSocketIds.value[0]]
+          }
 
-            // if (userMessage.value[data]) {
-            // delete userMessage.value[data]
-            // }
-          })
-
-          socket.value?.on('chat-message', (data) => {
-            const { form } = data
-            activeClient.value = onlineSocketUser.value[form]
-            router.push('/chat')
-            const ip = onlineSocketUser.value[form].clientIp
-            if (!userMessage.value[ip]) {
-              userMessage.value[ip] = []
-            }
-            userMessage.value[ip].push({
-              isSelf: false,
-              ...data,
-              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            })
-          })
+          // if (userMessage.value[data]) {
+          // delete userMessage.value[data]
+          // }
         })
 
-        socket.value.on('disconnect', (reason) => {
-          console.error(reason)
-          isConnected.value = false
+        socket.value?.on('chat-message', (data) => {
+          const { form } = data
+          activeClient.value = onlineSocketUser.value[form]
+          router.push('/chat')
+          const ip = onlineSocketUser.value[form].clientIp
+          if (!userMessage.value[ip]) {
+            userMessage.value[ip] = []
+          }
+          userMessage.value[ip].push({
+            isSelf: false,
+            ...data,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          })
         })
+      })
 
-        socket.value.on('error', (error) => {
-          console.error(error)
-        })
+      socket.value.on('disconnect', (reason) => {
+        console.error(reason)
+        isConnected.value = false
+      })
 
-        socket.value.on('reconnected', () => {
-          socket.value?.disconnect()
-          socket.value = null
-          connect()
-        })
-      }
+      socket.value.on('error', (error) => {
+        console.error(error)
+      })
+
+      socket.value.on('reconnected', () => {
+        isConnected.value = false
+        isReconnecting.value = true
+      })
     }
   }
 
@@ -109,13 +108,17 @@ export const useSocketStore = defineStore('socket-io', () => {
 
   // 处理自定义指令事件
   const eventHandler = useDebounceFn((item) => {
-    if (item.events) {
-      // socket事件
-      item.events.forEach((event) => {
-        setTimeout(() => {
-          emit(event.event, event.eventData)
-        }, event.delay || 0)
-      })
+    if (isConnected.value) {
+      if (item.events) {
+        // socket事件
+        item.events.forEach((event) => {
+          setTimeout(() => {
+            emit(event.event, event.eventData)
+          }, event.delay || 0)
+        })
+      }
+    } else {
+      Message.error('核心服务异常，请检查IP 网络配置')
     }
   })
 

@@ -20,7 +20,7 @@ const event = ref([
 </script>
 
 <template>
-  <div style="padding: 20px; height: 45%; overflow-y: auto">
+  <div style="padding: 0 1rem; height: 45%; overflow-y: auto" v-if="socketStore.isConnected">
     <div>
       <div class="title">
         {{

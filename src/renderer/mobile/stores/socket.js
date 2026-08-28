@@ -19,6 +19,8 @@ export const useSocketStore = defineStore('socket', () => {
   const localEventStore = LocalEventStore()
   const socket = ref(null)
   const isConnected = ref(false)
+  const isReconnecting = ref(false)
+
   const token = useStorage('socket-token', 'ssss') // returns Ref<number>
 
   const intervalData = ref(null)
@@ -54,6 +56,7 @@ export const useSocketStore = defineStore('socket', () => {
 
       socket.value.on('connect', () => {
         isConnected.value = true
+        isReconnecting.value = false
         tokenExpire.value = false
       })
 
@@ -177,8 +180,10 @@ export const useSocketStore = defineStore('socket', () => {
       })
 
       socket.value.on('reconnected', () => {
-        socket.value.disconnect()
-        connect()
+        // socket.value.disconnect()
+        // connect()
+        isConnected.value = false
+        isReconnecting.value = true
       })
 
       socket.value.connect()

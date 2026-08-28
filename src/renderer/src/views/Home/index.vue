@@ -6,13 +6,12 @@ import { useAppStore } from '@renderer/store/app'
 import { copyText } from '@renderer/utils/util'
 import { motion } from 'motion-v'
 import { useSocketStore } from '@renderer/store/socket'
-import { Copy } from 'lucide-vue-next'
+import { Copy, TriangleAlert } from 'lucide-vue-next'
 import MyFun from '@renderer/views/Home/MyFun.vue'
 const appStore = useAppStore()
 const qrContainer = ref<HTMLDivElement>()
 const qrCode = ref(new QRCodeStyling(appStore.qrOptions))
 const socketStore = useSocketStore()
-
 onMounted(async () => {
   await appStore.initSetting()
   qrCode.value.update({ data: appStore.mobileHtml })
@@ -39,10 +38,14 @@ const copyQrImg = async (): Promise<void> => {
     }"
   >
     <div class="main-view">
+      <div v-if="!socketStore.isConnected">
+        <TriangleAlert :size="16" color="#ff0000" />功能受限,请检查IP网络配置/尝试重启
+      </div>
       <div class="text">
-        Control Server Electron
+        本地助手
         <span class="vue">CSE</span>
       </div>
+
       <div class="tip" @click="copyText(appStore.mobileHtml)">
         扫一扫/复制链接 远控PC、自定义指令、数据互传<br />
         {{ appStore.mobileHtml }}
@@ -92,6 +95,7 @@ const copyQrImg = async (): Promise<void> => {
   align-items: center;
   flex-direction: column;
   gap: 8px;
+  padding: 1rem 0;
 }
 
 .qr-container {
