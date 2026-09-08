@@ -42,7 +42,7 @@ const onClickMenuItem = (key): void => {
     >
       <a-menu-item key="/home">
         <IconHome />
-        远程链接
+        链接助手
       </a-menu-item>
       <a-menu-item key="/chat">
         <icon-message />

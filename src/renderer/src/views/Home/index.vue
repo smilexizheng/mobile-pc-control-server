@@ -42,12 +42,10 @@ const copyQrImg = async (): Promise<void> => {
         <TriangleAlert :size="16" color="#ff0000" />功能受限,请检查IP网络配置/尝试重启
       </div>
       <div class="text">
-        本地助手
-        <span class="vue">CSE</span>
+        <span class="vue">扫一扫/复制链接 远控PC、设备互联、消息文件共享、快捷指令</span>
       </div>
 
       <div class="tip" @click="copyText(appStore.mobileHtml)">
-        扫一扫/复制链接 远控PC、自定义指令、数据互传<br />
         {{ appStore.mobileHtml }}
         <span style="font-size: 14px"> <Copy :size="12" />复制</span>
       </div>
@@ -107,7 +105,7 @@ const copyQrImg = async (): Promise<void> => {
 }
 
 .text {
-  font-size: 24px;
+  font-size: 20px;
   color: var(--color-text-1);
   font-weight: bold;
   line-height: 32px;
@@ -119,7 +117,6 @@ const copyQrImg = async (): Promise<void> => {
   font-size: 16px;
   line-height: 22px;
   color: var(--color-text-2);
-  font-weight: 600;
   text-align: center;
 }
 

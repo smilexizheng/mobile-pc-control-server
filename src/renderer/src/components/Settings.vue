@@ -25,7 +25,7 @@ const checkUpdate = async () => {
     <icon-sun-fill v-else />
   </button>
 
-  <a-dropdown>
+  <a-dropdown trigger="hover">
     <button class="control-btn">
       <icon-menu />
     </button>
