@@ -27,15 +27,16 @@ const onClickMenuItem = (key): void => {
     <!--        <div class="logo">-->
     <!--          <img alt="logo" class="min-logo" src="./assets/logo.svg" />-->
     <!--        </div>-->
-    <!--        <a-button shape="round" @click="onCollapse">-->
-    <!--          <IconCaretRight v-if="collapsed" />-->
-    <!--          <IconCaretLeft v-else />-->
-    <!--        </a-button>-->
-    <template #trigger="{ collapsed }">
-      <IconCaretRight v-if="collapsed"></IconCaretRight>
-      <IconCaretLeft v-else></IconCaretLeft>
-    </template>
+    <!--    <a-button shape="round" @click="onCollapse">-->
+    <!--      <IconCaretRight v-if="collapsed" />-->
+    <!--      <IconCaretLeft v-else />-->
+    <!--    </a-button>-->
+    <!--    <template #trigger="{ collapsed }">-->
+    <!--      <IconCaretRight v-if="collapsed"></IconCaretRight>-->
+    <!--      <IconCaretLeft v-else></IconCaretLeft>-->
+    <!--    </template>-->
     <a-menu
+      style="height: calc(100vh - 90px)"
       :defaultOpenKeys="['more']"
       :selected-keys="[route.path]"
       @menuItemClick="onClickMenuItem"
@@ -46,29 +47,32 @@ const onClickMenuItem = (key): void => {
       </a-menu-item>
       <a-menu-item key="/chat">
         <icon-message />
-        互传
+        设备互传
       </a-menu-item>
       <a-menu-item key="/draw">
         <icon-image />
-        绘画涂鸦/OCR
+        涂鸦/OCR
       </a-menu-item>
-      <a-menu-item key="/asr"> <iconVoice /> ASR语音转文字 </a-menu-item>
+      <a-menu-item key="/asr"> <iconVoice /> 语音转文字 </a-menu-item>
       <!--      <a-menu-item key="tts">-->
       <!--        <icon-chinese-fill />-->
       <!--        TTS文字转语音-->
       <!--      </a-menu-item>-->
-      <a-sub-menu key="more">
-        <template #title>
-          <span><icon-more />更多</span>
-        </template>
-        <!--        <a-menu-item key="/game"><icon-send />EmulatorJS</a-menu-item>-->
-        <!--        <a-sub-menu key="config" title="配置">-->
-        <a-menu-item key="sys-setting">
-          <icon-settings />
-          系统设置
-        </a-menu-item>
-        <!--        </a-sub-menu>-->
-      </a-sub-menu>
+      <!--      <a-sub-menu key="more">-->
+      <!--        <template #title>-->
+      <!--          <span><icon-more />更多</span>-->
+      <!--        </template>-->
+      <!--        <a-menu-item key="/game"><icon-send />EmulatorJS</a-menu-item>-->
+      <!--        <a-sub-menu key="config" title="配置"> </a-sub-menu>-->
+      <!--      </a-sub-menu>-->
+    </a-menu>
+
+    <a-divider :margin="0" />
+    <a-menu :selected-keys="[route.path]" @menuItemClick="onClickMenuItem">
+      <a-menu-item key="sys-setting">
+        <icon-settings />
+        设置
+      </a-menu-item>
     </a-menu>
   </a-layout-sider>
 </template>
