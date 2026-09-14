@@ -41,7 +41,7 @@ async function createWindow(): Promise<void> {
 
   // todo win11 bugs titleBarOverlay冲突  https://github.com/electron/electron/issues/42409  createWindow setTimeout 100ms  正常
   mainWindow.on('ready-to-show', () => {
-    const isAutoLaunch = app.getLoginItemSettings().wasOpenedAtLogin
+    const isAutoLaunch = app.getLoginItemSettings().openAtLogin
     if (isAutoLaunch) {
       // 启动后最小化到任务栏
       mainWindow.minimize()
@@ -94,7 +94,7 @@ async function createWindow(): Promise<void> {
   initProtocol()
   // 开机自启
   if (!is.dev && global.setting.autoStart) {
-    electronUtils.setAutoLaunch(global.setting.autoStart)
+    electronUtils.setAutoLaunch(true)
   }
 }
 app.commandLine.appendSwitch('lang', 'zh-CN')
