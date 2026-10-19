@@ -37,8 +37,10 @@ const event = ref([
           :title="module.name"
           @click="socketStore.eventHandler(module)"
         >
-          <div class="text-icon" :style="{ backgroundColor: module.color }">
-            {{ module.name.slice(0, 4) }}
+          <div>
+            <div class="text-icon" :style="{ backgroundColor: module.color }">
+              {{ module.name.slice(0, 4) }}
+            </div>
           </div>
         </a-col>
 
@@ -73,6 +75,9 @@ const event = ref([
 }
 
 .fun-grid .arco-col > div {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
   height: 100%;
 }
 
