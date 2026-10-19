@@ -2,11 +2,12 @@ import { defineStore } from 'pinia'
 import io from 'socket.io-client'
 import { ref, computed } from 'vue'
 import { useAppStore } from './app'
-import { Message } from '@arco-design/web-vue'
+import { Message, Modal } from '@arco-design/web-vue'
 import Socket = SocketIOClient.Socket
 import { UserMessage } from '../env'
 import { useRouter } from 'vue-router'
 import { useDebounceFn } from '@vueuse/core'
+import { CLIENT_EMIT_EVENTS as CE } from '@mobile/constant/client-emit'
 export const useSocketStore = defineStore('socket-io', () => {
   const router = useRouter()
   const socket = ref<Socket | null>(null)
@@ -21,6 +22,24 @@ export const useSocketStore = defineStore('socket-io', () => {
   const activeClient = ref()
   // 自定义事件
   const customEvents = ref<any>([])
+
+  window.electron?.ipcRenderer.on('bookmark-url', (_, data) => {
+    console.log(data)
+    Modal.success({
+      title: '快捷指令',
+      hideCancel: false,
+      content: `确认添加【${data.title}】到快捷指令吗？`,
+      onOk: () => {
+        emit('events:put', {
+          name: data.title,
+          color: '#f16b3a',
+          logo: data.logo,
+          events: [{ event: CE.OPEN_URL, eventData: { url: data.url } }]
+        })
+      }
+    })
+  })
+
   const connect = (): void => {
     const { settings, realHost, serverPort } = useAppStore()
     if (!socket.value && realHost && serverPort) {

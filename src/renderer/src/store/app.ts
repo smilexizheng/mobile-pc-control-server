@@ -23,6 +23,7 @@ export const useAppStore = defineStore('app', () => {
     ipcRenderer.on('app-resize', (_, window) => {
       isMaximize.value = window.isMaximized
     })
+
     ipcRenderer.on('updateNotAvailable', () => {
       Notification.success({
         id: 'updateNotion',

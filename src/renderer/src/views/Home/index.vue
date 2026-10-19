@@ -13,10 +13,8 @@ const qrContainer = ref<HTMLDivElement>()
 const qrCode = ref(new QRCodeStyling(appStore.qrOptions))
 const socketStore = useSocketStore()
 onMounted(async () => {
-  await appStore.initSetting()
   qrCode.value.update({ data: appStore.mobileHtml })
   qrCode.value.append(qrContainer.value as HTMLDivElement)
-  socketStore.connect()
 })
 
 const copyQrImg = async (): Promise<void> => {

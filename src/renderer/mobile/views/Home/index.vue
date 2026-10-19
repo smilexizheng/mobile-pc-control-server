@@ -126,13 +126,14 @@ const handleTouchEnd = (e) => {
       <div class="area-title">我的指令</div>
       <nut-grid :column-num="5" :border="false">
         <nut-grid-item
-          :text="module.name"
+          :text="module.name.slice(0, 5)"
           v-for="module in localEventStore.customEvents"
           @touchstart="handleTouchStart"
           @touchend="handleTouchEnd"
           @click="socketStore.eventHandler(module)"
         >
-          <nut-row class="text-icon" :style="{ backgroundColor: module.color }">
+          <nut-image v-if="module.logo" :src="module.logo" width="64" height="64" />
+          <nut-row v-else class="text-icon" :style="{ backgroundColor: module.color }">
             {{ module.name.charAt(0) }}
           </nut-row>
         </nut-grid-item>

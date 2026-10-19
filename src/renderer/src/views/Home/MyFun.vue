@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" xmlns="http://www.w3.org/1999/html">
 import { useSocketStore } from '@renderer/store/socket'
 import { CLIENT_EMIT_EVENTS as CE } from '@mobile/constant/client-emit'
 import { ref } from 'vue'
@@ -29,10 +29,16 @@ const event = ref([
             : '我的指令'
         }}
       </div>
-      <a-row class="fun-grid" :gutter="[10, 10]">
-        <a-col :lg="3" :xxl="2" v-for="module in event" @click="socketStore.eventHandler(module)">
+      <a-row class="fun-grid" :gutter="[20, 20]">
+        <a-col
+          :lg="3"
+          :xxl="2"
+          v-for="module in event"
+          :title="module.name"
+          @click="socketStore.eventHandler(module)"
+        >
           <div class="text-icon" :style="{ backgroundColor: module.color }">
-            {{ module.name }}
+            {{ module.name.slice(0, 4) }}
           </div>
         </a-col>
 
@@ -40,11 +46,18 @@ const event = ref([
         <a-col
           :lg="3"
           :xxl="2"
+          :title="module.name"
           v-for="module in socketStore.customEvents"
           @click="socketStore.eventHandler(module)"
         >
-          <div class="text-icon" :style="{ backgroundColor: module.color }">
-            {{ module.name }}
+          <div v-if="module.logo">
+            <img :src="module.logo" alt="logo" :title="module.name" style="height: 80%" />
+            <div>{{ module.name.slice(0, 5) }}</div>
+          </div>
+          <div v-else>
+            <div class="text-icon" :style="{ backgroundColor: module.color }">
+              {{ module.name.slice(0, 4) }}
+            </div>
           </div>
         </a-col>
       </a-row>
@@ -54,14 +67,12 @@ const event = ref([
 
 <style scoped>
 .fun-grid .arco-col {
-  height: 80px;
+  height: 90px;
   cursor: pointer;
   color: var(--color-text-1);
 }
+
 .fun-grid .arco-col > div {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   height: 100%;
 }
 
@@ -71,14 +82,19 @@ const event = ref([
   margin-bottom: 16px;
 }
 
+.text-span {
+  align-items: center;
+  justify-content: center;
+}
+
 .text-icon {
-  width: 70px;
-  height: 70px;
+  width: 64px;
+  height: 64px;
   border-radius: 12px;
-  /*margin-bottom: 2px;*/
   display: flex;
   align-items: center;
   justify-content: center;
+  /*margin-bottom: 2px;*/
   color: white;
   font-size: 14px;
   font-weight: 500;

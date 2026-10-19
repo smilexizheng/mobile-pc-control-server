@@ -5,6 +5,7 @@ import { useAppStore } from '@renderer/store/app'
 import { useResizeObserver } from '@vueuse/core'
 import { useSocketStore } from '@renderer/store/socket'
 const appStore = useAppStore()
+const socketStore = useSocketStore()
 const mainLayout = useTemplateRef<HTMLDivElement>('mainLayout')
 useResizeObserver(mainLayout, (entries) => {
   const entry = entries[0]
@@ -12,7 +13,10 @@ useResizeObserver(mainLayout, (entries) => {
   appStore.setMainLayoutWH(width, height)
 })
 
-onMounted(() => {})
+onMounted(async () => {
+  await appStore.initSetting()
+  socketStore.connect()
+})
 </script>
 
 <template>

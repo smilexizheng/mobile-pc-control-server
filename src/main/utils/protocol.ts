@@ -16,6 +16,7 @@ const initProtocol = (): void => {
 
   // macOS 下通过协议URL启动时，主实例会通过 open-url 事件接收这个 URL
   app.on('open-url', (_, urlStr) => {
+    console.log('open-url', urlStr)
     handleUrl(urlStr)
   })
 
@@ -41,8 +42,22 @@ const handleArgv = (argv: Array<string>): void => {
 
 const handleUrl = (urlStr: string): void => {
   const urlObj = new URL(urlStr)
-  const { searchParams } = urlObj
-  console.log('searchParams', searchParams)
+  const { host, searchParams } = urlObj
+  switch (host) {
+    case 'import':
+      const d = searchParams.get('d')
+      if (d) {
+        const b64 = d.replace(/-/g, '+').replace(/_/g, '/')
+        const json = JSON.parse(Buffer.from(b64, 'base64').toString('utf8'))
+        console.log(json)
+        global.mainWindow.webContents.send('bookmark-url', json)
+      }
+
+      break
+    default:
+      console.error('未定义的拉起事件', urlStr)
+      break
+  }
 }
 
 export { initProtocol, handleArgv, handleUrl }
